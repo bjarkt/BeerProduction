@@ -1,11 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="ALL" type="Application" factoryName="Application">
-    <option name="MAIN_CLASS_NAME" value="org.grp2.ErpServer" />
-    <module name="erp" />
-    <method v="2">
-      <option name="Make" enabled="true" />
-      <option name="RunConfigurationTask" enabled="true" run_configuration_name="SCADA" run_configuration_type="Application" />
-      <option name="RunConfigurationTask" enabled="true" run_configuration_name="MES" run_configuration_type="Application" />
-    </method>
+  <configuration default="false" name="ALL" type="CompoundRunConfigurationType" factoryName="Compound Run Configuration">
+    <toRun type="Application" name="ERP" />
+    <toRun type="Application" name="MES" />
+    <toRun type="Application" name="SCADA" />
+    <method v="2" />
   </configuration>
 </component>
