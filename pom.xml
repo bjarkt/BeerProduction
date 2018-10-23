@@ -45,6 +45,13 @@
       <artifactId>sdk-client</artifactId>
       <version>0.2.4</version>
     </dependency>
+
+    <!-- https://mvnrepository.com/artifact/io.javalin/javalin -->
+    <dependency>
+      <groupId>io.javalin</groupId>
+      <artifactId>javalin</artifactId>
+      <version>2.3.0</version>
+    </dependency>
     
   </dependencies>
 
