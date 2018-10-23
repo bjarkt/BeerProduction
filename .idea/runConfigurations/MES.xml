@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="MES" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="org.grp2.MesServer" />
+    <module name="mes" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
