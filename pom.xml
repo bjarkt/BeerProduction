@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.grp2</groupId>
-  <artifactId>beer-production</artifactId>
+  <artifactId>BeerProduction</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
@@ -14,7 +14,7 @@
       <module>scada</module>
     </modules>
 
-    <name>beer-production</name>
+    <name>BeerProduction</name>
   <!-- FIXME change it to the project's website -->
   <url>http://www.example.com</url>
 
