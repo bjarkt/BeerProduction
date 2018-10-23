@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="3-MES" type="Application" factoryName="Application">
+  <configuration default="false" name="MES" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="org.grp2.MesServer" />
     <module name="mes" />
     <method v="2">

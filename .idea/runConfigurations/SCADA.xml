@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="2-SCADA" type="Application" factoryName="Application">
+  <configuration default="false" name="SCADA" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="org.grp2.ScadaServer" />
     <module name="scada" />
     <method v="2">
