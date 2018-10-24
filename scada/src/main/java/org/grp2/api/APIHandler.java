@@ -1,7 +1,7 @@
 package org.grp2.api;
 
 import io.javalin.Context;
-import org.grp2.Domain.*;
+import org.grp2.domain.*;
 import org.grp2.Javalin.Message;
 
 import java.time.LocalDateTime;

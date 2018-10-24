@@ -1,4 +1,4 @@
-package org.grp2.Domain;
+package org.grp2.domain;
 
 import java.time.LocalDateTime;
 
