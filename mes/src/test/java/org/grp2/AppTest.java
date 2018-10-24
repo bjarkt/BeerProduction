@@ -7,14 +7,12 @@ import static org.junit.Assert.assertTrue;
 /**
  * Unit test for simple MesServer.
  */
-public class AppTest 
-{
-    /**
-     * Rigorous Test :-)
-     */
-    @Test
-    public void shouldAnswerWithTrue()
-    {
-        assertTrue( true );
-    }
+public class AppTest {
+	/**
+	 * Rigorous Test :-)
+	 */
+	@Test
+	public void shouldAnswerWithTrue() {
+		assertTrue(true);
+	}
 }

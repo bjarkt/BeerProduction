@@ -126,5 +126,5 @@ yarn-error.log
 # rollup-test output
 /modules/rollup-test/dist/
 
-# Configurations
+# Excludes
 !.idea/runConfigurations/*
