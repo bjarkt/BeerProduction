@@ -1,4 +1,4 @@
-package org.sdu;
+package org.grp2;
 
 /**
  * Hello world!
