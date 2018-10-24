@@ -1,3 +1,5 @@
+-- noinspection SqlNoDataSourceInspectionForFile
+
 DROP TABLE Order_items, Orders, Recipes, Queue_items, Batches, Measurement_logs, State_time_logs;
 
 CREATE TABLE Orders (
