@@ -1,7 +1,10 @@
 package org.grp2;
 
+import org.grp2.api.API;
+
 public class ScadaServer {
 	public static void main(String[] args) {
-		System.out.println("Hello World!");
+        API api = new API();
+        api.start();
 	}
 }
