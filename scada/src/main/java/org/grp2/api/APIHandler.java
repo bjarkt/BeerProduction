@@ -1,6 +1,7 @@
 package org.grp2.api;
 
 import io.javalin.Context;
+import org.grp2.dao.ScadaDAO;
 import org.grp2.domain.*;
 import org.grp2.Javalin.Message;
 
@@ -12,9 +13,11 @@ import java.util.Map;
 
 public class APIHandler {
     // private CubeFacade facade;
+    private ScadaDAO scadaDao;
 
     public APIHandler() {
         // this.facade = facade
+        this.scadaDao = new ScadaDAO();
     }
 
     public void startNewProduction(Context context) {
@@ -60,17 +63,10 @@ public class APIHandler {
 
     public void viewLog(Context context) {
         int batchId = Integer.parseInt(context.pathParam("batch-id"));
-        List<MeasurementLog> measurementLogs = new ArrayList<>();// TODO db.getMeasurementLogs(batchId)
-        MeasurementLog measurementLog = new MeasurementLog(batchId, LocalDateTime.now(), 0, 0, 0);
-        measurementLogs.add(measurementLog);
-
-        List<StateTimeLog> stateTimeLogs = new ArrayList<>(); // TODO db.getStateTimeLogs(batchId)
-        StateTimeLog stateTimeLog = new StateTimeLog(batchId, "fixme", 0);
-        stateTimeLogs.add(stateTimeLog);
 
         Map<String, List> map = new HashMap<>();
-        map.put("MeasurementLogs", measurementLogs);
-        map.put("StateTimeLogs", stateTimeLogs);
+        map.put("MeasurementLogs", scadaDao.getMeasurementLogs(batchId));
+        map.put("StateTimeLogs", scadaDao.getStateTimeLogs(batchId));
 
         context.json(map);
     }
