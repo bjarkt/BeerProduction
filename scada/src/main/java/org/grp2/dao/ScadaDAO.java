@@ -1,24 +1,26 @@
 package org.grp2.dao;
 
 import org.grp2.database.DatabaseConnection;
-import org.grp2.database.IDatabaseCallback;
 import org.grp2.domain.*;
 import org.grp2.enums.State;
 
-import java.math.BigDecimal;
-import java.sql.*;
-import java.time.Instant;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ScadaDAO extends DatabaseConnection {
+
+    /**
+     * Get measurements logs for a batch.
+     * @param batchId batch id
+     * @return list of measurementlog
+     */
     public List<MeasurementLog> getMeasurementLogs(int batchId) {
         List<MeasurementLog> measurementLogs = new ArrayList<>();
         this.executeQuery(conn -> {
@@ -39,6 +41,11 @@ public class ScadaDAO extends DatabaseConnection {
         return measurementLogs;
     }
 
+    /**
+     * Get state time logs.
+     * @param batchId batch id
+     * @return list of state time logs
+     */
     public List<StateTimeLog> getStateTimeLogs(int batchId) {
         List<StateTimeLog> stateTimeLogs = new ArrayList<>();
         this.executeQuery(conn -> {
@@ -58,77 +65,135 @@ public class ScadaDAO extends DatabaseConnection {
         return stateTimeLogs;
     }
 
-    public LocalDateTime getBatchStartTime(int batchId){
-        AtomicReference<LocalDateTime> timestamp = new AtomicReference<>();
+    /**
+     * Get batch by id.
+     * @param batchId batch id
+     * @return a batch
+     */
+    public Batch getBatch(int batchId) {
+        AtomicReference<Batch> batch = new AtomicReference<>();
         this.executeQuery(conn -> {
-            PreparedStatement ps = conn.prepareStatement("SELECT started FROM Batches WHERE batch_id = ?");
+            PreparedStatement ps = conn.prepareStatement("SELECT beer_name, order_number, batch_id, started, " +
+                                                        "finished, accepted, defect FROM batches WHERE batch_id = ?");
             ps.setInt(1, batchId);
 
             ResultSet rs = ps.executeQuery();
 
-            while(rs.next()) {
-                LocalDateTime temp = rs.getTimestamp("started").toLocalDateTime();
-                timestamp.set(temp);
+            while (rs.next()) {
+                Batch tmp = batchFromResultSet(rs, batchId);
+                batch.set(tmp);
             }
         });
-        return timestamp.get();
+
+        return batch.get();
     }
 
-    public int createBatch(ProductionInformation productInfo){
-        AtomicInteger batchId = new AtomicInteger();
-        AtomicBoolean batchAlreadyHasProduct = new AtomicBoolean(false);
-
+    /**
+     * Get items in queue_items.
+     * @return list of {@link ProductionInformation} objects
+     */
+    public List<ProductionInformation> getQueueItems() {
+        List<ProductionInformation> items = new ArrayList<>();
         this.executeQuery(conn -> {
-            PreparedStatement ps = conn.prepareStatement("SELECT beer_name FROM batches WHERE order_number = ?");
-            ps.setInt(1, productInfo.getOrderNumber());
+            PreparedStatement ps = conn.prepareStatement("SELECT batches_id, quantity, machine_speed, recipe_name, " +
+                    "order_number FROM queue_items ORDER BY order_number");
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                String beerName = rs.getString("beer_name");
-                if (productInfo.getRecipeName().equals(beerName)) {
-                    batchAlreadyHasProduct.set(true);
-                }
+                ProductionInformation temp = new ProductionInformation(rs.getString("recipe_name"), rs.getInt("order_number"),
+                        rs.getInt("machine_speed"), rs.getInt("quantity"));
+                temp.setBatchId(rs.getInt("batches_id"));
+
+                items.add(temp);
             }
         });
 
-        if (batchAlreadyHasProduct.get()) { // Order with that beer already exists in the database
-            return -1;
-        }
-
-        this.executeQuery(conn -> {
-            PreparedStatement ps = conn.prepareStatement("INSERT INTO queue_items VALUES (default, ?, ?, ?, ?) " +
-                                                            "RETURNING batches_id", Statement.RETURN_GENERATED_KEYS);
-            ps.setInt(1, productInfo.getQuantity());
-            ps.setInt(2, productInfo.getMachineSpeed());
-            ps.setString(3, productInfo.getRecipeName());
-            ps.setInt(4, productInfo.getOrderNumber());
-            ps.execute();
-
-            ResultSet rs = ps.getGeneratedKeys();
-            while (rs.next()) {
-                batchId.set(rs.getInt(1));
-            }
-        });
-
-        this.executeQuery(conn -> {
-            PreparedStatement ps = conn.prepareStatement("INSERT INTO batches VALUES" +
-                                                             "(?, ?, ?, now(), null, null, null) ");
-            ps.setString(1, productInfo.getRecipeName());
-            ps.setInt(2, productInfo.getOrderNumber());
-            ps.setInt(3, batchId.get());
-            ps.execute();
-        });
-
-        return batchId.get();
+        return items;
     }
 
+    /**
+     * Get items from the queue, and add the first as a batch, if the machine is ready.
+     * @return
+     */
+    public ProductionInformation startNextBatch(){
+        List<ProductionInformation> queueItems = getQueueItems();
+        Optional<ProductionInformation> productionInformation = queueItems.stream().findFirst();
+        boolean batchRunning = true;
+
+        // is the machine ready? (no currently running batch)
+        if (this.getCurrentBatch() == null) {
+            productionInformation.ifPresent(this::addBatchAndRemoveFromQueue);
+            batchRunning = false;
+        }
+
+        if (!batchRunning && productionInformation.isPresent()) { // no batch is running, and we got an item from the queue
+            return productionInformation.get(); // return the item, signalling that it is ready to start
+        } else {
+            return null; // no item, cannot start
+        }
+    }
+
+    /**
+     * Add {@link ProductionInformation} list to queue_items.
+     * @param productionInformations list of production information
+     */
+    public void addToQueueItems(List<ProductionInformation> productionInformations) {
+        String sql = "INSERT INTO queue_items VALUES (DEFAULT, ?, ?, ?, ?)";
+
+        this.executeQuery(conn -> {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            for (ProductionInformation productInfo : productionInformations) {
+                ps.setInt(1, productInfo.getQuantity());
+                ps.setInt(2, productInfo.getMachineSpeed());
+                ps.setString(3, productInfo.getRecipeName());
+                ps.setInt(4, productInfo.getOrderNumber());
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        });
+    }
+
+    /**
+     * Add a {@link ProductionInformation} from the queue to the batches table, and remove it from the queue.
+     * @param productionInformation the item to add and remove
+     */
+    private void addBatchAndRemoveFromQueue(ProductionInformation productionInformation) {
+        this.executeQuery(conn -> {
+            PreparedStatement ps = conn.prepareStatement("INSERT INTO batches VALUES (?, ?, ?, now(), null, null, null)");
+            ps.setString(1, productionInformation.getRecipeName());
+            ps.setInt(2, productionInformation.getOrderNumber());
+            ps.setInt(3, productionInformation.getBatchId());
+
+            ps.executeUpdate();
+        });
+        this.deleteQueueItem(productionInformation);
+    }
+
+    /**
+     * Delete an item from the queue.
+     * @param productionInformation item to remove
+     */
+    private void deleteQueueItem(ProductionInformation productionInformation) {
+        this.executeQuery(conn -> {
+            PreparedStatement ps = conn.prepareStatement("DELETE FROM queue_items WHERE recipe_name = ? AND order_number = ?");
+            ps.setString(1, productionInformation.getRecipeName());
+            ps.setInt(2, productionInformation.getOrderNumber());
+
+            ps.executeUpdate();
+        });
+    }
+
+    /**
+     * Get a recipe by beer name.
+     * @param name name of beer
+     * @return
+     */
     public Recipe getRecipe(String name){
         AtomicReference<Recipe> recipe = new AtomicReference<>();
 
         this.executeQuery(conn -> {
             PreparedStatement ps = conn.prepareStatement("SELECT id, name, min_speed, max_speed " +
                                                             "FROM recipes WHERE name = ?");
-
             ps.setString(1, name);
 
             ResultSet rs = ps.executeQuery();
@@ -140,7 +205,71 @@ public class ScadaDAO extends DatabaseConnection {
                 recipe.set(temp);
             }
         });
+
         return recipe.get();
     }
 
+    /**
+     * Get the currently executing batch.
+     * @return the executing batch
+     */
+    public Batch getCurrentBatch() {
+        AtomicReference<Batch> batch = new AtomicReference<>();
+        this.executeQuery(conn -> {
+            PreparedStatement ps = conn.prepareStatement("SELECT beer_name, order_number, batch_id, started, " +
+                    "finished, accepted, defect FROM batches WHERE finished IS NULL ORDER BY batch_id DESC LIMIT 1");
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Batch tmp = batchFromResultSet(rs);
+                batch.set(tmp);
+            }
+        });
+
+        return batch.get();
+    }
+
+    /**
+     * Set the finished time of the running batch.
+     */
+    public void updateCurrentBatchFinished() {
+        Batch currentBatch = this.getCurrentBatch();
+        if (currentBatch != null) {
+            this.executeQuery(conn -> {
+                PreparedStatement ps = conn.prepareStatement("UPDATE batches SET finished = now() WHERE batch_id = ?");
+                ps.setInt(1, currentBatch.getBatchId());
+
+                ps.executeUpdate();
+            });
+        }
+    }
+
+    /**
+     * Create a batch from a result set.
+     * @param rs
+     * @return
+     * @throws SQLException
+     */
+    private Batch batchFromResultSet(ResultSet rs) throws SQLException {
+        return batchFromResultSet(rs, rs.getInt("batch_id"));
+    }
+
+    /**
+     * Create a batch from a result set.
+     * @param rs
+     * @return
+     * @throws SQLException
+     */
+    private Batch batchFromResultSet(ResultSet rs, int batchId) throws SQLException {
+        String beerName = rs.getString("beer_name");
+        int orderNumber = rs.getInt("order_number");
+        LocalDateTime started = rs.getTimestamp("started").toLocalDateTime();
+        Timestamp timeStampFinished = rs.getTimestamp("finished");
+        LocalDateTime finished = null;
+        if (timeStampFinished != null) {
+            finished = timeStampFinished.toLocalDateTime();
+        }
+        int accepted = rs.getInt("accepted");
+        int defect = rs.getInt("defect");
+        return new Batch(beerName, orderNumber, batchId, started, finished, accepted, defect);
+    }
 }

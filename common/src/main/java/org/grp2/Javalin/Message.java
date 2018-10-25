@@ -9,6 +9,11 @@ public class Message {
         this.message = message;
     }
 
+    public void set(int status, String message) {
+        this.status = status;
+        this.message = message;
+    }
+
     public int getStatus() {
         return status;
     }
