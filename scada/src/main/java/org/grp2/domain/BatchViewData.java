@@ -1,11 +1,11 @@
 package org.grp2.domain;
 
-public class BatchData {
+public class BatchViewData {
     private int produced;
     private int acceptable;
     private int defect;
 
-    public BatchData(int produced, int acceptable, int defect) {
+    public BatchViewData(int produced, int acceptable, int defect) {
         this.produced = produced;
         this.acceptable = acceptable;
         this.defect = defect;

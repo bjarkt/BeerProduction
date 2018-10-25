@@ -1,11 +1,11 @@
 package org.grp2.domain;
 
-public class BatchOrder {
+public class BatchViewOrder {
     private int batchId;
     private int amountToProduce;
     private int productsPerMinute;
 
-    public BatchOrder(int batchId, int amountToProduce, int productsPerMinute) {
+    public BatchViewOrder(int batchId, int amountToProduce, int productsPerMinute) {
         this.batchId = batchId;
         this.amountToProduce = amountToProduce;
         this.productsPerMinute = productsPerMinute;
