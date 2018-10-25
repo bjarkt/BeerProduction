@@ -159,7 +159,7 @@ public class HardwareProvider implements IHardwareProvider {
 		}
 
 		try {
-			Thread.sleep(25);
+			Thread.sleep(75);
 		} catch(InterruptedException e) {
 			e.printStackTrace();
 		}
