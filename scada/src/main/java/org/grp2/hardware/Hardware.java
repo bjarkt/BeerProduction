@@ -26,16 +26,30 @@ public class Hardware implements IHardware {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public IHardwareProvider getProvider() {
 		return provider;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public IHardwareSubcriber getSubcriber() {
 		return subcriber;
 	}
 
+	/**
+	 * Creates client and connect it to given URL. <p></p>
+	 * {@link IHardware#CUBE_URL} or {@link IHardware#SIMULATION_URL}
+	 * @param endpointUrl any URL
+	 * @return the created OPC-UA client
+	 * @throws ExecutionException
+	 * @throws InterruptedException
+	 */
 	private OpcUaClient buildClient(String endpointUrl) throws ExecutionException, InterruptedException {
 		EndpointDescription[] endpoints = UaTcpStackClient.getEndpoints(endpointUrl).get();
 

@@ -26,6 +26,9 @@ public class HardwareSubcriber implements IHardwareSubcriber {
 		client.getSubscriptionManager().clearSubscriptions();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void subcribe(CubeNodeId node, SubcribeCallback callback, int interval) {
 		ReadValueId readValueId =
