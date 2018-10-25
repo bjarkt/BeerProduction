@@ -2,15 +2,11 @@ package org.grp2.dao;
 
 import org.grp2.database.DatabaseConnection;
 import org.grp2.database.IDatabaseCallback;
-import org.grp2.domain.MeasurementLog;
-import org.grp2.domain.Measurements;
-import org.grp2.domain.StateTimeLog;
+import org.grp2.domain.*;
 import org.grp2.enums.State;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.math.BigDecimal;
+import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -74,6 +70,46 @@ public class ScadaDAO extends DatabaseConnection {
             }
         });
         return timestamp.get();
+    }
+
+    public int createBatch(ProductionInformation productInfo){
+        AtomicReference<BigDecimal> batchId = new AtomicReference<>();
+        this.executeQuery(conn -> {
+            PreparedStatement ps = conn.prepareStatement("INSERT INTO batches VALUES" +
+                                                             "(?, ?, default, now(), null, null, null), " +
+                                                            "RETURNING batch_id", Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, productInfo.getRecipeName());
+            ps.setString(2, String.valueOf(productInfo.getOrderNumber()));
+            ps.execute();
+            ResultSet rs = ps.getGeneratedKeys();
+
+            while(rs.next()){
+                batchId.set(rs.getBigDecimal(1));
+            }
+
+        });
+        return batchId.get().intValue();
+    }
+
+    public Recipe getRecipe(String name){
+        AtomicReference<Recipe> recipe = new AtomicReference<>();
+
+        this.executeQuery(conn -> {
+            PreparedStatement ps = conn.prepareStatement("SELECT id, name, min_speed, max_speed " +
+                                                            "FROM recipes WHERE name = ?");
+
+            ps.setString(1, name);
+
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()){
+                Recipe temp = new Recipe(rs.getInt("id"), rs.getString("name"),
+                        rs.getInt("min_speed"), rs.getInt("max_speed"));
+
+                recipe.set(temp);
+            }
+        });
+        return recipe.get();
     }
 
 }
