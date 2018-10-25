@@ -14,6 +14,8 @@ import java.time.ZonedDateTime;
 import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ScadaDAO extends DatabaseConnection {
@@ -73,22 +75,51 @@ public class ScadaDAO extends DatabaseConnection {
     }
 
     public int createBatch(ProductionInformation productInfo){
-        AtomicReference<BigDecimal> batchId = new AtomicReference<>();
+        AtomicInteger batchId = new AtomicInteger();
+        AtomicBoolean batchAlreadyHasProduct = new AtomicBoolean(false);
+
+        this.executeQuery(conn -> {
+            PreparedStatement ps = conn.prepareStatement("SELECT beer_name FROM batches WHERE order_number = ?");
+            ps.setInt(1, productInfo.getOrderNumber());
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                String beerName = rs.getString("beer_name");
+                if (productInfo.getRecipeName().equals(beerName)) {
+                    batchAlreadyHasProduct.set(true);
+                }
+            }
+        });
+
+        if (batchAlreadyHasProduct.get()) { // Order with that beer already exists in the database
+            return -1;
+        }
+
+        this.executeQuery(conn -> {
+            PreparedStatement ps = conn.prepareStatement("INSERT INTO queue_items VALUES (default, ?, ?, ?, ?) " +
+                                                            "RETURNING batches_id", Statement.RETURN_GENERATED_KEYS);
+            ps.setInt(1, productInfo.getQuantity());
+            ps.setInt(2, productInfo.getMachineSpeed());
+            ps.setString(3, productInfo.getRecipeName());
+            ps.setInt(4, productInfo.getOrderNumber());
+            ps.execute();
+
+            ResultSet rs = ps.getGeneratedKeys();
+            while (rs.next()) {
+                batchId.set(rs.getInt(1));
+            }
+        });
+
         this.executeQuery(conn -> {
             PreparedStatement ps = conn.prepareStatement("INSERT INTO batches VALUES" +
-                                                             "(?, ?, default, now(), null, null, null), " +
-                                                            "RETURNING batch_id", Statement.RETURN_GENERATED_KEYS);
+                                                             "(?, ?, ?, now(), null, null, null) ");
             ps.setString(1, productInfo.getRecipeName());
-            ps.setString(2, String.valueOf(productInfo.getOrderNumber()));
+            ps.setInt(2, productInfo.getOrderNumber());
+            ps.setInt(3, batchId.get());
             ps.execute();
-            ResultSet rs = ps.getGeneratedKeys();
-
-            while(rs.next()){
-                batchId.set(rs.getBigDecimal(1));
-            }
-
         });
-        return batchId.get().intValue();
+
+        return batchId.get();
     }
 
     public Recipe getRecipe(String name){
