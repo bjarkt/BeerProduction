@@ -41,7 +41,7 @@ public class ScadaDAO extends DatabaseConnection {
     }
 
     public List<StateTimeLog> getStateTimeLogs(int batchId) {
-        List<StateTimeLog> stateTimeLogs = new ArrayList<>(); // TODO db.getStateTimeLogs(batchId)
+        List<StateTimeLog> stateTimeLogs = new ArrayList<>();
         this.executeQuery(conn -> {
             PreparedStatement ps = conn.prepareStatement("SELECT batch_id, phase, time_elapsed FROM state_time_logs WHERE batch_id = ?");
             ps.setInt(1, batchId);
