@@ -63,42 +63,23 @@ public class APIHandler {
         BatchOrder batchorder = new BatchOrder(0,0,0);
         BatchData batchdata = new BatchData(0,0,0);
 
-        hs.subcribe(CubeNodeId.READ_TEMPERAURE, value ->{
-            measurements.setTemperature(new Float((float)value).doubleValue());
-        },1);
 
-        hs.subcribe(CubeNodeId.READ_HUMIDITY, value ->{
-            measurements.setHumidity(new Float((float)value).doubleValue());
-        },1);
+        measurements.setTemperature(hardwareProvider.getTemperature());
+        measurements.setHumidity(hardwareProvider.getHumidity());
+        measurements.setVibration(hardwareProvider.getVibration());
 
-        hs.subcribe(CubeNodeId.READ_VIBRATION, value ->{
-            measurements.setVibration(new Float((float)value).doubleValue());
-        },1);
+        batchorder.setBatchId((int) hardwareProvider.getBatchId());
+        batchorder.setAmountToProduce((int) hardwareProvider.getAmountToProduce());
 
-        hs.subcribe(CubeNodeId.READ_BATCH_ID, value ->{
-            batchorder.setBatchId(Math.round((Float) value));
-        },1);
+        LocalDateTime started = scadaDao.getBatchStartTime(batchorder.getBatchId());
+        LocalDateTime now = LocalDateTime.now();
+        long minutes = started.until(now, ChronoUnit.MINUTES);
+        batchorder.setProductsPerMinute((int)((hardwareProvider.getCurrentBeersProduced()) / minutes));
 
-        hs.subcribe(CubeNodeId.READ_AMOUNT_TO_PRODUCE, value ->{
-            batchorder.setAmountToProduce(Math.round((Float) value));
-            LocalDateTime started = scadaDao.getBatchStartTime(batchorder.getBatchId());
-            LocalDateTime now = LocalDateTime.now();
-            long minutes = started.until(now, ChronoUnit.MINUTES);
-            batchorder.setProductsPerMinute((int)((batchorder.getAmountToProduce()) / minutes));
-        },1);
+        batchdata.setProduced(hardwareProvider.getCurrentBeersProduced());
+        batchdata.setAcceptable(hardwareProvider.getAcceptedBeersProduced());
+        batchdata.setDefect(hardwareProvider.getDefectiveBeersProduced());
 
-
-        hs.subcribe(CubeNodeId.READ_CURRENT_PRODUCED, value ->{
-            System.out.println(value);
-            batchdata.setProduced((Integer) value);
-        },1);
-
-
-        hs.subcribe(CubeNodeId.READ_CURRENT_DEFECTIVE, value ->{
-            int accepted = batchorder.getAmountToProduce()- (Integer) value;
-            batchdata.setAcceptable(accepted);
-            batchdata.setDefect((Integer) value);
-        },1);
 
         map.put("Measurements", measurements);
         map.put("BatchOrder", batchorder);
