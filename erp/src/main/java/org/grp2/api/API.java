@@ -19,8 +19,10 @@ public class API {
         app.routes(() -> {
             path("/api", () -> {
                 post("/create-order", handler::createOrder);
+                post("/add-order-item/:order-id/:beer-name/:quantity", handler::addOrderItem);
                 post("/delete-order/:order-id", handler::deleteOrder);
-                post("/edit-order/:order-id", handler::editOrder);
+                post("/edit-order-item/", handler::editOrderItem);
+                post("/delete-order-item/:order-id/:beer-name", handler::deleteOrderItem);
                 get("/view-order/:order-id", handler::viewOrder);
             });
         });
