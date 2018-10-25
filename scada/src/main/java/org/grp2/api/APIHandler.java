@@ -74,7 +74,7 @@ public class APIHandler {
         LocalDateTime started = scadaDao.getBatchStartTime(batchorder.getBatchId());
         LocalDateTime now = LocalDateTime.now();
         long minutes = started.until(now, ChronoUnit.MINUTES);
-        batchorder.setProductsPerMinute((int)((hardwareProvider.getCurrentBeersProduced()) / minutes));
+        batchorder.setProductsPerMinute((int)((batchorder.getAmountToProduce()) / minutes));
 
         batchdata.setProduced(hardwareProvider.getCurrentBeersProduced());
         batchdata.setAcceptable(hardwareProvider.getAcceptedBeersProduced());
