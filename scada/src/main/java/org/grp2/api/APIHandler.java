@@ -4,8 +4,12 @@ import io.javalin.Context;
 import org.grp2.dao.ScadaDAO;
 import org.grp2.domain.*;
 import org.grp2.Javalin.Message;
+import org.grp2.hardware.CubeNodeId;
+import org.grp2.hardware.Hardware;
+import org.grp2.hardware.HardwareSubcriber;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +18,7 @@ import java.util.Map;
 public class APIHandler {
     // private CubeFacade facade;
     private ScadaDAO scadaDao;
+    private HardwareSubcriber hs;
 
     public APIHandler() {
         // this.facade = facade
@@ -31,6 +36,7 @@ public class APIHandler {
         switch (choice) {
             case "start":
                 //this.facade.start()
+
             break;
             case "stop":
                 //this.facade.start()
@@ -54,9 +60,54 @@ public class APIHandler {
 
     public void viewScreen(Context context) {
         Map<String, Object> map = new HashMap<>();
-        map.put("Measurements", new Measurements(0, 0, 0)); // TODO hent fra cube
-        map.put("BatchOrder", new BatchOrder(0, 0, 0)); // TODO
-        map.put("BatchData", new BatchData(0, 0, 0)); // TODO
+        Measurements measurements = new Measurements(0,0,0);
+        BatchOrder batchorder = new BatchOrder(0,0,0);
+        BatchData batchdata = new BatchData(0,0,0);
+
+
+        hs.subcribe(CubeNodeId.READ_TEMPERAURE, value ->{
+            measurements.setTemperature((Double) value);
+        },1);
+
+        hs.subcribe(CubeNodeId.READ_HUMIDITY, value ->{
+            measurements.setHumidity((Double) value);
+        },1);
+
+        hs.subcribe(CubeNodeId.READ_VIBRATION, value ->{
+            measurements.setVibration((Double) value);
+        },1);
+
+        hs.subcribe(CubeNodeId.READ_BATCH_ID, value ->{
+            batchorder.setBatchId((Integer) value);
+        },1);
+
+        hs.subcribe(CubeNodeId.READ_AMOUNT_TO_PRODUCE, value ->{
+            batchorder.setAmountToProduce((Integer) value);
+            LocalDateTime started = scadaDao.getBatchStartTime(batchorder.getBatchId());
+            LocalDateTime now = LocalDateTime.now();
+            long minutes = started.until(now, ChronoUnit.MINUTES);
+            batchorder.setProductsPerMinute((int)((batchorder.getAmountToProduce()) / minutes));
+        },1);
+
+
+        hs.subcribe(CubeNodeId.READ_CURRENT_PRODUCED, value ->{
+            batchdata.setProduced((Integer) value);
+        },1);
+
+
+        hs.subcribe(CubeNodeId.READ_CURRENT_DEFECTIVE, value ->{
+            int accepted = batchorder.getAmountToProduce()- (Integer) value;
+            batchdata.setAcceptable(accepted);
+            batchdata.setDefect((Integer) value);
+        },1);
+
+        map.put("Measurements", measurements);
+        map.put("BatchOrder", batchorder);
+        map.put("BatchData", batchdata);
+
+
+
+
 
         context.json(map);
     }

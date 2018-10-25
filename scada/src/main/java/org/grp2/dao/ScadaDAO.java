@@ -18,6 +18,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ScadaDAO extends DatabaseConnection {
     public List<MeasurementLog> getMeasurementLogs(int batchId) {
@@ -57,6 +58,22 @@ public class ScadaDAO extends DatabaseConnection {
         });
 
         return stateTimeLogs;
+    }
+
+    public LocalDateTime getBatchStartTime(int batchId){
+        AtomicReference<LocalDateTime> timestamp = new AtomicReference<>();
+        this.executeQuery(conn -> {
+            PreparedStatement ps = conn.prepareStatement("SELECT started FROM Batches WHERE batch_id = ?");
+            ps.setInt(1, batchId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()) {
+                LocalDateTime temp = rs.getTimestamp("started").toLocalDateTime();
+                timestamp.set(temp);
+            }
+        });
+        return timestamp.get();
     }
 
 }
