@@ -29,19 +29,25 @@ public class APIHandler {
         ProductionInformation pi = context.bodyAsClass(ProductionInformation.class);
         int batchId = scadaDao.createBatch(pi);
 
-        Recipe recipe = scadaDao.getRecipe(pi.getRecipeName());
-
-        hardwareProvider.setBatchId(batchId);
-        hardwareProvider.setProduct(recipe.getId());
-        hardwareProvider.setAmountToProduce(pi.getQuantity());
-        hardwareProvider.setMachSpeed(pi.getMachineSpeed());
-        if(!pi.validateMachSpeed(recipe.getMinSpeed(), recipe.getMaxSpeed())){
+        if (batchId == -1) {
             message.setStatus(422);
-            message.setMessage("Invalid Speed");
+            message.setMessage("Order already has that type of beer");
+        } else {
+            Recipe recipe = scadaDao.getRecipe(pi.getRecipeName());
+            pi.setBatchId(batchId);
+
+            hardwareProvider.setBatchId(batchId);
+            hardwareProvider.setProduct(recipe.getId());
+            hardwareProvider.setAmountToProduce(pi.getQuantity());
+            hardwareProvider.setMachSpeed(pi.getMachineSpeed());
+            if(!pi.validateMachSpeed(recipe.getMinSpeed(), recipe.getMaxSpeed())){
+                message.setStatus(422);
+                message.setMessage("Invalid Speed");
+            }
+            hardwareProvider.stop();
+            hardwareProvider.reset();
+            hardwareProvider.start();
         }
-        hardwareProvider.stop();
-        hardwareProvider.reset();
-        hardwareProvider.start();
 
         context.json(message);
     }

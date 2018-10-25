@@ -7,6 +7,8 @@ public class ProductionInformation {
     private int quantity;
     private Integer batchId;
 
+    public ProductionInformation() { }
+
     public ProductionInformation(String recipeName, int orderNumber, int machineSpeed, int quantity) {
         this.recipeName = recipeName;
         this.orderNumber = orderNumber;
