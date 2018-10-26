@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.Context;
 import org.grp2.dao.ScadaDAO;
 import org.grp2.domain.*;
-import org.grp2.Javalin.Message;
+import org.grp2.javalin.Message;
 import org.grp2.enums.State;
 import org.grp2.hardware.*;
 import org.grp2.shared.Batch;
@@ -23,13 +23,13 @@ import java.util.concurrent.atomic.AtomicReference;
 public class APIHandler {
     private ScadaDAO scadaDao;
     private IHardwareProvider hardwareProvider;
-    private IHardwareSubcriber hardwareSubcriber;
+    private IHardwareSubscriber hardwareSubscriber;
     private ObjectMapper mapper;
 
     public APIHandler(IHardware hardware) {
         this.scadaDao = new ScadaDAO();
         this.hardwareProvider = hardware.getProvider();
-        this.hardwareSubcriber = hardware.getSubcriber();
+        this.hardwareSubscriber = hardware.getSubscriber();
         this.mapper = new ObjectMapper();
     }
 
@@ -37,7 +37,7 @@ public class APIHandler {
         AtomicReference<LocalDateTime> now = new AtomicReference<>(LocalDateTime.now());
         AtomicReference<State> previousState = new AtomicReference<>();
         AtomicReference<State> state = new AtomicReference<>();
-        this.hardwareSubcriber.subcribe(CubeNodeId.READ_STATE, value -> {
+        this.hardwareSubscriber.subscribe(CubeNodeId.READ_STATE, value -> {
             LocalDateTime stateChanged = LocalDateTime.now();
             long seconds = ChronoUnit.SECONDS.between(now.get(), stateChanged);
 
@@ -65,19 +65,19 @@ public class APIHandler {
         }, 1000);
 
         // Collect measurements
-        this.hardwareSubcriber.subcribe(CubeNodeId.READ_TEMPERAURE, temperatureFloat -> {
+        this.hardwareSubscriber.subscribe(CubeNodeId.READ_TEMPERAURE, temperatureFloat -> {
             double temperature = ((Float) temperatureFloat).doubleValue();
-            this.hardwareSubcriber.subcribe(CubeNodeId.READ_HUMIDITY, humidityFloat -> {
+            this.hardwareSubscriber.subscribe(CubeNodeId.READ_HUMIDITY, humidityFloat -> {
                 double humidity = ((Float) humidityFloat).doubleValue();
                 scadaDao.updateMeasurementLogs(temperature, humidity);
             }, 1000);
         }, 1000);
 
         // Collecit accepted and defected
-        this.hardwareSubcriber.subcribe(CubeNodeId.READ_CURRENT_PRODUCED, produced -> {
+        this.hardwareSubscriber.subscribe(CubeNodeId.READ_CURRENT_PRODUCED, produced -> {
             scadaDao.updateCurrentBatchProduced((Integer) produced);
         }, 1000);
-        this.hardwareSubcriber.subcribe(CubeNodeId.READ_CURRENT_DEFECTIVE, defects -> {
+        this.hardwareSubscriber.subscribe(CubeNodeId.READ_CURRENT_DEFECTIVE, defects -> {
             scadaDao.updateCurrentBatchDefects((Integer) defects);
         }, 1000);
     }

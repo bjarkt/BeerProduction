@@ -1,4 +1,4 @@
-package org.grp2.Javalin;
+package org.grp2.javalin;
 
 public class Message {
     private int status;

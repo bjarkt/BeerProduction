@@ -1,11 +1,9 @@
 package org.grp2.printmanager;
 
-import com.itextpdf.io.font.FontProgramFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
-import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
@@ -108,7 +106,7 @@ public class SimplePdfPrinter1 implements IPrintManager {
 
 		for(MeasurementLog log : logs) {
 			tMeasurements.startNewRow()
-					.addCell(log.getMeasuremenTime().format(dtf))
+					.addCell(log.getMeasurementTime().format(dtf))
 					.addCell(df.format(log.getMeasurements().getTemperature()))
 					.addCell(df.format(log.getMeasurements().getHumidity()));
 					//.addCell(String.valueOf(log.getMeasurements().getVibration()));
