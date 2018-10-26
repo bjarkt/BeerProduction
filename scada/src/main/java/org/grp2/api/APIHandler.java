@@ -11,9 +11,11 @@ import org.grp2.hardware.*;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class APIHandler {
     private ScadaDAO scadaDao;
@@ -29,11 +31,22 @@ public class APIHandler {
     }
 
     public void listenForStateChanges() {
+        AtomicReference<LocalDateTime> now = new AtomicReference<>(LocalDateTime.now());
+        AtomicReference<State> previousState = new AtomicReference<>();
+        AtomicReference<State> state = new AtomicReference<>();
         this.hardwareSubcriber.subcribe(CubeNodeId.READ_STATE, value -> {
-            State state = State.fromCode((int) value);
-            System.out.println("CURRENT STATE: " + state);
-            if (state != null) {
-                switch (state) {
+            LocalDateTime stateChanged = LocalDateTime.now();
+            long seconds = ChronoUnit.SECONDS.between(now.get(), stateChanged);
+
+            if (previousState.get() != State.EXECUTE) { // update of EXECUTE state is handled in completeBatch();
+                scadaDao.updateStateTimeLogs(previousState.get(), Math.toIntExact(seconds));
+            }
+            previousState.set(state.get());
+
+            state.set(State.fromCode((int) value));
+            now.set(LocalDateTime.now());
+            if (state.get() != null) {
+                switch (state.get()) {
                     case IDLE:
                         try {
                             this.startBatch();
@@ -42,13 +55,29 @@ public class APIHandler {
                         }
                         break;
                     case COMPLETE:
-                        this.completeBatch();
-                        break;
-                    case EXECUTE:
-                        // collect data
+                        this.completeBatch(previousState.get(), Math.toIntExact(seconds));
                         break;
                 }
             }
+        }, 1000);
+
+        // Collect measurements
+        this.hardwareSubcriber.subcribe(CubeNodeId.READ_TEMPERAURE, temperatureFloat -> {
+            double temperature = ((Float) temperatureFloat).doubleValue();
+            this.hardwareSubcriber.subcribe(CubeNodeId.READ_HUMIDITY, humidityFloat -> {
+                double humidity = ((Float) humidityFloat).doubleValue();
+                scadaDao.updateMeasurementLogs(temperature, humidity);
+            }, 1000);
+        }, 1000);
+
+        // Collecit accepted and defected
+        this.hardwareSubcriber.subcribe(CubeNodeId.READ_CURRENT_PRODUCED, produced -> {
+            System.out.println("produced: " + produced);
+            scadaDao.updateCurrentBatchProduced((Integer) produced);
+        }, 1000);
+        this.hardwareSubcriber.subcribe(CubeNodeId.READ_CURRENT_DEFECTIVE, defects -> {
+            System.out.println("defects: " + defects);
+            scadaDao.updateCurrentBatchDefects((Integer) defects);
         }, 1000);
     }
 
@@ -173,7 +202,10 @@ public class APIHandler {
         return message;
     }
 
-    private void completeBatch() {
+    private void completeBatch(State state, int timeElapsed) {
+        scadaDao.updateStateTimeLogs(state, timeElapsed);
+        scadaDao.updateCurrentBatchProduced(hardwareProvider.getAcceptedBeersProduced());
+        scadaDao.updateCurrentBatchDefects(hardwareProvider.getDefectiveBeersProduced());
         scadaDao.updateCurrentBatchFinished();
         hardwareProvider.stop();
         hardwareProvider.reset();

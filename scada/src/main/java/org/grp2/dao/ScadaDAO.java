@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ScadaDAO extends DatabaseConnection {
@@ -271,5 +272,101 @@ public class ScadaDAO extends DatabaseConnection {
         int accepted = rs.getInt("accepted");
         int defect = rs.getInt("defect");
         return new Batch(beerName, orderNumber, batchId, started, finished, accepted, defect);
+    }
+
+    /**
+     * Adds a new row to the measurement logs, for the current batch.
+     * @param temperature temperature
+     * @param humidity humidity
+     */
+    public void updateMeasurementLogs(double temperature, double humidity) {
+        Batch currentBatch = this.getCurrentBatch();
+
+        if (currentBatch != null) {
+            this.executeQuery(conn -> {
+                PreparedStatement ps = conn.prepareStatement("INSERT INTO measurement_logs VALUES (?, now(), ?, ?)");
+                ps.setInt(1, currentBatch.getBatchId());
+                ps.setDouble(2, temperature);
+                ps.setDouble(3, humidity);
+
+                ps.executeUpdate();
+            });
+        }
+    }
+
+    /**
+     * Update the state time logs, for the current batch.
+     * @param state the state
+     * @param timeElapsed how much time spent in that state
+     */
+    public void updateStateTimeLogs(State state, int timeElapsed) {
+        Batch currentBatch = this.getCurrentBatch();
+
+        if (currentBatch != null && state != null) {
+            AtomicInteger currentSeconds = new AtomicInteger(-1);
+            this.executeQuery(conn -> {
+                PreparedStatement ps = conn.prepareStatement("SELECT time_elapsed FROM state_time_logs WHERE batch_id = ? and phase = ?");
+                ps.setInt(1, currentBatch.getBatchId());
+                ps.setInt(2, state.getValue());
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    currentSeconds.set(rs.getInt("time_elapsed"));
+                }
+            });
+
+
+            this.executeQuery(conn -> {
+                PreparedStatement ps;
+                if (currentSeconds.get() == -1) { // phase does not exist for that batch id
+                    ps = conn.prepareStatement("INSERT INTO state_time_logs VALUES (?, ?, ?)");
+                    ps.setInt(1, currentBatch.getBatchId());
+                    ps.setInt(2, state.getValue());
+                    ps.setInt(3, timeElapsed);
+                } else { // phase exists for that batch id
+                    ps = conn.prepareStatement("UPDATE state_time_logs SET time_elapsed = ? WHERE batch_id = ? AND phase = ?");
+                    ps.setInt(1, timeElapsed + currentSeconds.get());
+                    ps.setInt(2, currentBatch.getBatchId());
+                    ps.setInt(3, state.getValue());
+                }
+
+                ps.executeUpdate();
+            });
+        }
+    }
+
+    /**
+     * Update the produced column for the current batch.
+     * @param accepted how many accepted
+     */
+    public void updateCurrentBatchProduced(int accepted) {
+        Batch currentBatch = getCurrentBatch();
+
+        if (currentBatch != null) {
+            this.executeQuery(conn -> {
+                PreparedStatement ps = conn.prepareStatement("UPDATE batches SET accepted = ? WHERE batch_id = ?");
+                ps.setInt(1, accepted);
+                ps.setInt(2, currentBatch.getBatchId());
+
+                ps.executeUpdate();
+            });
+        }
+    }
+
+    /**
+     * Update the defects column for the current batch.
+     * @param defects how many defects
+     */
+    public void updateCurrentBatchDefects(int defects) {
+        Batch currentBatch = getCurrentBatch();
+
+        if (currentBatch != null) {
+            this.executeQuery(conn -> {
+                PreparedStatement ps = conn.prepareStatement("UPDATE batches SET defect = ? WHERE batch_id = ?");
+                ps.setInt(1, defects);
+                ps.setInt(2, currentBatch.getBatchId());
+
+                ps.executeUpdate();
+            });
+        }
     }
 }
