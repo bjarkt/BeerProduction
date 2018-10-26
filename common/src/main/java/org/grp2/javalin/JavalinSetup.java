@@ -1,4 +1,4 @@
-package org.grp2.Javalin;
+package org.grp2.javalin;
 
 import io.javalin.Javalin;
 

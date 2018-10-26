@@ -86,7 +86,7 @@ public class SimplePdfPrinter2 implements IPrintManager {
 			measurementTable.addCell(cellBold.clone(true).add(new Paragraph("Humidity")).setTextAlignment(TextAlignment.CENTER));
 
 			for (MeasurementLog log : logs) {
-				measurementTable.addCell(log.getMeasuremenTime().format(dateTimeFormatter)).setTextAlignment(TextAlignment.CENTER);
+				measurementTable.addCell(log.getMeasurementTime().format(dateTimeFormatter)).setTextAlignment(TextAlignment.CENTER);
 				measurementTable.addCell(String.valueOf(Math.round(log.getMeasurements().getTemperature() * 100) / 100.)).setTextAlignment(TextAlignment.CENTER);
 				measurementTable.addCell(String.valueOf(Math.round(log.getMeasurements().getHumidity() * 100) / 100.)).setTextAlignment(TextAlignment.CENTER);
 			}

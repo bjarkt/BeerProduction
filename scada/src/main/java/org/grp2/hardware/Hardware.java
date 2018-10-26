@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutionException;
 public class Hardware implements IHardware {
 	private OpcUaClient client;
 	private IHardwareProvider provider;
-	private IHardwareSubcriber subcriber;
+	private IHardwareSubscriber subscriber;
 
 	public Hardware(String endpointUrl) {
 		try {
@@ -20,7 +20,7 @@ public class Hardware implements IHardware {
 			client.connect().get();
 
 			provider = new HardwareProvider(client);
-			subcriber = new HardwareSubcriber(client);
+			subscriber = new HardwareSubscriber(client);
 		} catch(ExecutionException | InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -38,8 +38,8 @@ public class Hardware implements IHardware {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public IHardwareSubcriber getSubcriber() {
-		return subcriber;
+	public IHardwareSubscriber getSubscriber() {
+		return subscriber;
 	}
 
 	/**

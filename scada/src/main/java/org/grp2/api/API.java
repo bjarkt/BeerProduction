@@ -1,7 +1,7 @@
 package org.grp2.api;
 
 import io.javalin.Javalin;
-import org.grp2.Javalin.JavalinSetup;
+import org.grp2.javalin.JavalinSetup;
 import org.grp2.hardware.Hardware;
 import org.grp2.hardware.IHardware;
 

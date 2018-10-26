@@ -14,5 +14,5 @@ public interface IHardware {
 	 * Gets the subscriber which offers subscribing to cube values.
 	 * @return a subscriber
 	 */
-	IHardwareSubcriber getSubcriber();
+	IHardwareSubscriber getSubscriber();
 }
