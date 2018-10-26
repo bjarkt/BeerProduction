@@ -5,6 +5,7 @@ import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
+import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
@@ -15,6 +16,7 @@ import org.grp2.shared.Batch;
 import org.grp2.shared.MeasurementLog;
 
 import java.io.FileNotFoundException;
+import java.text.DecimalFormat;
 import java.time.format.DateTimeFormatter;
 
 public class SimplePdfPrinter1 implements IPrintManager {
@@ -23,9 +25,11 @@ public class SimplePdfPrinter1 implements IPrintManager {
 	private Table tMeasurements;
 
 	private DateTimeFormatter dtf;
+	private DecimalFormat df;
 
 	public SimplePdfPrinter1() {
-		dtf = DateTimeFormatter.ofPattern("dd:MM:uuuu HH:mm:ss");
+		dtf = DateTimeFormatter.ofPattern("uuuu:MM:dd  HH:mm:ss");
+		df = new DecimalFormat("#.0000");
 	}
 
 	/**
@@ -43,7 +47,7 @@ public class SimplePdfPrinter1 implements IPrintManager {
 
 			setupDocumentTitle();
 			setupBasicInformation(batch);
-			setupMeasurements();
+			setupMeasurements(logs);
 
 			document.add(pTitle);
 			document.add(tBasicInfo);
@@ -93,14 +97,20 @@ public class SimplePdfPrinter1 implements IPrintManager {
 
 	private void setupMeasurements(MeasurementLog ... logs) {
 		tMeasurements = new Table(3, true);
-		tMeasurements.addHeaderCell(new Cell(0, 3).add(new Paragraph("Measurements").setFontSize(18)).setTextAlignment(TextAlignment.CENTER));
-		tMeasurements.startNewRow().setTextAlignment(TextAlignment.CENTER).addCell("Time").addCell("Temperature").addCell("Humidity");
+		tMeasurements.addHeaderCell(new Cell(0, 3).add(new Paragraph("Measurements")
+				.setFontSize(18))
+				.setTextAlignment(TextAlignment.CENTER));
+
+		tMeasurements.startNewRow().setTextAlignment(TextAlignment.CENTER)
+				.addCell("Time").setBold()
+				.addCell("Temperature").setBold()
+				.addCell("Humidity").setBold();
 
 		for(MeasurementLog log : logs) {
 			tMeasurements.startNewRow()
 					.addCell(log.getMeasuremenTime().format(dtf))
-					.addCell(String.valueOf(log.getMeasurements().getTemperature()))
-					.addCell(String.valueOf(log.getMeasurements().getHumidity()));
+					.addCell(df.format(log.getMeasurements().getTemperature()))
+					.addCell(df.format(log.getMeasurements().getHumidity()));
 					//.addCell(String.valueOf(log.getMeasurements().getVibration()));
 		}
 
