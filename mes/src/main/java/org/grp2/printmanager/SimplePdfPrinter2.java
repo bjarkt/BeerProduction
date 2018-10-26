@@ -15,11 +15,14 @@ import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.UnitValue;
 import org.grp2.shared.Batch;
+import org.grp2.shared.MeasurementLog;
 
 import java.awt.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 public class SimplePdfPrinter2 implements IPrintManager {
 	/**
@@ -28,7 +31,7 @@ public class SimplePdfPrinter2 implements IPrintManager {
 	 * @param batch any batch
 	 */
 	@Override
-	public void writeDocument(String path, Batch batch) {
+	public void writeDocument(String path, Batch batch, MeasurementLog... logs) {
 		try {
 			PdfWriter writer = new PdfWriter("document.pdf");
 			PdfDocument pdf = new PdfDocument(writer);
@@ -47,7 +50,7 @@ public class SimplePdfPrinter2 implements IPrintManager {
 
 
 			// *******    Table    ********
-			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-uu   HH:mm:ss");
+			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-uuuu   HH:mm:ss");
 			float[] columnWidths = {100, 200};
 			Table table1 = new Table(columnWidths);
 			table1.setWidth(UnitValue.createPercentValue(100));
@@ -71,11 +74,12 @@ public class SimplePdfPrinter2 implements IPrintManager {
 			table1.addCell(cellBold.clone(true).add(new Paragraph("Beers defective")));
 			table1.addCell(String.valueOf(batch.getDefect()));
 			table1.addCell(cellBold.clone(true).add(new Paragraph("Batch started")));
-			table1.addCell(String.valueOf(batch.getStarted().format(dateTimeFormatter)));
+			table1.addCell(batch.getStarted().format(dateTimeFormatter));
 			table1.addCell(cellBold.clone(true).add(new Paragraph("Batch finished")));
-			table1.addCell("08-11-2018\t09:21:01");
+			table1.addCell(batch.getFinished().format(dateTimeFormatter));
 			table1.addCell(cellBold.clone(true).add(new Paragraph("Time elapsed (min:sec)")));
-			table1.addCell("12:48");
+			long secondsDiff = ChronoUnit.SECONDS.between(batch.getStarted(), batch.getFinished());
+			table1.addCell(LocalTime.MIN.plusSeconds(secondsDiff).toString());
 
 			table1.addCell(cellNoBorder.clone(true));
 			table1.addCell(cellNoBorder.clone(true));
@@ -89,9 +93,8 @@ public class SimplePdfPrinter2 implements IPrintManager {
 			measurementTable.addCell(cellBold.clone(true).add(new Paragraph("Time")));
 			measurementTable.addCell(cellBold.clone(true).add(new Paragraph("Temperature")));
 			measurementTable.addCell(cellBold.clone(true).add(new Paragraph("Humidity")));
-			int numberOfMeasurements = 9;
-			for (int i = 0; i < numberOfMeasurements; i++) {
-				measurementTable.addCell(new Cell().add(new Paragraph("Test")));
+			for (MeasurementLog log : logs) {
+				table1.addCell(batch.getFinished().format(dateTimeFormatter));
 			}
 
 			document.add(measurementTable);
