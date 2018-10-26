@@ -14,13 +14,21 @@ import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.UnitValue;
+import org.grp2.shared.Batch;
 
 import java.awt.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 
 public class SimplePdfPrinter2 implements IPrintManager {
-	public void writeDocument() {
+	/**
+	 * {@inheritDoc}
+	 * @param path the path to write the document to, including name
+	 * @param batch any batch
+	 */
+	@Override
+	public void writeDocument(String path, Batch batch) {
 		try {
 			PdfWriter writer = new PdfWriter("document.pdf");
 			PdfDocument pdf = new PdfDocument(writer);
@@ -36,7 +44,10 @@ public class SimplePdfPrinter2 implements IPrintManager {
 
 			document.add(p);
 
+
+
 			// *******    Table    ********
+			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-uu   HH:mm:ss");
 			float[] columnWidths = {100, 200};
 			Table table1 = new Table(columnWidths);
 			table1.setWidth(UnitValue.createPercentValue(100));
@@ -45,22 +56,22 @@ public class SimplePdfPrinter2 implements IPrintManager {
 			Cell cellBold = new Cell().setMinHeight(15).setBold();
 
 			table1.addCell(cellBold.clone(true).add(new Paragraph("Batch ID")));
-			table1.addCell("59884");
+			table1.addCell(String.valueOf(batch.getBatchId()));
 			table1.addCell(cellBold.clone(true).add(new Paragraph("Product type")));
-			table1.addCell("Pilsner");
+			table1.addCell(batch.getBeerName());
 
 			table1.addCell(cellNoBorder.clone(true));
 			table1.addCell(cellNoBorder.clone(true));
 
 			table1.addCell(new Cell(1,2).add(new Paragraph("Measurements").setFontSize(15).setBold()).setMinHeight(15).setBold().setTextAlignment(TextAlignment.CENTER));
 			table1.addCell(cellBold.clone(true).add(new Paragraph("Beers produced")));
-			table1.addCell("100");
+			table1.addCell(String.valueOf(batch.getAccepted() + batch.getDefect()));
 			table1.addCell(cellBold.clone(true).add(new Paragraph("Beers accepted")));
-			table1.addCell("87");
+			table1.addCell(String.valueOf(batch.getAccepted()));
 			table1.addCell(cellBold.clone(true).add(new Paragraph("Beers defective")));
-			table1.addCell("13");
+			table1.addCell(String.valueOf(batch.getDefect()));
 			table1.addCell(cellBold.clone(true).add(new Paragraph("Batch started")));
-			table1.addCell("08-11-2018   09:08:13");
+			table1.addCell(String.valueOf(batch.getStarted().format(dateTimeFormatter)));
 			table1.addCell(cellBold.clone(true).add(new Paragraph("Batch finished")));
 			table1.addCell("08-11-2018\t09:21:01");
 			table1.addCell(cellBold.clone(true).add(new Paragraph("Time elapsed (min:sec)")));
