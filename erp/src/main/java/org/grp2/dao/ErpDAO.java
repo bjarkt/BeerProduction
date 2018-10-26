@@ -1,14 +1,12 @@
 package org.grp2.dao;
 
-import jdk.internal.jline.internal.Nullable;
 import org.grp2.database.DatabaseConnection;
+import org.grp2.domain.Order;
 import org.grp2.domain.OrderItem;
 
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -150,6 +148,11 @@ public class ErpDAO extends DatabaseConnection {
         if (!isOrderProcessed) {
             this.executeQuery(conn -> {
                 try {
+                    String deleteAllOrderItemsQuery = "DELETE FROM Order_items WHERE order_number = ?";
+                    PreparedStatement ps1 = conn.prepareStatement(deleteAllOrderItemsQuery);
+                    ps1.setInt(1, orderNumber);
+                    ps1.execute();
+
                     String deleteOrderQuery = "DELETE FROM Orders WHERE order_number = ?";
                     PreparedStatement ps = conn.prepareStatement(deleteOrderQuery);
                     ps.setInt(1, orderNumber);
@@ -169,7 +172,12 @@ public class ErpDAO extends DatabaseConnection {
     }
 
 
-    public List<OrderItem> viewOrder(int orderNumber) {
+    /**
+     *
+     * @param orderNumber
+     * @return
+     */
+    public List<OrderItem> viewOrderItems(int orderNumber) {
         List<OrderItem> orderItems = new ArrayList<>();
 
         if (doesOrderExist(orderNumber)) {
@@ -200,10 +208,50 @@ public class ErpDAO extends DatabaseConnection {
 
     }
 
+    /**
+     *
+     * @param orderNumber
+     * @return
+     */
+    public Order viewOrderDetails(int orderNumber) {
+        Order order = new Order(orderNumber);
+
+        if (doesOrderExist(orderNumber)) {
+            this.executeQuery(conn -> {
+                try {
+                    String getOrderQuery = "SELECT date_created, status FROM Orders WHERE order_number = ?";
+                    PreparedStatement ps = conn.prepareStatement(getOrderQuery);
+                    ps.setInt(1, orderNumber);
+                    ResultSet rs = ps.executeQuery();
+                    while (rs.next()) {
+                        Timestamp dateCreated = rs.getTimestamp(1);
+                        String status = rs.getString(2);
+
+                        order.setDate(dateCreated);
+                        order.setStatus(status);
+                    }
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+
+        return order;
+
+    }
+
+
+    /**
+     *
+     * @param orderNumber
+     * @param beerName
+     * @return
+     */
     public boolean deleteOrderItem(int orderNumber, String beerName) {
         boolean isOrderProcessed = isOrderProcessed(orderNumber);
 
-        if (!isOrderProcessed) {
+        if (!isOrderProcessed && isDuplicateOrderItem(orderNumber, beerName)) {
             this.executeQuery(conn -> {
                 try {
                     String deleteOrderItemQuery = "DELETE FROM Order_items WHERE order_number = ? AND beer_name = ?";
@@ -224,30 +272,27 @@ public class ErpDAO extends DatabaseConnection {
         return false;
     }
 
-    public boolean editOrderItem(int orderNumber, String beerName, @Nullable Integer quantity, @Nullable String newBeerName){
+
+    /**
+     *
+     * @param orderNumber
+     * @param beerName
+     * @param quantity
+     * @param newBeerName
+     * @return
+     */
+    public boolean editOrderItem(int orderNumber, String beerName, Integer quantity, String newBeerName){
         boolean isOrderProcessed = isOrderProcessed(orderNumber);
 
-        if (!isOrderProcessed) {
+        if (!isOrderProcessed && !isDuplicateOrderItem(orderNumber, beerName)) {
             this.executeQuery(conn -> {
                 try {
                     String updateOrderItemQuery = "UPDATE Order_items SET quantity = ?, beer_name = ? WHERE order_number = ? AND beer_name = ?";
                     PreparedStatement ps = conn.prepareStatement(updateOrderItemQuery);
-
-                    if(quantity == null){
-                        ps.setString(1, "(SELECT Order_items.quantity FROM Order_items WHERE order_number " + orderNumber + " AND beer_name = " + beerName + ")");
-                    } else{
-                        ps.setInt(1, quantity.intValue());
-                    }
-
-                    if(newBeerName == null){
-                        ps.setString(2, "(SELECT Order_items.beer_name FROM Order_items WHERE order_number " + orderNumber + " AND beer_name = " + beerName + ")");
-                    } else{
-                        ps.setString(2, newBeerName);
-                    }
-
+                    ps.setInt(1, quantity.intValue());
+                    ps.setString(2, newBeerName);
                     ps.setInt(3,orderNumber);
                     ps.setString(4, beerName);
-
                     ps.execute();
 
                 } catch (SQLException e) {
@@ -261,5 +306,72 @@ public class ErpDAO extends DatabaseConnection {
 
         return false;
     }
+
+    /**
+     *
+     * @param orderNumber
+     * @param beerName
+     * @param newBeerName
+     * @return
+     */
+    public boolean editOrderItem(int orderNumber, String beerName, String newBeerName){
+        boolean isOrderProcessed = isOrderProcessed(orderNumber);
+
+        if (!isOrderProcessed && !isDuplicateOrderItem(orderNumber, beerName)) {
+            this.executeQuery(conn -> {
+                try {
+                    String updateOrderItemQuery = "UPDATE Order_items SET quantity = (SELECT Order_items.quantity FROM Order_items WHERE order_number = ? AND beer_name = ?), beer_name = ? WHERE order_number = ? AND beer_name = ?";
+                    PreparedStatement ps = conn.prepareStatement(updateOrderItemQuery);
+                    ps.setInt(1, orderNumber);
+                    ps.setString(2, beerName);
+                    ps.setString(3, newBeerName);
+                    ps.setInt(4,orderNumber);
+                    ps.setString(5, beerName);
+                    ps.execute();
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+            });
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     *
+     * @param orderNumber
+     * @param beerName
+     * @param quantity
+     * @return
+     */
+    public boolean editOrderItem(int orderNumber, String beerName, int quantity){
+        boolean isOrderProcessed = isOrderProcessed(orderNumber);
+
+        if (!isOrderProcessed && isDuplicateOrderItem(orderNumber, beerName)) {
+            this.executeQuery(conn -> {
+                try {
+                    String updateOrderItemQuery = "UPDATE Order_items SET quantity = ?, beer_name = (SELECT Order_items.beer_name FROM Order_items WHERE order_number = ? AND beer_name = ?) WHERE order_number = ? AND beer_name = ?";
+                    PreparedStatement ps = conn.prepareStatement(updateOrderItemQuery);
+                    ps.setInt(1, quantity);
+                    ps.setInt(2, orderNumber);
+                    ps.setString(3, beerName);
+                    ps.setInt(4,orderNumber);
+                    ps.setString(5, beerName);
+                    ps.execute();
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+            });
+
+            return true;
+        }
+
+        return false;    }
 
 }

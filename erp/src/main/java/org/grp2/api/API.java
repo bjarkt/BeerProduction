@@ -21,9 +21,10 @@ public class API {
                 post("/create-order", handler::createOrder);
                 post("/add-order-item/:order-id/:beer-name/:quantity", handler::addOrderItem);
                 post("/delete-order/:order-id", handler::deleteOrder);
-                post("/edit-order-item/", handler::editOrderItem);
+                post("/edit-order-item/:order-id/:beer-name", handler::editOrderItem);
                 post("/delete-order-item/:order-id/:beer-name", handler::deleteOrderItem);
-                get("/view-order/:order-id", handler::viewOrder);
+                get("/view-order-items/:order-id", handler::viewOrderItems);
+                get("/view-order-details/:order-id", handler::viewOrderDetails);
             });
         });
     }
