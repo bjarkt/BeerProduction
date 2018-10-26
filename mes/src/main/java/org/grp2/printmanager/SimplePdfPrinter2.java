@@ -1,9 +1,5 @@
 package org.grp2.printmanager;
 
-import com.itextpdf.io.font.FontNames;
-import com.itextpdf.io.font.FontProgram;
-import com.itextpdf.io.font.PdfEncodings;
-import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
@@ -11,15 +7,12 @@ import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
-import com.itextpdf.layout.property.HorizontalAlignment;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.UnitValue;
 import org.grp2.shared.Batch;
 import org.grp2.shared.MeasurementLog;
 
-import java.awt.*;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -46,8 +39,6 @@ public class SimplePdfPrinter2 implements IPrintManager {
 			p.setBold();
 
 			document.add(p);
-
-
 
 			// *******    Table    ********
 			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-uuuu   HH:mm:ss");
