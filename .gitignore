@@ -127,5 +127,8 @@ yarn-error.log
 # rollup-test output
 /modules/rollup-test/dist/
 
+# Remove pdfs
+*.pdf
+
 # Excludes
 !.idea/runConfigurations/*
