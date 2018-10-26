@@ -8,10 +8,13 @@ import org.grp2.domain.*;
 import org.grp2.Javalin.Message;
 import org.grp2.enums.State;
 import org.grp2.hardware.*;
+import org.grp2.shared.Batch;
+import org.grp2.shared.Measurements;
+import org.grp2.shared.ProductionInformation;
+import org.grp2.shared.Recipe;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -72,11 +75,9 @@ public class APIHandler {
 
         // Collecit accepted and defected
         this.hardwareSubcriber.subcribe(CubeNodeId.READ_CURRENT_PRODUCED, produced -> {
-            System.out.println("produced: " + produced);
             scadaDao.updateCurrentBatchProduced((Integer) produced);
         }, 1000);
         this.hardwareSubcriber.subcribe(CubeNodeId.READ_CURRENT_DEFECTIVE, defects -> {
-            System.out.println("defects: " + defects);
             scadaDao.updateCurrentBatchDefects((Integer) defects);
         }, 1000);
     }

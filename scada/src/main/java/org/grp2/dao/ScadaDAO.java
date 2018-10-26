@@ -1,8 +1,8 @@
 package org.grp2.dao;
 
 import org.grp2.database.DatabaseConnection;
-import org.grp2.domain.*;
 import org.grp2.enums.State;
+import org.grp2.shared.*;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

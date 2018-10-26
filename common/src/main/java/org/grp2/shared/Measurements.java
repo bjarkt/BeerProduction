@@ -1,4 +1,4 @@
-package org.grp2.domain;
+package org.grp2.shared;
 
 public class Measurements {
     private double temperature;
