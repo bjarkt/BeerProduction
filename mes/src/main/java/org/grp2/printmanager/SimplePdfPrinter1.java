@@ -11,11 +11,12 @@ import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.property.BorderCollapsePropertyValue;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.UnitValue;
+import org.grp2.shared.Batch;
 
 import java.io.FileNotFoundException;
 
 public class SimplePdfPrinter1 implements IPrintManager {
-	public void writeDocument() {
+	public void writeDocument(String path, Batch batch) {
 		try {
 			PdfWriter writer = new PdfWriter("document.pdf");
 			PdfDocument pdf = new PdfDocument(writer);
