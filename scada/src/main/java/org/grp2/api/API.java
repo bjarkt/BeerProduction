@@ -2,6 +2,8 @@ package org.grp2.api;
 
 import io.javalin.Javalin;
 import org.grp2.Javalin.JavalinSetup;
+import org.grp2.hardware.Hardware;
+import org.grp2.hardware.IHardware;
 
 import static io.javalin.apibuilder.ApiBuilder.*;
 
@@ -10,7 +12,8 @@ public class API {
 
     public void start() {
         Javalin app = JavalinSetup.setup(PORT);
-        APIHandler handler = new APIHandler();
+        APIHandler handler = new APIHandler(new Hardware(IHardware.SIMULATION_URL));
+        handler.listenForStateChanges();
         setRoutes(app, handler);
         app.start();
     }

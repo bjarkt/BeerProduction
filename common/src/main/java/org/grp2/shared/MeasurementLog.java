@@ -1,6 +1,5 @@
-package org.grp2.domain;
+package org.grp2.shared;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 public class MeasurementLog {
