@@ -17,13 +17,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class MesDAO extends DatabaseConnection {
 
-    public boolean createBatches() {
-
-
-
-        return true;
-    }
-
     public List<Order> viewOrders() {
         List<Order> orders = new ArrayList<>();
 
@@ -119,6 +112,11 @@ public class MesDAO extends DatabaseConnection {
         Plant plant = new Plant();
 
         return plant;
+
+    }
+
+    public void createBatches(List<Batch> batches) {
+
 
     }
 

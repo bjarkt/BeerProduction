@@ -1,5 +1,8 @@
 package org.grp2.api;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mashape.unirest.http.Unirest;
 import io.javalin.Context;
 import org.grp2.Javalin.Message;
 import org.grp2.dao.MesDAO;
@@ -7,12 +10,18 @@ import org.grp2.domain.Plant;
 import org.grp2.shared.Batch;
 import org.grp2.shared.Order;
 import org.grp2.shared.OrderItem;
+import org.grp2.shared.ProductionInformation;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class APIHandler {
 
     private MesDAO mesDAO;
+    private ObjectMapper mapper;
 
     public APIHandler() {
         // this.facade = facade
@@ -57,6 +66,36 @@ public class APIHandler {
 
         context.json(plant);
 
+    }
+
+    public void createBatches(Context context) {
+        Message message = new Message(200, "Success");
+
+        Map<OrderItem, String> orderItems;
+        List<ProductionInformation> orderList = new ArrayList<>();
+        Map<String, List<ProductionInformation>> orderMap = new HashMap<>();
+
+        try {
+            orderItems = mapper.readValue(context.body(), new TypeReference<Map<OrderItem, String>>() {});
+
+            for (Map.Entry<OrderItem, String> orderItemStringEntry : orderItems.entrySet()) {
+                String recipeName = orderItemStringEntry.getKey().getBeerName();
+                int orderNumber = orderItemStringEntry.getKey().getOrderNumber();
+                int quantity = orderItemStringEntry.getKey().getQuantity();
+                int machineSpeed = Integer.parseInt(orderItemStringEntry.getValue());
+
+                orderList.add(new ProductionInformation(recipeName, orderNumber, machineSpeed, quantity));
+            }
+            orderMap.put("orderItems", orderList);
+
+        } catch (IOException e) {
+            message.set(422, "JSON error : " +  e.getMessage());
+        }
+
+        //context.json(orderList);
+        Unirest.post("localhost:7000/API/start-new-production").body(orderMap);
+
+        //SET ORDER ITEMS STATUS
     }
 
 }
