@@ -23,6 +23,7 @@ public class API {
                 get("/view-all-batches", handler::viewAllBatches);
                 get("/view-current-batch-status/:order-number", handler::viewCurrentBatchStatus);
                 get("/view-plant-statistics", handler::viewPlantStatistics);
+                post("/create-batches/:batches/", handler::createBatches);
             });
         });
     }
