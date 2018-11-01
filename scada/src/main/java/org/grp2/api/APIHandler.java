@@ -1,6 +1,5 @@
 package org.grp2.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.Context;
 import org.grp2.dao.ScadaDAO;
 import org.grp2.domain.*;
@@ -22,13 +21,11 @@ public class APIHandler {
     private ScadaDAO scadaDao;
     private IHardwareProvider hardwareProvider;
     private IHardwareSubscriber hardwareSubscriber;
-    private ObjectMapper mapper;
 
     public APIHandler(IHardware hardware) {
         this.scadaDao = new ScadaDAO();
         this.hardwareProvider = hardware.getProvider();
         this.hardwareSubscriber = hardware.getSubscriber();
-        this.mapper = new ObjectMapper();
     }
 
     public void listenForStateChanges() {
@@ -79,13 +76,14 @@ public class APIHandler {
             hardwareProvider.setProduct(recipe.getId());
             hardwareProvider.setAmountToProduce(startedBatch.getQuantity());
             hardwareProvider.setMachSpeed(startedBatch.getMachineSpeed());
+
             hardwareProvider.stop();
             TimeUnit.SECONDS.sleep(1);
             hardwareProvider.reset();
             TimeUnit.SECONDS.sleep(1);
             hardwareProvider.start();
         } else {
-            message.set(200, "No batch started, queue is empty");
+            message.set(200, "No batch started. Queue is empty, or another batch is currently executing.");
         }
 
         return message;
@@ -169,7 +167,11 @@ public class APIHandler {
         scadaDao.updateStateTimeLogs(state, timeElapsed);
         scadaDao.updateCurrentBatchProduced(hardwareProvider.getAcceptedBeersProduced());
         scadaDao.updateCurrentBatchDefects(hardwareProvider.getDefectiveBeersProduced());
-        scadaDao.updateCurrentBatchFinished();
+        Batch finishedBatch = scadaDao.updateCurrentBatchFinished();
+
+        scadaDao.updateOrderItemStatus(finishedBatch, "processed");
+        scadaDao.deleteQueueItem(finishedBatch);
+
         hardwareProvider.stop();
         hardwareProvider.reset();
     }
