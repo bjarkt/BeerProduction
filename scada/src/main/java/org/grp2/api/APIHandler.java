@@ -37,6 +37,7 @@ public class APIHandler {
         AtomicReference<LocalDateTime> now = new AtomicReference<>(LocalDateTime.now());
         AtomicReference<State> previousState = new AtomicReference<>();
         AtomicReference<State> state = new AtomicReference<>();
+
         this.hardwareSubscriber.subscribe(CubeNodeId.READ_STATE, value -> {
             LocalDateTime stateChanged = LocalDateTime.now();
             long seconds = ChronoUnit.SECONDS.between(now.get(), stateChanged);
@@ -49,37 +50,11 @@ public class APIHandler {
             state.set(State.fromCode((int) value));
             now.set(LocalDateTime.now());
             if (state.get() != null) {
-                switch (state.get()) {
-                    case IDLE:
-                        try {
-                            this.startBatch();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        break;
-                    case COMPLETE:
-                        this.completeBatch(previousState.get(), Math.toIntExact(seconds));
-                        break;
-                }
+                handleStateChange(state.get(), previousState.get(), Math.toIntExact(seconds));
             }
         }, 1000);
 
-        // Collect measurements
-        this.hardwareSubscriber.subscribe(CubeNodeId.READ_TEMPERAURE, temperatureFloat -> {
-            double temperature = ((Float) temperatureFloat).doubleValue();
-            this.hardwareSubscriber.subscribe(CubeNodeId.READ_HUMIDITY, humidityFloat -> {
-                double humidity = ((Float) humidityFloat).doubleValue();
-                scadaDao.updateMeasurementLogs(temperature, humidity);
-            }, 1000);
-        }, 1000);
-
-        // Collecit accepted and defected
-        this.hardwareSubscriber.subscribe(CubeNodeId.READ_CURRENT_PRODUCED, produced -> {
-            scadaDao.updateCurrentBatchProduced((Integer) produced);
-        }, 1000);
-        this.hardwareSubscriber.subscribe(CubeNodeId.READ_CURRENT_DEFECTIVE, defects -> {
-            scadaDao.updateCurrentBatchDefects((Integer) defects);
-        }, 1000);
+        collectData();
     }
 
     public void startNewProduction(Context context) {
@@ -210,5 +185,39 @@ public class APIHandler {
         scadaDao.updateCurrentBatchFinished();
         hardwareProvider.stop();
         hardwareProvider.reset();
+    }
+
+    private void handleStateChange(State state, State previousState, int seconds) {
+        switch (state) {
+            case IDLE:
+                try {
+                    this.startBatch();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case COMPLETE:
+                this.completeBatch(previousState, seconds);
+                break;
+        }
+    }
+
+    private void collectData() {
+        // Collect measurements
+        this.hardwareSubscriber.subscribe(CubeNodeId.READ_TEMPERAURE, temperatureFloat -> {
+            double temperature = ((Float) temperatureFloat).doubleValue();
+            this.hardwareSubscriber.subscribe(CubeNodeId.READ_HUMIDITY, humidityFloat -> {
+                double humidity = ((Float) humidityFloat).doubleValue();
+                scadaDao.updateMeasurementLogs(temperature, humidity);
+            }, 1000);
+        }, 1000);
+
+        // Collect accepted and defected
+        this.hardwareSubscriber.subscribe(CubeNodeId.READ_CURRENT_PRODUCED, produced -> {
+            scadaDao.updateCurrentBatchProduced((Integer) produced);
+        }, 1000);
+        this.hardwareSubscriber.subscribe(CubeNodeId.READ_CURRENT_DEFECTIVE, defects -> {
+            scadaDao.updateCurrentBatchDefects((Integer) defects);
+        }, 1000);
     }
 }
