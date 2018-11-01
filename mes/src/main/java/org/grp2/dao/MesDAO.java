@@ -118,40 +118,12 @@ public class MesDAO extends DatabaseConnection {
         return batches;
     }
 
-    /**
-     * Get status of current batch.
-     * @param orderNumber   orderNumber for the order is production.
-     * @return status of current batch.
-     */
-    public String viewCurrentBatchStatus(int orderNumber) {
-        AtomicReference<String> status = new AtomicReference<>();
-        this.executeQuery(conn -> {
-            try {
-                String getOrderQuery = "SELECT Orders.status FROM Orders, Batches " +
-                        "WHERE Orders.order_number = ? AND Orders.order_number = Batches.order_number;";
-                PreparedStatement ps = conn.prepareStatement(getOrderQuery);
-                ps.setInt(1, orderNumber);
-                ResultSet rs = ps.executeQuery();
-                while (rs.next()) {
-                    status.set(rs.getString(1));
-                }
-
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
-
-        return status.toString();
-    }
 
     /**
      *
      * @return
      */
-    public Plant viewPlantStatistics() {
-        Plant plant = new Plant();
-
-        return plant;
+    public void viewPlantStatistics() {
 
     }
 

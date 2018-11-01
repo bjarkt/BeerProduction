@@ -21,7 +21,6 @@ public class API {
                 get("/view-orders", handler::viewOrders);
                 get("/view-order-items/:order-number", handler::viewOrderItems);
                 get("/view-all-batches", handler::viewAllBatches);
-                get("/view-current-batch-status/:order-number", handler::viewCurrentBatchStatus);
                 get("/view-plant-statistics", handler::viewPlantStatistics);
                 get("/get-report/:batch-id", handler::getReport);
                 post("/create-batches/", handler::createBatches);

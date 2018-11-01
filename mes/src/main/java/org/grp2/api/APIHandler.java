@@ -20,49 +20,36 @@ import java.util.Map;
 public class APIHandler {
 
     private Plant plant;
-    private MesDAO mesDAO;
     private ObjectMapper mapper;
 
     public APIHandler() {
-        this.plant = new Plant();
-        this.mesDAO = new MesDAO();
+        this.plant = Plant.getInstance();
         mapper = new ObjectMapper();
     }
 
     public void viewOrders(Context context) {
-
-        List<Order> orders = mesDAO.getLockedOrders();
+        List<Order> orders = plant.getMesDAO().getLockedOrders();
         context.json(orders);
     }
 
 
     public void viewOrderItems(Context context) {
         int orderNumber = Integer.parseInt(context.pathParam("order-number"));
-        Map<OrderItem, Recipe> orderItems = mesDAO.getOrderItems(orderNumber);
+        Map<OrderItem, Recipe> orderItems = plant.getMesDAO().getOrderItems(orderNumber);
         context.json(orderItems);
     }
 
     public void viewAllBatches(Context context) {
 
-        List<Batch> batches = mesDAO.viewAllBatches();
+        List<Batch> batches = plant.getMesDAO().viewAllBatches();
         context.json(batches);
-    }
-
-    public void viewCurrentBatchStatus(Context context) {
-
-        int batchId = Integer.parseInt(context.pathParam("order-number"));
-
-        String status = mesDAO.viewCurrentBatchStatus(batchId);
-
-        context.json(status);
-
     }
 
     public void viewPlantStatistics(Context context) {
 
-        Plant plant  = mesDAO.viewPlantStatistics();
+        //mesDAO.viewPlantStatistics();
 
-        context.json(plant);
+        //context.json(statascstics);
 
     }
 
@@ -76,7 +63,7 @@ public class APIHandler {
 
             orderList = temp.get("orderItems");
 
-            mesDAO.addToQueueItems(orderList);
+            plant.getMesDAO().addToQueueItems(orderList);
 
             try{
                 HttpResponse<Message> postMessage = Unirest.post("http://localhost:7000/api/start-new-production").asObject(Message.class);
@@ -84,7 +71,7 @@ public class APIHandler {
                 message.set(422, "JSON error : " +  e.getMessage());
             }
 
-            if(!orderList.isEmpty()) mesDAO.setOrderItemStatus(OrderItemStatus.PROCESSING, orderList.get(0).getOrderNumber());
+            if(!orderList.isEmpty()) plant.getMesDAO().setOrderItemStatus(OrderItemStatus.PROCESSING, orderList.get(0).getOrderNumber());
 
         } catch (IOException e) {
             message.set(422, "JSON error : " +  e.getMessage());
@@ -96,10 +83,11 @@ public class APIHandler {
     public ByteArrayInputStream getReport(Context context){
         int batchID = Integer.parseInt(context.pathParam("batch-id"));
 
-        List<MeasurementLog> measurementLogs = mesDAO.getMeasurementLogs(batchID);
-        Batch batch = mesDAO.getBatch(batchID);
+        List<MeasurementLog> measurementLogs = plant.getMesDAO().getMeasurementLogs(batchID);
+        Batch batch = plant.getMesDAO().getBatch(batchID);
 
-        return plant.getPrintManager().getDocument(batch, measurementLogs);
+        //return plant.getPrintManager().getDocument(batch, measurementLogs);
+        return null;
     }
 
 }
