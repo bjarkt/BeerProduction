@@ -2,9 +2,11 @@ package org.grp2.dao;
 
 import org.grp2.database.DatabaseConnection;
 import org.grp2.domain.Plant;
+import org.grp2.enums.OrderItemStatus;
 import org.grp2.shared.Batch;
 import org.grp2.shared.Order;
 import org.grp2.shared.OrderItem;
+import org.grp2.shared.ProductionInformation;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -115,10 +117,41 @@ public class MesDAO extends DatabaseConnection {
 
     }
 
-    public void createBatches(List<Batch> batches) {
 
+    /**
+     * Add {@link ProductionInformation} list to queue_items.
+     * @param productionInformations list of production information
+     */
+    public void addToQueueItems(List<ProductionInformation> productionInformations) {
+        String sql = "INSERT INTO queue_items VALUES (DEFAULT, ?, ?, ?, ?)";
 
+        this.executeQuery(conn -> {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            for (ProductionInformation productInfo : productionInformations) {
+                ps.setInt(1, productInfo.getQuantity());
+                ps.setInt(2, productInfo.getMachineSpeed());
+                ps.setString(3, productInfo.getRecipeName());
+                ps.setInt(4, productInfo.getOrderNumber());
+                ps.addBatch();
+            }
+            ps.executeBatch();
+        });
     }
 
+    /**
+     * Update status on {@link OrderItem} for every OrderItem connected to the orderNumber.
+     * @param status    which status to set
+     * @param orderNumber   orderNumber
+     */
+    public void setOrderItemStatus(OrderItemStatus status, int orderNumber){
+        String sql = "UPDATE Order_items SET status = ? WHERE order_number = ?";
+
+        this.executeQuery(conn -> {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setString(1, status.getStatus());
+            ps.setInt(2, orderNumber);
+            ps.execute();
+        });
+    }
 
 }
