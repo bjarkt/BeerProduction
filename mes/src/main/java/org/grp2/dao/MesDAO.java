@@ -47,7 +47,11 @@ public class MesDAO extends DatabaseConnection {
         return orders;
     }
 
-    
+    /**
+     *
+     * @param orderNumber
+     * @return
+     */
     public List<OrderItem> viewOrderItems(int orderNumber) {
         List<OrderItem> orderItems = new ArrayList<>();
         this.executeQuery(conn -> {
@@ -67,10 +71,15 @@ public class MesDAO extends DatabaseConnection {
                 e.printStackTrace();
             }
         });
+
         return orderItems;
 
     }
 
+    /**
+     *
+     * @return
+     */
     public List<Batch> viewAllBatches() {
         List<Batch> batches = new ArrayList<>();
         this.executeQuery(conn -> {
@@ -96,6 +105,11 @@ public class MesDAO extends DatabaseConnection {
         return batches;
     }
 
+    /**
+     *
+     * @param orderNumber
+     * @return
+     */
     public String viewCurrentBatchStatus(int orderNumber) {
         AtomicReference<String> status = new AtomicReference<>();
         this.executeQuery(conn -> {
@@ -117,6 +131,10 @@ public class MesDAO extends DatabaseConnection {
         return status.toString();
     }
 
+    /**
+     *
+     * @return
+     */
     public Plant viewPlantStatistics() {
         Plant plant = new Plant();
 
