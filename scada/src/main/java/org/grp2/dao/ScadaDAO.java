@@ -134,25 +134,6 @@ public class ScadaDAO extends DatabaseConnection {
         }
     }
 
-    /**
-     * Add {@link ProductionInformation} list to queue_items.
-     * @param productionInformations list of production information
-     */
-    public void addToQueueItems(List<ProductionInformation> productionInformations) {
-        String sql = "INSERT INTO queue_items VALUES (DEFAULT, ?, ?, ?, ?)";
-
-        this.executeQuery(conn -> {
-            PreparedStatement ps = conn.prepareStatement(sql);
-            for (ProductionInformation productInfo : productionInformations) {
-                ps.setInt(1, productInfo.getQuantity());
-                ps.setInt(2, productInfo.getMachineSpeed());
-                ps.setString(3, productInfo.getRecipeName());
-                ps.setInt(4, productInfo.getOrderNumber());
-                ps.addBatch();
-            }
-            ps.executeBatch();
-        });
-    }
 
     /**
      * Add a {@link ProductionInformation} from the queue to the batches table, and remove it from the queue.
