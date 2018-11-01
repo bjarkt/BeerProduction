@@ -25,9 +25,8 @@ public class APIHandler {
     private ObjectMapper mapper;
 
     public APIHandler() {
-        // this.facade = facade
         this.mesDAO = new MesDAO();
-
+        mapper = new ObjectMapper();
     }
 
     public void viewOrders(Context context) {
@@ -42,7 +41,6 @@ public class APIHandler {
 
         List<OrderItem> orderItems = mesDAO.viewOrderItems(orderNumber);
         context.json(orderItems);
-
     }
 
     public void viewAllBatches(Context context) {

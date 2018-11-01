@@ -3,6 +3,7 @@ package org.grp2.dao;
 import org.grp2.database.DatabaseConnection;
 import org.grp2.domain.Plant;
 import org.grp2.enums.OrderItemStatus;
+import org.grp2.enums.OrderStatus;
 import org.grp2.shared.Batch;
 import org.grp2.shared.Order;
 import org.grp2.shared.OrderItem;
@@ -19,13 +20,18 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class MesDAO extends DatabaseConnection {
 
+    /**
+     *
+     * @return
+     */
     public List<Order> viewOrders() {
         List<Order> orders = new ArrayList<>();
 
         this.executeQuery(conn -> {
             try {
-                String getOrderQuery = "SELECT date_created, status, order_number FROM Orders WHERE status = 'nonProcessed'";
+                String getOrderQuery = "SELECT date_created, status, order_number FROM Orders WHERE status = ?";
                 PreparedStatement ps = conn.prepareStatement(getOrderQuery);
+                ps.setString(1, OrderStatus.LOCKED.getStatus());
                 ResultSet rs = ps.executeQuery();
                 while (rs.next()) {
                     Timestamp dateCreated = rs.getTimestamp(1);
@@ -41,6 +47,7 @@ public class MesDAO extends DatabaseConnection {
         return orders;
     }
 
+    
     public List<OrderItem> viewOrderItems(int orderNumber) {
         List<OrderItem> orderItems = new ArrayList<>();
         this.executeQuery(conn -> {
