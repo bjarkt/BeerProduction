@@ -19,11 +19,12 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class MesDAO extends DatabaseConnection {
 
+
     /**
-     *
-     * @return
+     * Get a list of {@link Order} ready for production.
+     * @return list of orders.
      */
-    public List<Order> viewOrders() {
+    public List<Order> getLockedOrders() {
         List<Order> orders = new ArrayList<>();
 
         this.executeQuery(conn -> {
@@ -46,10 +47,11 @@ public class MesDAO extends DatabaseConnection {
         return orders;
     }
 
+
     /**
-     *
+     * Get map of {@link OrderItem} and its {@link Recipe} for an order.
      * @param orderNumber
-     * @return
+     * @return  map of OrderItem and Recipe.
      */
     public Map<OrderItem, Recipe> getOrderItems(int orderNumber) {
 
@@ -86,9 +88,10 @@ public class MesDAO extends DatabaseConnection {
 
     }
 
+
     /**
-     *
-     * @return
+     * Get list of all {@link Batch}.
+     * @return list of batches.
      */
     public List<Batch> viewAllBatches() {
         List<Batch> batches = new ArrayList<>();
@@ -116,9 +119,9 @@ public class MesDAO extends DatabaseConnection {
     }
 
     /**
-     *
-     * @param orderNumber
-     * @return
+     * Get status of current batch.
+     * @param orderNumber   orderNumber for the order is production.
+     * @return status of current batch.
      */
     public String viewCurrentBatchStatus(int orderNumber) {
         AtomicReference<String> status = new AtomicReference<>();
