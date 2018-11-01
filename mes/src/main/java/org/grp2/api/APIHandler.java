@@ -30,7 +30,7 @@ public class APIHandler {
 
     public void viewOrders(Context context) {
 
-        List<Order> orders = mesDAO.viewOrders();
+        List<Order> orders = mesDAO.getLockedOrders();
         context.json(orders);
     }
 
@@ -78,7 +78,7 @@ public class APIHandler {
             mesDAO.addToQueueItems(orderList);
 
             try{
-                HttpResponse<Message> postMessage = Unirest.post("localhost:7000/API/start-new-production").asObject(Message.class);
+                HttpResponse<Message> postMessage = Unirest.post("http://localhost:7000/api/start-new-production").asObject(Message.class);
             } catch (UnirestException e){
                 message.set(422, "JSON error : " +  e.getMessage());
             }
