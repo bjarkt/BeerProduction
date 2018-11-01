@@ -2,7 +2,9 @@ package org.grp2.api;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import io.javalin.Context;
 import org.grp2.Javalin.Message;
 import org.grp2.dao.MesDAO;
@@ -63,10 +65,6 @@ public class APIHandler {
 
     }
 
-    /**
-     *
-     * @param context
-     */
     public void createBatches(Context context) {
         Message message = new Message(200, "Success");
 
@@ -79,7 +77,11 @@ public class APIHandler {
 
             mesDAO.addToQueueItems(orderList);
 
-            Unirest.post("localhost:7000/API/start-new-production");
+            try{
+                HttpResponse<Message> postMessage = Unirest.post("localhost:7000/API/start-new-production").asObject(Message.class);
+            } catch (UnirestException e){
+                message.set(422, "JSON error : " +  e.getMessage());
+            }
 
             if(!orderList.isEmpty()) mesDAO.setOrderItemStatus(OrderItemStatus.PROCESSING, orderList.get(0).getOrderNumber());
 
