@@ -4,10 +4,7 @@ import org.grp2.database.DatabaseConnection;
 import org.grp2.domain.Plant;
 import org.grp2.enums.OrderItemStatus;
 import org.grp2.enums.OrderStatus;
-import org.grp2.shared.Batch;
-import org.grp2.shared.Order;
-import org.grp2.shared.OrderItem;
-import org.grp2.shared.ProductionInformation;
+import org.grp2.shared.*;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,7 +12,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class MesDAO extends DatabaseConnection {
@@ -52,11 +51,13 @@ public class MesDAO extends DatabaseConnection {
      * @param orderNumber
      * @return
      */
-    public List<OrderItem> viewOrderItems(int orderNumber) {
-        List<OrderItem> orderItems = new ArrayList<>();
+    public Map<OrderItem, Recipe> getOrderItems(int orderNumber) {
+
+        Map<OrderItem, Recipe> orderItems = new HashMap<>();
+
         this.executeQuery(conn -> {
             try {
-                String getOrderQuery = "SELECT quantity, beer_name, status FROM Order_items WHERE order_number = ? ";
+                String getOrderQuery = "SELECT Order_items.quantity, Order_items.beer_name, Order_items.status, Recipes.max_speed, Recipes.min_speed, Recipes.ID, Recipes.name FROM Order_items, Recipes WHERE order_number = ? AND Order_items.beer_name = Recipes.name";
                 PreparedStatement ps = conn.prepareStatement(getOrderQuery);
                 ps.setInt(1, orderNumber);
                 ResultSet rs = ps.executeQuery();
@@ -64,7 +65,16 @@ public class MesDAO extends DatabaseConnection {
                     int quantity = rs.getInt(1);
                     String beerName = rs.getString(2);
                     String status = rs.getString(3);
-                    orderItems.add(new OrderItem(orderNumber, beerName, quantity, status));
+                    OrderItem orderItem = new OrderItem(orderNumber, beerName, quantity, status);
+
+                    int maxSpeed = rs.getInt(4);
+                    int minSpeed = rs.getInt(5);
+                    int id = rs.getInt(6);
+                    String name = rs.getString(7);
+                    Recipe recipe = new Recipe(id, name, minSpeed, maxSpeed);
+
+                    orderItems.put(orderItem, recipe);
+
                 }
 
             } catch (SQLException e) {

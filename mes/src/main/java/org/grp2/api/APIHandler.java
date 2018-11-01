@@ -8,10 +8,7 @@ import org.grp2.Javalin.Message;
 import org.grp2.dao.MesDAO;
 import org.grp2.domain.Plant;
 import org.grp2.enums.OrderItemStatus;
-import org.grp2.shared.Batch;
-import org.grp2.shared.Order;
-import org.grp2.shared.OrderItem;
-import org.grp2.shared.ProductionInformation;
+import org.grp2.shared.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,11 +32,10 @@ public class APIHandler {
         context.json(orders);
     }
 
+
     public void viewOrderItems(Context context) {
-
         int orderNumber = Integer.parseInt(context.pathParam("order-number"));
-
-        List<OrderItem> orderItems = mesDAO.viewOrderItems(orderNumber);
+        Map<OrderItem, Recipe> orderItems = mesDAO.getOrderItems(orderNumber);
         context.json(orderItems);
     }
 
@@ -74,28 +70,18 @@ public class APIHandler {
     public void createBatches(Context context) {
         Message message = new Message(200, "Success");
 
-        Map<OrderItem, String> orderItems;
-        List<ProductionInformation> orderList = new ArrayList<>();
-        int orderNumber;
+        List<ProductionInformation> orderList;
 
         try {
-            orderItems = mapper.readValue(context.body(), new TypeReference<Map<OrderItem, String>>() {});
+            Map<String, List<ProductionInformation>> temp = mapper.readValue(context.body(), new TypeReference<Map<String, List<ProductionInformation>>>() {});
 
-            for (Map.Entry<OrderItem, String> orderItemStringEntry : orderItems.entrySet()) {
-                String recipeName = orderItemStringEntry.getKey().getBeerName();
-                orderNumber = orderItemStringEntry.getKey().getOrderNumber();
-                int quantity = orderItemStringEntry.getKey().getQuantity();
-                int machineSpeed = Integer.parseInt(orderItemStringEntry.getValue());
-
-                orderList.add(new ProductionInformation(recipeName, orderNumber, machineSpeed, quantity));
-            }
+            orderList = temp.get("orderItems");
 
             mesDAO.addToQueueItems(orderList);
 
             Unirest.post("localhost:7000/API/start-new-production");
 
-            mesDAO.setOrderItemStatus(OrderItemStatus.PROCESSING, orderList.get(0).getOrderNumber());
-
+            if(!orderList.isEmpty()) mesDAO.setOrderItemStatus(OrderItemStatus.PROCESSING, orderList.get(0).getOrderNumber());
 
         } catch (IOException e) {
             message.set(422, "JSON error : " +  e.getMessage());
