@@ -1,6 +1,5 @@
 package org.grp2.api;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.Context;
 import org.grp2.dao.ScadaDAO;
@@ -13,7 +12,6 @@ import org.grp2.shared.Measurements;
 import org.grp2.shared.ProductionInformation;
 import org.grp2.shared.Recipe;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -59,22 +57,38 @@ public class APIHandler {
 
     public void startNewProduction(Context context) {
         Message message = new Message(200, "Success");
-        List<ProductionInformation> productInfos = new ArrayList<>();
-        try {
-            Map<String, List<ProductionInformation>> temp = mapper.readValue(context.body(), new TypeReference<Map<String, ArrayList<ProductionInformation>>>() {
-            });
-            productInfos = temp.get("orderItems");
-        } catch (IOException e) {
-            message.set(422, "JSON Error : " + e.getMessage());
-        }
 
-        scadaDao.addToQueueItems(productInfos);
         try {
             message = startBatch();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        context.json(message);
+
+        message.send(context);
+    }
+
+    private Message startBatch() throws InterruptedException {
+        Message message = new Message(200, "Batch started");
+        ProductionInformation startedBatch = scadaDao.startNextBatch();
+
+
+        if (startedBatch != null) {
+            Recipe recipe = scadaDao.getRecipe(startedBatch.getRecipeName());
+
+            hardwareProvider.setBatchId(startedBatch.getBatchId());
+            hardwareProvider.setProduct(recipe.getId());
+            hardwareProvider.setAmountToProduce(startedBatch.getQuantity());
+            hardwareProvider.setMachSpeed(startedBatch.getMachineSpeed());
+            hardwareProvider.stop();
+            TimeUnit.SECONDS.sleep(1);
+            hardwareProvider.reset();
+            TimeUnit.SECONDS.sleep(1);
+            hardwareProvider.start();
+        } else {
+            message.set(200, "No batch started, queue is empty");
+        }
+
+        return message;
     }
 
     public void manageProduction(Context context) {
@@ -100,8 +114,8 @@ public class APIHandler {
                 message.setStatus(422);
                 message.setMessage("Choice not supported");
         }
-        context.status(message.getStatus());
-        context.json(message);
+
+        message.send(context);
     }
 
     public void viewScreen(Context context) {
@@ -150,33 +164,6 @@ public class APIHandler {
         context.json(map);
     }
 
-
-    private Message startBatch() throws InterruptedException {
-        Message message = new Message(200, "Order started");
-        ProductionInformation startedBatch = scadaDao.startNextBatch();
-
-        if (startedBatch != null) {
-            Recipe recipe = scadaDao.getRecipe(startedBatch.getRecipeName());
-
-            hardwareProvider.setBatchId(startedBatch.getBatchId());
-            hardwareProvider.setProduct(recipe.getId());
-            hardwareProvider.setAmountToProduce(startedBatch.getQuantity());
-            hardwareProvider.setMachSpeed(startedBatch.getMachineSpeed());
-            if (!startedBatch.validateMachSpeed(recipe.getMinSpeed(), recipe.getMaxSpeed())) {
-                message.setStatus(422);
-                message.setMessage("Invalid Speed");
-            }
-            hardwareProvider.stop();
-            TimeUnit.SECONDS.sleep(1);
-            hardwareProvider.reset();
-            TimeUnit.SECONDS.sleep(1);
-            hardwareProvider.start();
-        } else {
-            message.set(200, "Order placed in queue");
-        }
-
-        return message;
-    }
 
     private void completeBatch(State state, int timeElapsed) {
         scadaDao.updateStateTimeLogs(state, timeElapsed);
