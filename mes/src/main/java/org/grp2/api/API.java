@@ -1,7 +1,7 @@
 package org.grp2.api;
 
 import io.javalin.Javalin;
-import org.grp2.Javalin.JavalinSetup;
+import org.grp2.javalin.JavalinSetup;
 
 import static io.javalin.apibuilder.ApiBuilder.*;
 
@@ -23,6 +23,7 @@ public class API {
                 get("/view-all-batches", handler::viewAllBatches);
                 get("/view-current-batch-status/:order-number", handler::viewCurrentBatchStatus);
                 get("/view-plant-statistics", handler::viewPlantStatistics);
+                get("/get-report/:batch-id", handler::getReport);
                 post("/create-batches/", handler::createBatches);
             });
         });

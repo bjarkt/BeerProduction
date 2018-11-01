@@ -6,24 +6,25 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import io.javalin.Context;
-import org.grp2.Javalin.Message;
+import org.grp2.javalin.Message;
 import org.grp2.dao.MesDAO;
 import org.grp2.domain.Plant;
 import org.grp2.enums.OrderItemStatus;
 import org.grp2.shared.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class APIHandler {
 
+    private Plant plant;
     private MesDAO mesDAO;
     private ObjectMapper mapper;
 
     public APIHandler() {
+        this.plant = new Plant();
         this.mesDAO = new MesDAO();
         mapper = new ObjectMapper();
     }
@@ -90,6 +91,15 @@ public class APIHandler {
         }
 
         context.json(message);
+    }
+
+    public ByteArrayInputStream getReport(Context context){
+        int batchID = Integer.parseInt(context.pathParam("batch-id"));
+
+        List<MeasurementLog> measurementLogs = mesDAO.getMeasurementLogs(batchID);
+        Batch batch = mesDAO.getBatch(batchID);
+
+        return plant.getPrintManager().getDocument(batch, measurementLogs);
     }
 
 }

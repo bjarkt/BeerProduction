@@ -192,4 +192,72 @@ public class MesDAO extends DatabaseConnection {
         });
     }
 
+    /**
+     * Get measurements logs for a batch.
+     * @param batchId batch id
+     * @return list of measurementlog
+     */
+    public List<MeasurementLog> getMeasurementLogs(int batchId) {
+        List<MeasurementLog> measurementLogs = new ArrayList<>();
+        this.executeQuery(conn -> {
+            PreparedStatement ps = conn.prepareStatement("SELECT batch_id, measurement_time, temperature, humidity FROM Measurement_logs WHERE batch_id = ?");
+            ps.setInt(1, batchId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                LocalDateTime timestamp = rs.getTimestamp("measurement_time").toLocalDateTime();
+                MeasurementLog measurementLog = new MeasurementLog(rs.getBigDecimal("batch_id").intValue(),
+                        timestamp, rs.getDouble("temperature"),
+                        rs.getDouble("humidity"), 0);
+                measurementLogs.add(measurementLog);
+            }
+        });
+
+        return measurementLogs;
+    }
+
+    /**
+     * Get batch by id.
+     * @param batchId batch id
+     * @return a batch
+     */
+    public Batch getBatch(int batchId) {
+        AtomicReference<Batch> batch = new AtomicReference<>();
+        this.executeQuery(conn -> {
+            PreparedStatement ps = conn.prepareStatement("SELECT beer_name, order_number, batch_id, started, " +
+                    "finished, accepted, defect FROM batches WHERE batch_id = ?");
+            ps.setInt(1, batchId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Batch tmp = batchFromResultSet(rs, batchId);
+                batch.set(tmp);
+            }
+        });
+
+        return batch.get();
+    }
+
+    /**
+     * Create a batch from a result set.
+     * @param rs
+     * @return
+     * @throws SQLException
+     */
+    private Batch batchFromResultSet(ResultSet rs, int batchId) throws SQLException {
+        String beerName = rs.getString("beer_name");
+        int orderNumber = rs.getInt("order_number");
+        LocalDateTime started = rs.getTimestamp("started").toLocalDateTime();
+        Timestamp timeStampFinished = rs.getTimestamp("finished");
+        LocalDateTime finished = null;
+        if (timeStampFinished != null) {
+            finished = timeStampFinished.toLocalDateTime();
+        }
+        int accepted = rs.getInt("accepted");
+        int defect = rs.getInt("defect");
+        return new Batch(beerName, orderNumber, batchId, started, finished, accepted, defect);
+    }
+
 }
