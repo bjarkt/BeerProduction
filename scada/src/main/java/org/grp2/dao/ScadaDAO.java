@@ -25,7 +25,7 @@ public class ScadaDAO extends DatabaseConnection {
     public List<MeasurementLog> getMeasurementLogs(int batchId) {
         List<MeasurementLog> measurementLogs = new ArrayList<>();
         this.executeQuery(conn -> {
-            PreparedStatement ps = conn.prepareStatement("SELECT batch_id, measurement_time, temperature, humidity FROM Measurement_logs WHERE batch_id = ?");
+            PreparedStatement ps = conn.prepareStatement("SELECT batch_id, measurement_time, temperature, humidity, vibration FROM Measurement_logs WHERE batch_id = ?");
             ps.setInt(1, batchId);
 
             ResultSet rs = ps.executeQuery();
@@ -34,7 +34,7 @@ public class ScadaDAO extends DatabaseConnection {
                 LocalDateTime timestamp = rs.getTimestamp("measurement_time").toLocalDateTime();
                 MeasurementLog measurementLog = new MeasurementLog(rs.getBigDecimal("batch_id").intValue(),
                         timestamp, rs.getDouble("temperature"),
-                        rs.getDouble("humidity"), 0);
+                        rs.getDouble("humidity"), rs.getDouble("vibration"));
                 measurementLogs.add(measurementLog);
             }
         });
@@ -268,15 +268,16 @@ public class ScadaDAO extends DatabaseConnection {
      * @param temperature temperature
      * @param humidity humidity
      */
-    public void updateMeasurementLogs(double temperature, double humidity) {
+    public void updateMeasurementLogs(double temperature, double humidity, double vibration) {
         Batch currentBatch = this.getCurrentBatch();
 
         if (currentBatch != null) {
             this.executeQuery(conn -> {
-                PreparedStatement ps = conn.prepareStatement("INSERT INTO measurement_logs VALUES (?, now(), ?, ?)");
+                PreparedStatement ps = conn.prepareStatement("INSERT INTO measurement_logs VALUES (?, now(), ?, ?, ?)");
                 ps.setInt(1, currentBatch.getBatchId());
                 ps.setDouble(2, temperature);
                 ps.setDouble(3, humidity);
+                ps.setDouble(4, vibration);
 
                 ps.executeUpdate();
             });

@@ -197,7 +197,10 @@ public class APIHandler {
             double temperature = ((Float) temperatureFloat).doubleValue();
             this.hardwareSubscriber.subscribe(CubeNodeId.READ_HUMIDITY, humidityFloat -> {
                 double humidity = ((Float) humidityFloat).doubleValue();
-                scadaDao.updateMeasurementLogs(temperature, humidity);
+                this.hardwareSubscriber.subscribe(CubeNodeId.READ_VIBRATION, vibrationFloat -> {
+                    double vibration = ((Float) vibrationFloat).doubleValue();
+                    scadaDao.updateMeasurementLogs(temperature, humidity, vibration);
+                }, 1000);
             }, 1000);
         }, 1000);
 
