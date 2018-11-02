@@ -78,9 +78,9 @@ public class APIHandler {
             hardwareProvider.setMachSpeed(startedBatch.getMachineSpeed());
 
             hardwareProvider.stop();
-            TimeUnit.SECONDS.sleep(1);
+            TimeUnit.SECONDS.sleep(2);
             hardwareProvider.reset();
-            TimeUnit.SECONDS.sleep(1);
+            TimeUnit.SECONDS.sleep(2);
             hardwareProvider.start();
         } else {
             message.set(200, "No batch started. Queue is empty, or another batch is currently executing.");
