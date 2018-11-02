@@ -54,7 +54,6 @@ public class APIHandler {
 
     public void startNewProduction(Context context) {
         Message message = new Message(200, "Success");
-
         try {
             message = startBatch();
         } catch (InterruptedException e) {

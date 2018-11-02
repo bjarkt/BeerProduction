@@ -133,7 +133,7 @@ public class ScadaDAO extends DatabaseConnection {
             return null; // no item, cannot start
         }
     }
-
+  
     /**
      * Add a {@link ProductionInformation} from the queue to the batches table, and remove it from the queue.
      * @param productionInformation the item to add and remove
