@@ -1,7 +1,5 @@
 package org.grp2.api;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.Context;
 import org.grp2.dao.ScadaDAO;
 import org.grp2.domain.*;
@@ -13,7 +11,6 @@ import org.grp2.shared.Measurements;
 import org.grp2.shared.ProductionInformation;
 import org.grp2.shared.Recipe;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -24,19 +21,18 @@ public class APIHandler {
     private ScadaDAO scadaDao;
     private IHardwareProvider hardwareProvider;
     private IHardwareSubscriber hardwareSubscriber;
-    private ObjectMapper mapper;
 
     public APIHandler(IHardware hardware) {
         this.scadaDao = new ScadaDAO();
         this.hardwareProvider = hardware.getProvider();
         this.hardwareSubscriber = hardware.getSubscriber();
-        this.mapper = new ObjectMapper();
     }
 
     public void listenForStateChanges() {
         AtomicReference<LocalDateTime> now = new AtomicReference<>(LocalDateTime.now());
         AtomicReference<State> previousState = new AtomicReference<>();
         AtomicReference<State> state = new AtomicReference<>();
+
         this.hardwareSubscriber.subscribe(CubeNodeId.READ_STATE, value -> {
             LocalDateTime stateChanged = LocalDateTime.now();
             long seconds = ChronoUnit.SECONDS.between(now.get(), stateChanged);
@@ -49,37 +45,11 @@ public class APIHandler {
             state.set(State.fromCode((int) value));
             now.set(LocalDateTime.now());
             if (state.get() != null) {
-                switch (state.get()) {
-                    case IDLE:
-                        try {
-                            this.startBatch();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        break;
-                    case COMPLETE:
-                        this.completeBatch(previousState.get(), Math.toIntExact(seconds));
-                        break;
-                }
+                handleStateChange(state.get(), previousState.get(), Math.toIntExact(seconds));
             }
         }, 1000);
 
-        // Collect measurements
-        this.hardwareSubscriber.subscribe(CubeNodeId.READ_TEMPERAURE, temperatureFloat -> {
-            double temperature = ((Float) temperatureFloat).doubleValue();
-            this.hardwareSubscriber.subscribe(CubeNodeId.READ_HUMIDITY, humidityFloat -> {
-                double humidity = ((Float) humidityFloat).doubleValue();
-                scadaDao.updateMeasurementLogs(temperature, humidity);
-            }, 1000);
-        }, 1000);
-
-        // Collecit accepted and defected
-        this.hardwareSubscriber.subscribe(CubeNodeId.READ_CURRENT_PRODUCED, produced -> {
-            scadaDao.updateCurrentBatchProduced((Integer) produced);
-        }, 1000);
-        this.hardwareSubscriber.subscribe(CubeNodeId.READ_CURRENT_DEFECTIVE, defects -> {
-            scadaDao.updateCurrentBatchDefects((Integer) defects);
-        }, 1000);
+        collectData();
     }
 
     public void startNewProduction(Context context) {
@@ -89,7 +59,33 @@ public class APIHandler {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        context.json(message);
+
+        message.send(context);
+    }
+
+    private Message startBatch() throws InterruptedException {
+        Message message = new Message(200, "Batch started");
+        ProductionInformation startedBatch = scadaDao.startNextBatch();
+
+
+        if (startedBatch != null) {
+            Recipe recipe = scadaDao.getRecipe(startedBatch.getRecipeName());
+
+            hardwareProvider.setBatchId(startedBatch.getBatchId());
+            hardwareProvider.setProduct(recipe.getId());
+            hardwareProvider.setAmountToProduce(startedBatch.getQuantity());
+            hardwareProvider.setMachSpeed(startedBatch.getMachineSpeed());
+
+            hardwareProvider.stop();
+            TimeUnit.SECONDS.sleep(2);
+            hardwareProvider.reset();
+            TimeUnit.SECONDS.sleep(2);
+            hardwareProvider.start();
+        } else {
+            message.set(200, "No batch started. Queue is empty, or another batch is currently executing.");
+        }
+
+        return message;
     }
 
     public void manageProduction(Context context) {
@@ -115,8 +111,8 @@ public class APIHandler {
                 message.setStatus(422);
                 message.setMessage("Choice not supported");
         }
-        context.status(message.getStatus());
-        context.json(message);
+
+        message.send(context);
     }
 
     public void viewScreen(Context context) {
@@ -166,39 +162,53 @@ public class APIHandler {
     }
 
 
-    private Message startBatch() throws InterruptedException {
-        Message message = new Message(200, "Order started");
-        ProductionInformation startedBatch = scadaDao.startNextBatch();
-
-        if (startedBatch != null) {
-            Recipe recipe = scadaDao.getRecipe(startedBatch.getRecipeName());
-
-            hardwareProvider.setBatchId(startedBatch.getBatchId());
-            hardwareProvider.setProduct(recipe.getId());
-            hardwareProvider.setAmountToProduce(startedBatch.getQuantity());
-            hardwareProvider.setMachSpeed(startedBatch.getMachineSpeed());
-            if (!startedBatch.validateMachSpeed(recipe.getMinSpeed(), recipe.getMaxSpeed())) {
-                message.setStatus(422);
-                message.setMessage("Invalid Speed");
-            }
-            hardwareProvider.stop();
-            TimeUnit.SECONDS.sleep(1);
-            hardwareProvider.reset();
-            TimeUnit.SECONDS.sleep(1);
-            hardwareProvider.start();
-        } else {
-            message.set(200, "Order placed in queue");
-        }
-
-        return message;
-    }
-
     private void completeBatch(State state, int timeElapsed) {
         scadaDao.updateStateTimeLogs(state, timeElapsed);
         scadaDao.updateCurrentBatchProduced(hardwareProvider.getAcceptedBeersProduced());
         scadaDao.updateCurrentBatchDefects(hardwareProvider.getDefectiveBeersProduced());
-        scadaDao.updateCurrentBatchFinished();
+        Batch finishedBatch = scadaDao.updateCurrentBatchFinished();
+
+        scadaDao.updateOrderItemStatus(finishedBatch, "processed");
+        scadaDao.deleteQueueItem(finishedBatch);
+
         hardwareProvider.stop();
         hardwareProvider.reset();
+    }
+
+    private void handleStateChange(State state, State previousState, int seconds) {
+        switch (state) {
+            case IDLE:
+                try {
+                    this.startBatch();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case COMPLETE:
+                this.completeBatch(previousState, seconds);
+                break;
+        }
+    }
+
+    private void collectData() {
+        // Collect measurements
+        this.hardwareSubscriber.subscribe(CubeNodeId.READ_TEMPERAURE, temperatureFloat -> {
+            double temperature = ((Float) temperatureFloat).doubleValue();
+            this.hardwareSubscriber.subscribe(CubeNodeId.READ_HUMIDITY, humidityFloat -> {
+                double humidity = ((Float) humidityFloat).doubleValue();
+                this.hardwareSubscriber.subscribe(CubeNodeId.READ_VIBRATION, vibrationFloat -> {
+                    double vibration = ((Float) vibrationFloat).doubleValue();
+                    scadaDao.updateMeasurementLogs(temperature, humidity, vibration);
+                }, 1000);
+            }, 1000);
+        }, 1000);
+
+        // Collect accepted and defected
+        this.hardwareSubscriber.subscribe(CubeNodeId.READ_CURRENT_PRODUCED, produced -> {
+            scadaDao.updateCurrentBatchProduced((Integer) produced);
+        }, 1000);
+        this.hardwareSubscriber.subscribe(CubeNodeId.READ_CURRENT_DEFECTIVE, defects -> {
+            scadaDao.updateCurrentBatchDefects((Integer) defects);
+        }, 1000);
     }
 }
