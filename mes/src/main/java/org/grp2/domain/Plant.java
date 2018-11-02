@@ -10,7 +10,6 @@ public class Plant {
     private IPrintManager printManager;
     private MesDAO mesDAO;
 
-
     private Plant() {
         printManager = new SimplePdfPrinter1();
         mesDAO = new MesDAO();

@@ -59,35 +59,39 @@ public class APIHandler {
         List<ProductionInformation> orderList;
 
         try {
-            Map<String, List<ProductionInformation>> temp = mapper.readValue(context.body(), new TypeReference<Map<String, List<ProductionInformation>>>() {});
+            Map<String, List<ProductionInformation>> temp = mapper.readValue(context.body(), new TypeReference<Map<String, List<ProductionInformation>>>() {
+            });
 
             orderList = temp.get("orderItems");
 
             plant.getMesDAO().addToQueueItems(orderList);
 
-            try{
+            try {
                 HttpResponse<Message> postMessage = Unirest.post("http://localhost:7000/api/start-new-production").asObject(Message.class);
-            } catch (UnirestException e){
-                message.set(422, "JSON error : " +  e.getMessage());
+            } catch (UnirestException e) {
+                message.set(422, "JSON error : " + e.getMessage());
             }
 
-            if(!orderList.isEmpty()) plant.getMesDAO().setOrderItemStatus(OrderItemStatus.PROCESSING, orderList.get(0).getOrderNumber());
+            if (!orderList.isEmpty())
+                plant.getMesDAO().setOrderItemStatus(OrderItemStatus.PROCESSING, orderList.get(0).getOrderNumber());
 
         } catch (IOException e) {
-            message.set(422, "JSON error : " +  e.getMessage());
+            message.set(422, "JSON error : " + e.getMessage());
         }
 
         context.json(message);
     }
 
-    public ByteArrayInputStream getReport(Context context){
+    public void getReport(Context context) {
         int batchID = Integer.parseInt(context.pathParam("batch-id"));
-
         List<MeasurementLog> measurementLogs = plant.getMesDAO().getMeasurementLogs(batchID);
         Batch batch = plant.getMesDAO().getBatch(batchID);
-
-        //return plant.getPrintManager().getDocument(batch, measurementLogs);
-        return null;
+        // TODO: Get byte[] from PrintManager
+        //byte[] report = plant.getPrintManager().getDocument(batch, measurementLogs);
+        context.header("Content-Type", "application/pdf");
+        //context.header("Content-Length", String.valueOf(report.length));
+        context.header("Content-Disposition", "attachment;filename=batch-report.pdf");
+        //context.result(new ByteArrayInputStream(report));
     }
 
 }
