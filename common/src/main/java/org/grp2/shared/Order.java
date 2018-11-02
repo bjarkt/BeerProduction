@@ -1,6 +1,5 @@
-package org.grp2.domain;
+package org.grp2.shared;
 
-import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 

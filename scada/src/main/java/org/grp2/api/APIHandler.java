@@ -84,16 +84,6 @@ public class APIHandler {
 
     public void startNewProduction(Context context) {
         Message message = new Message(200, "Success");
-        List<ProductionInformation> productInfos = new ArrayList<>();
-        try {
-            Map<String, List<ProductionInformation>> temp = mapper.readValue(context.body(), new TypeReference<Map<String, ArrayList<ProductionInformation>>>() {
-            });
-            productInfos = temp.get("orderItems");
-        } catch (IOException e) {
-            message.set(422, "JSON Error : " + e.getMessage());
-        }
-
-        scadaDao.addToQueueItems(productInfos);
         try {
             message = startBatch();
         } catch (InterruptedException e) {
