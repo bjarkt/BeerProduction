@@ -59,6 +59,11 @@ public class SimplePdfPrinter1 implements IPrintManager {
 		//System.out.println(FontProgramFactory.getRegisteredFonts());
 	}
 
+	@Override
+	public byte[] getDocument(Batch batch, MeasurementLog... logs) {
+		return new byte[0];
+	}
+
 	private void setupDocumentTitle() {
 		pTitle = new Paragraph("Batch Rapport")
 				.setBold().setTextAlignment(TextAlignment.CENTER)
