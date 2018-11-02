@@ -34,6 +34,7 @@ public class APIHandler {
         AtomicReference<State> state = new AtomicReference<>();
 
         this.hardwareSubscriber.subscribe(CubeNodeId.READ_STATE, value -> {
+            System.out.println("State changed to: " + State.fromCode((int) value));
             LocalDateTime stateChanged = LocalDateTime.now();
             long seconds = ChronoUnit.SECONDS.between(now.get(), stateChanged);
 
@@ -47,7 +48,7 @@ public class APIHandler {
             if (state.get() != null) {
                 handleStateChange(state.get(), previousState.get(), Math.toIntExact(seconds));
             }
-        }, 1000);
+        }, 500);
 
         collectData();
     }
@@ -162,16 +163,20 @@ public class APIHandler {
     }
 
 
-    private void completeBatch(State state, int timeElapsed) {
+    private void completeBatch(State state, int timeElapsed) throws InterruptedException {
+        System.out.println("Starting complete batch");
         scadaDao.updateStateTimeLogs(state, timeElapsed);
         scadaDao.updateCurrentBatchProduced(hardwareProvider.getAcceptedBeersProduced());
         scadaDao.updateCurrentBatchDefects(hardwareProvider.getDefectiveBeersProduced());
         Batch finishedBatch = scadaDao.updateCurrentBatchFinished();
+        System.out.println("Completed batch, trying to update status and delete");
+        if (finishedBatch != null) {
+            scadaDao.updateOrderItemStatus(finishedBatch, "processed");
+            scadaDao.deleteQueueItem(finishedBatch);
+        }
 
-        scadaDao.updateOrderItemStatus(finishedBatch, "processed");
-        scadaDao.deleteQueueItem(finishedBatch);
-
-        hardwareProvider.stop();
+        //hardwareProvider.stop();
+        TimeUnit.SECONDS.sleep(2);
         hardwareProvider.reset();
     }
 
@@ -185,7 +190,11 @@ public class APIHandler {
                 }
                 break;
             case COMPLETE:
-                this.completeBatch(previousState, seconds);
+                try {
+                    this.completeBatch(previousState, seconds);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 break;
         }
     }

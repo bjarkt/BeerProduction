@@ -1,8 +1,9 @@
 package org.grp2.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.ObjectMapper;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import io.javalin.Context;
@@ -14,17 +15,18 @@ import org.grp2.shared.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class APIHandler {
 
     private Plant plant;
-    private ObjectMapper mapper;
+    private com.fasterxml.jackson.databind.ObjectMapper mapper;
 
     public APIHandler() {
         this.plant = Plant.getInstance();
-        mapper = new ObjectMapper();
+        mapper = new com.fasterxml.jackson.databind.ObjectMapper();
     }
 
     public void viewOrders(Context context) {
@@ -59,7 +61,7 @@ public class APIHandler {
         List<ProductionInformation> orderList;
 
         try {
-            Map<String, List<ProductionInformation>> temp = mapper.readValue(context.body(), new TypeReference<Map<String, List<ProductionInformation>>>() {
+            Map<String, List<ProductionInformation>> temp = mapper.readValue(context.body(), new TypeReference<Map<String, ArrayList<ProductionInformation>>>() {
             });
 
             orderList = temp.get("orderItems");
@@ -69,7 +71,7 @@ public class APIHandler {
             try {
                 HttpResponse<Message> postMessage = Unirest.post("http://localhost:7000/api/start-new-production").asObject(Message.class);
             } catch (UnirestException e) {
-                message.set(422, "JSON error : " + e.getMessage());
+                message.set(422, "Error from SCADA : " + e.getMessage());
             }
 
             if (!orderList.isEmpty())

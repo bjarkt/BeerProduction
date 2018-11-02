@@ -20,7 +20,7 @@ public class Plant {
      * @return instance of Plant.
      */
     public static Plant getInstance(){
-        if(instance != null){
+        if(instance == null){
             instance = new Plant();
         }
         return instance;
