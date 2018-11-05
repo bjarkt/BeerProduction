@@ -201,16 +201,23 @@ public class APIHandler {
 
     private void collectData() {
         // Collect measurements
-        this.hardwareSubscriber.subscribe(CubeNodeId.READ_TEMPERAURE, temperatureFloat -> {
-            double temperature = ((Float) temperatureFloat).doubleValue();
-            this.hardwareSubscriber.subscribe(CubeNodeId.READ_HUMIDITY, humidityFloat -> {
-                double humidity = ((Float) humidityFloat).doubleValue();
-                this.hardwareSubscriber.subscribe(CubeNodeId.READ_VIBRATION, vibrationFloat -> {
-                    double vibration = ((Float) vibrationFloat).doubleValue();
-                    scadaDao.updateMeasurementLogs(temperature, humidity, vibration);
-                }, 1000);
-            }, 1000);
+        AtomicReference<Double> vibration = new AtomicReference<>(Double.MIN_VALUE);
+        AtomicReference<Double> humidity =  new AtomicReference<>(Double.MIN_VALUE);
+        AtomicReference<Double> temperature =  new AtomicReference<>(Double.MIN_VALUE);
+
+        this.hardwareSubscriber.subscribe(CubeNodeId.READ_VIBRATION, vibrationFloat -> {
+            vibration.set(((Float) vibrationFloat).doubleValue());
         }, 1000);
+        this.hardwareSubscriber.subscribe(CubeNodeId.READ_HUMIDITY, humidityFloat -> {
+            humidity.set(((Float) humidityFloat).doubleValue());
+        }, 1000);
+        this.hardwareSubscriber.subscribe(CubeNodeId.READ_TEMPERAURE, temperatureFloat -> {
+            temperature.set(((Float) temperatureFloat).doubleValue());
+            if (temperature.get() != Double.MIN_VALUE && humidity.get() != Double.MIN_VALUE && vibration.get() != Double.MIN_VALUE) {
+                scadaDao.updateMeasurementLogs(temperature.get(), humidity.get(), vibration.get());
+            }
+        }, 1000);
+
 
         // Collect accepted and defected
         this.hardwareSubscriber.subscribe(CubeNodeId.READ_CURRENT_PRODUCED, produced -> {
