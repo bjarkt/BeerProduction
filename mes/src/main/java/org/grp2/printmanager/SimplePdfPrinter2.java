@@ -12,7 +12,10 @@ import com.itextpdf.layout.property.UnitValue;
 import org.grp2.shared.Batch;
 import org.grp2.shared.MeasurementLog;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -58,31 +61,17 @@ public class SimplePdfPrinter2 implements IPrintManager {
 	 */
 	public byte[] getDocument()
 	{
-		byte[] byteArray = null;
+		byte[] array = null;
 
-		try {
-			InputStream inputStream = new FileInputStream(path);
-
-			byte[] buffer = new byte[8192];
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-			int bytesRead;
-			while ((bytesRead = inputStream.read(buffer)) != -1)
-			{
-				baos.write(buffer, 0, bytesRead);
+		if(path != null) {
+			try {
+				array = Files.readAllBytes(Paths.get(path));
+			} catch(IOException e) {
+				e.printStackTrace();
 			}
-
-			byteArray = baos.toByteArray();
-
-			inputStream.close();
-		} catch (FileNotFoundException e) {
-			System.err.println("File Not found" + e);
-			System.err.println("You need to run writeDocument() before running getDocument()");
-		} catch (IOException e) {
-			System.err.println("IO Ex" + e);
 		}
 
-		return byteArray;
+		return array;
 	}
 
 	private Paragraph getHeader()

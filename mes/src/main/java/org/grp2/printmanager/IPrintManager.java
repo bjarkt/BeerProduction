@@ -6,7 +6,7 @@ import org.grp2.shared.MeasurementLog;
 public interface IPrintManager {
 	/**
 	 * Sets the path for the stored PDF document.
-	 * @param path the path to write the document to, including name
+	 * @param path the path to write the document to, including name and extension
 	 */
 	void setPath(String path);
 
