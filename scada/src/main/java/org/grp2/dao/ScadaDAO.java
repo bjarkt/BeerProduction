@@ -75,13 +75,13 @@ public class ScadaDAO extends DatabaseConnection {
         AtomicReference<Batch> batch = new AtomicReference<>();
         this.executeQuery(conn -> {
             PreparedStatement ps = conn.prepareStatement("SELECT beer_name, order_number, batch_id, started, " +
-                                                        "finished, accepted, defect FROM batches WHERE batch_id = ?");
+                                                        "finished, accepted, defect, machine_speed FROM batches WHERE batch_id = ?");
             ps.setInt(1, batchId);
 
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                Batch tmp = batchFromResultSet(rs, batchId);
+                Batch tmp = batchFromResultSet(rs);
                 batch.set(tmp);
             }
         });
@@ -140,10 +140,11 @@ public class ScadaDAO extends DatabaseConnection {
      */
     private void addBatch(ProductionInformation productionInformation) {
         this.executeQuery(conn -> {
-            PreparedStatement ps = conn.prepareStatement("INSERT INTO batches VALUES (?, ?, ?, now(), null, null, null)");
+            PreparedStatement ps = conn.prepareStatement("INSERT INTO batches VALUES (?, ?, ?, now(), null, null, null, ?)");
             ps.setString(1, productionInformation.getRecipeName());
             ps.setInt(2, productionInformation.getOrderNumber());
             ps.setInt(3, productionInformation.getBatchId());
+            ps.setInt(4, productionInformation.getMachineSpeed());
 
             ps.executeUpdate();
         });
@@ -205,7 +206,7 @@ public class ScadaDAO extends DatabaseConnection {
         AtomicReference<Batch> batch = new AtomicReference<>();
         this.executeQuery(conn -> {
             PreparedStatement ps = conn.prepareStatement("SELECT beer_name, order_number, batch_id, started, " +
-                    "finished, accepted, defect FROM batches WHERE finished IS NULL ORDER BY batch_id DESC LIMIT 1");
+                    "finished, accepted, defect, machine_speed FROM batches WHERE finished IS NULL ORDER BY batch_id DESC LIMIT 1");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Batch tmp = batchFromResultSet(rs);
@@ -233,15 +234,6 @@ public class ScadaDAO extends DatabaseConnection {
         return currentBatch;
     }
 
-    /**
-     * Create a batch from a result set.
-     * @param rs
-     * @return
-     * @throws SQLException
-     */
-    private Batch batchFromResultSet(ResultSet rs) throws SQLException {
-        return batchFromResultSet(rs, rs.getInt("batch_id"));
-    }
 
     /**
      * Create a batch from a result set.
@@ -249,7 +241,8 @@ public class ScadaDAO extends DatabaseConnection {
      * @return
      * @throws SQLException
      */
-    private Batch batchFromResultSet(ResultSet rs, int batchId) throws SQLException {
+    private Batch batchFromResultSet(ResultSet rs) throws SQLException {
+        int batchId = rs.getInt("batch_id");
         String beerName = rs.getString("beer_name");
         int orderNumber = rs.getInt("order_number");
         LocalDateTime started = rs.getTimestamp("started").toLocalDateTime();
@@ -260,7 +253,8 @@ public class ScadaDAO extends DatabaseConnection {
         }
         int accepted = rs.getInt("accepted");
         int defect = rs.getInt("defect");
-        return new Batch(beerName, orderNumber, batchId, started, finished, accepted, defect);
+        int machineSpeed = rs.getInt("machine_speed");
+        return new Batch(beerName, orderNumber, batchId, started, finished, accepted, defect, machineSpeed);
     }
 
     /**
