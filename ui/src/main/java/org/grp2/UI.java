@@ -24,16 +24,16 @@ public class UI {
         switch (SCADACommands.fromCommand(command.getKeyword()))
         {
             case START_NEW_BATCH:
-                System.out.println("Start New Batch");
+                System.out.println("Start New Batch!");
                 break;
             case MANAGE_PRODUCTION:
-                System.out.println("Manage Production");
+                System.out.println("Manage Production!");
                 break;
             case VIEW_SCREEN:
-                System.out.println("View Screen");
+                System.out.println("View Screen!");
                 break;
             case VIEW_LOG:
-                System.out.println("View Log");
+                System.out.println("View Log!");
                 break;
             default:
 
