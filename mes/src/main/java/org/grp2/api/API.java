@@ -30,6 +30,7 @@ public class API {
                 get("/get-plant-statistics", handler::viewPlantStatistics);
                 get("/get-report/:batch-id", handler::getReport);
                 post("/create-batches/", handler::createBatches);
+                get("/get-oee/:batch-id", handler::getOEE);
             });
         });
     }
