@@ -13,6 +13,11 @@ public class Parser {
         reader = new Scanner(System.in);
     }
 
+    public void setSystem(SubSystem subsystem)
+    {
+        validator.setCurrentSystem(subsystem);
+    }
+
     public Command getCommand ()
     {
         String inputLine = reader.nextLine();
@@ -23,9 +28,13 @@ public class Parser {
         if (!validator.isCommand(command))
             return null;
 
-        String[] arguments = new String[inputs.length - 1];
-        for (int i = 0; i < arguments.length - 1; i++)
-            arguments[i] = inputs[i + 1];
+        String[] arguments = new String[0];
+        if (inputs.length > 1)
+        {
+            arguments = new String[inputs.length - 1];
+            for (int i = 0; i < arguments.length; i++)
+                arguments[i] = inputs[i + 1];
+        }
 
         return new Command(command, arguments);
     }
