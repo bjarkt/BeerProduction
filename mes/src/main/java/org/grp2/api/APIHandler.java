@@ -7,6 +7,7 @@ import com.mashape.unirest.http.ObjectMapper;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import io.javalin.Context;
+import org.grp2.domain.PlantStatistics;
 import org.grp2.domain.OEE;
 import org.grp2.javalin.Message;
 import org.grp2.dao.MesDAO;
@@ -16,6 +17,8 @@ import org.grp2.shared.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -50,9 +53,8 @@ public class APIHandler {
 
     public void viewPlantStatistics(Context context) {
 
-        //mesDAO.viewPlantStatistics();
-
-        //context.json(statascstics);
+        PlantStatistics plantStatistics = plant.getMesDAO().viewPlantStatistics(LocalDateTime.now().minusDays(1), LocalDateTime.now());
+        context.json(plantStatistics);
 
     }
 

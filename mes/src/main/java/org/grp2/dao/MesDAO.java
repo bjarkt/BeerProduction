@@ -1,12 +1,16 @@
 package org.grp2.dao;
 
 import org.grp2.database.DatabaseConnection;
+import org.grp2.domain.BatchStatistics;
+import org.grp2.domain.MeasurementsStatistics;
 import org.grp2.domain.OEE;
 import org.grp2.domain.Plant;
+import org.grp2.domain.PlantStatistics;
 import org.grp2.enums.OrderItemStatus;
 import org.grp2.enums.OrderStatus;
 import org.grp2.shared.*;
 
+import java.sql.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -120,8 +124,88 @@ public class MesDAO extends DatabaseConnection {
      *
      * @return
      */
-    public void viewPlantStatistics() {
+    public PlantStatistics viewPlantStatistics(LocalDateTime from, LocalDateTime to) {
+        BatchStatistics bs = getBatchStatistics(from, to);
+        MeasurementsStatistics ms = getMeasurementStatistics(bs.getBatchList());
 
+        PlantStatistics plantStatistics = new PlantStatistics(ms, bs);
+
+        return  plantStatistics;
+    }
+
+
+
+    private BatchStatistics getBatchStatistics(LocalDateTime from, LocalDateTime to) {
+        BatchStatistics batchStatistics;
+        String sql = "SELECT * FROM batches WHERE started  >= ? AND finished <= ? ";
+        List<Batch> batches = new ArrayList<>();
+        double avgAccepted = 0;
+        double avgDefects = 0;
+        double avgProductionSeconds = 0;
+
+        this.executeQuery(conn -> {
+            PreparedStatement ps = conn.prepareStatement(sql);
+
+            ps.setTimestamp(1, Timestamp.valueOf(from));
+            ps.setTimestamp(2, Timestamp.valueOf(to));
+
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()) {
+                Batch temp = batchFromResultSet(rs);
+                batches.add(temp);
+            }
+
+        });
+
+        double accepted = 0;
+        double defects = 0;
+        double seconds = 0;
+        for(Batch batch : batches) {
+            accepted += batch.getAccepted();
+            defects += batch.getDefect();
+            seconds += ChronoUnit.SECONDS.between(batch.getStarted(), batch.getFinished());
+        }
+        avgAccepted = accepted / batches.size();
+        avgDefects = defects / batches.size();
+        avgProductionSeconds = seconds / batches.size();
+
+        batchStatistics = new BatchStatistics(avgAccepted, avgDefects, avgProductionSeconds, batches);
+
+        return batchStatistics;
+    }
+
+    private MeasurementsStatistics getMeasurementStatistics(List<Batch> batches){
+        MeasurementsStatistics measurementStatistics;
+        double highestTemp = Double.MIN_VALUE;
+        double lowestTemp = Double.MAX_VALUE;
+        double avgTemp = 0;
+        double tempSum = 0;
+        List<MeasurementLog> measurements = new ArrayList<>();
+
+
+        for(Batch batch : batches) {
+            measurements.addAll(getMeasurementLogs(batch.getBatchId()));
+        }
+
+        for(MeasurementLog measurement : measurements) {
+            if(measurement.getMeasurements().getTemperature() > highestTemp) {
+                highestTemp = measurement.getMeasurements().getTemperature();
+            }
+            if(measurement.getMeasurements().getTemperature() < lowestTemp) {
+                lowestTemp = measurement.getMeasurements().getTemperature();
+            }
+        }
+
+        for(MeasurementLog measurement : measurements) {
+            tempSum += measurement.getMeasurements().getTemperature();
+        }
+
+        avgTemp = tempSum / measurements.size();
+
+        measurementStatistics = new MeasurementsStatistics(highestTemp, lowestTemp, avgTemp);
+
+        return measurementStatistics;
     }
 
 
