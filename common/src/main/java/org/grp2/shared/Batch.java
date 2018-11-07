@@ -10,8 +10,9 @@ public class Batch {
     private LocalDateTime finished;
     private int accepted;
     private int defect;
+    private int machineSpeed;
 
-    public Batch(String beerName, int orderNumber, int batchId, LocalDateTime started, LocalDateTime finished, int accepted, int defect) {
+    public Batch(String beerName, int orderNumber, int batchId, LocalDateTime started, LocalDateTime finished, int accepted, int defect, int machineSpeed) {
         this.beerName = beerName;
         this.orderNumber = orderNumber;
         this.batchId = batchId;
@@ -19,6 +20,7 @@ public class Batch {
         this.finished = finished;
         this.accepted = accepted;
         this.defect = defect;
+        this.machineSpeed = machineSpeed;
     }
 
     public String getBeerName() {

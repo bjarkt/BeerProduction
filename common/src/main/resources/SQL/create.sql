@@ -43,6 +43,7 @@ CREATE TABLE Batches (
 	finished TIMESTAMP,
 	accepted INT,
 	defect INT,
+	machine_speed INT,
 	PRIMARY KEY(beer_name, order_number)
 );
 
