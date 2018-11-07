@@ -145,7 +145,7 @@ public class MesDAO extends DatabaseConnection {
             ResultSet rs = ps.executeQuery();
 
             while(rs.next()) {
-                Batch temp = batchFromResultSet(rs, rs.getInt("batch_id"));
+                Batch temp = batchFromResultSet(rs);
                 batches.add(temp);
             }
 
