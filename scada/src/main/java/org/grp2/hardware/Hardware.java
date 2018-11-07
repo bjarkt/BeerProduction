@@ -7,6 +7,8 @@ import org.eclipse.milo.opcua.stack.client.UaTcpStackClient;
 import org.eclipse.milo.opcua.stack.core.types.builtin.LocalizedText;
 import org.eclipse.milo.opcua.stack.core.types.structured.EndpointDescription;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
 
 public class Hardware implements IHardware {
@@ -21,7 +23,7 @@ public class Hardware implements IHardware {
 
 			provider = new HardwareProvider(client);
 			subscriber = new HardwareSubscriber(client);
-		} catch(ExecutionException | InterruptedException e) {
+		} catch(ExecutionException | InterruptedException | URISyntaxException e) {
 			e.printStackTrace();
 		}
 	}
@@ -50,17 +52,46 @@ public class Hardware implements IHardware {
 	 * @throws ExecutionException
 	 * @throws InterruptedException
 	 */
-	private OpcUaClient buildClient(String endpointUrl) throws ExecutionException, InterruptedException {
+	private OpcUaClient buildClient(String endpointUrl) throws ExecutionException, InterruptedException, URISyntaxException {
 		EndpointDescription[] endpoints = UaTcpStackClient.getEndpoints(endpointUrl).get();
+
+		EndpointDescription endpoint = updateEndpointUrl(endpoints[0], endpointUrl);
 
 		OpcUaClientConfig config = OpcUaClientConfig.builder()
 				.setApplicationName(LocalizedText.english("Eclipse Milo Test Client"))
 				.setApplicationUri("urn:eclipse:milo:test:client")
-				.setEndpoint(endpoints[0])
+				.setEndpoint(endpoint)
 				.setIdentityProvider(new UsernameProvider("sdu", "1234"))
 				.setSessionName(() -> "api-test")
 				.build();
 
 		return new OpcUaClient(config);
+	}
+
+	private EndpointDescription updateEndpointUrl(
+			EndpointDescription original, String url) throws URISyntaxException {
+
+		URI uri = new URI(original.getEndpointUrl()).parseServerAuthority();
+
+		String hostname = url.split(":")[1].substring(2); // split on :, remove //
+
+		String endpointUrl = String.format(
+				"%s://%s:%s%s",
+				uri.getScheme(),
+				hostname,
+				uri.getPort(),
+				uri.getPath()
+		);
+
+		return new EndpointDescription(
+				endpointUrl,
+				original.getServer(),
+				original.getServerCertificate(),
+				original.getSecurityMode(),
+				original.getSecurityPolicyUri(),
+				original.getUserIdentityTokens(),
+				original.getTransportProfileUri(),
+				original.getSecurityLevel()
+		);
 	}
 }

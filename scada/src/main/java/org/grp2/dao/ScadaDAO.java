@@ -25,7 +25,7 @@ public class ScadaDAO extends DatabaseConnection {
     public List<MeasurementLog> getMeasurementLogs(int batchId) {
         List<MeasurementLog> measurementLogs = new ArrayList<>();
         this.executeQuery(conn -> {
-            PreparedStatement ps = conn.prepareStatement("SELECT batch_id, measurement_time, temperature, humidity FROM Measurement_logs WHERE batch_id = ?");
+            PreparedStatement ps = conn.prepareStatement("SELECT batch_id, measurement_time, temperature, humidity, vibration FROM Measurement_logs WHERE batch_id = ?");
             ps.setInt(1, batchId);
 
             ResultSet rs = ps.executeQuery();
@@ -34,7 +34,7 @@ public class ScadaDAO extends DatabaseConnection {
                 LocalDateTime timestamp = rs.getTimestamp("measurement_time").toLocalDateTime();
                 MeasurementLog measurementLog = new MeasurementLog(rs.getBigDecimal("batch_id").intValue(),
                         timestamp, rs.getDouble("temperature"),
-                        rs.getDouble("humidity"), 0);
+                        rs.getDouble("humidity"), rs.getDouble("vibration"));
                 measurementLogs.add(measurementLog);
             }
         });
@@ -123,7 +123,7 @@ public class ScadaDAO extends DatabaseConnection {
 
         // is the machine ready? (no currently running batch)
         if (this.getCurrentBatch() == null) {
-            productionInformation.ifPresent(this::addBatchAndRemoveFromQueue);
+            productionInformation.ifPresent(this::addBatch);
             batchRunning = false;
         }
 
@@ -133,32 +133,12 @@ public class ScadaDAO extends DatabaseConnection {
             return null; // no item, cannot start
         }
     }
-
-    /**
-     * Add {@link ProductionInformation} list to queue_items.
-     * @param productionInformations list of production information
-     */
-    public void addToQueueItems(List<ProductionInformation> productionInformations) {
-        String sql = "INSERT INTO queue_items VALUES (DEFAULT, ?, ?, ?, ?)";
-
-        this.executeQuery(conn -> {
-            PreparedStatement ps = conn.prepareStatement(sql);
-            for (ProductionInformation productInfo : productionInformations) {
-                ps.setInt(1, productInfo.getQuantity());
-                ps.setInt(2, productInfo.getMachineSpeed());
-                ps.setString(3, productInfo.getRecipeName());
-                ps.setInt(4, productInfo.getOrderNumber());
-                ps.addBatch();
-            }
-            ps.executeBatch();
-        });
-    }
-
+  
     /**
      * Add a {@link ProductionInformation} from the queue to the batches table, and remove it from the queue.
      * @param productionInformation the item to add and remove
      */
-    private void addBatchAndRemoveFromQueue(ProductionInformation productionInformation) {
+    private void addBatch(ProductionInformation productionInformation) {
         this.executeQuery(conn -> {
             PreparedStatement ps = conn.prepareStatement("INSERT INTO batches VALUES (?, ?, ?, now(), null, null, null)");
             ps.setString(1, productionInformation.getRecipeName());
@@ -167,7 +147,6 @@ public class ScadaDAO extends DatabaseConnection {
 
             ps.executeUpdate();
         });
-        this.deleteQueueItem(productionInformation);
     }
 
     /**
@@ -175,10 +154,18 @@ public class ScadaDAO extends DatabaseConnection {
      * @param productionInformation item to remove
      */
     private void deleteQueueItem(ProductionInformation productionInformation) {
+        this.deleteQueueItem(productionInformation.getRecipeName(), productionInformation.getOrderNumber());
+    }
+
+    public void deleteQueueItem(Batch batch) {
+        this.deleteQueueItem(batch.getBeerName(), batch.getOrderNumber());
+    }
+
+    private void deleteQueueItem(String recipeName, int orderNumber) {
         this.executeQuery(conn -> {
             PreparedStatement ps = conn.prepareStatement("DELETE FROM queue_items WHERE recipe_name = ? AND order_number = ?");
-            ps.setString(1, productionInformation.getRecipeName());
-            ps.setInt(2, productionInformation.getOrderNumber());
+            ps.setString(1, recipeName);
+            ps.setInt(2, orderNumber);
 
             ps.executeUpdate();
         });
@@ -195,7 +182,7 @@ public class ScadaDAO extends DatabaseConnection {
         this.executeQuery(conn -> {
             PreparedStatement ps = conn.prepareStatement("SELECT id, name, min_speed, max_speed " +
                                                             "FROM recipes WHERE name = ?");
-            ps.setString(1, name);
+            ps.setString(1, name.toLowerCase());
 
             ResultSet rs = ps.executeQuery();
 
@@ -232,7 +219,7 @@ public class ScadaDAO extends DatabaseConnection {
     /**
      * Set the finished time of the running batch.
      */
-    public void updateCurrentBatchFinished() {
+    public Batch updateCurrentBatchFinished() {
         Batch currentBatch = this.getCurrentBatch();
         if (currentBatch != null) {
             this.executeQuery(conn -> {
@@ -242,6 +229,8 @@ public class ScadaDAO extends DatabaseConnection {
                 ps.executeUpdate();
             });
         }
+
+        return currentBatch;
     }
 
     /**
@@ -279,15 +268,16 @@ public class ScadaDAO extends DatabaseConnection {
      * @param temperature temperature
      * @param humidity humidity
      */
-    public void updateMeasurementLogs(double temperature, double humidity) {
+    public void updateMeasurementLogs(double temperature, double humidity, double vibration) {
         Batch currentBatch = this.getCurrentBatch();
 
         if (currentBatch != null) {
             this.executeQuery(conn -> {
-                PreparedStatement ps = conn.prepareStatement("INSERT INTO measurement_logs VALUES (?, now(), ?, ?)");
+                PreparedStatement ps = conn.prepareStatement("INSERT INTO measurement_logs VALUES (?, now(), ?, ?, ?)");
                 ps.setInt(1, currentBatch.getBatchId());
                 ps.setDouble(2, temperature);
                 ps.setDouble(3, humidity);
+                ps.setDouble(4, vibration);
 
                 ps.executeUpdate();
             });
@@ -368,5 +358,20 @@ public class ScadaDAO extends DatabaseConnection {
                 ps.executeUpdate();
             });
         }
+    }
+
+    public void updateOrderItemStatus(Batch finishedBatch, String status) {
+        if (finishedBatch != null) {
+            this.executeQuery(conn -> {
+                PreparedStatement ps = conn.prepareStatement("UPDATE order_items SET status = ? WHERE order_number = ?");
+                ps.setString(1, status);
+                ps.setInt(2, finishedBatch.getOrderNumber());
+
+                ps.executeUpdate();
+            });
+        }
+    }
+
+    public void removeFromQueueItems(Batch finishedBatch) {
     }
 }

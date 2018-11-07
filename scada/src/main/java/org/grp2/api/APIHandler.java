@@ -1,7 +1,5 @@
 package org.grp2.api;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.Context;
 import org.grp2.dao.ScadaDAO;
 import org.grp2.domain.*;
@@ -13,8 +11,8 @@ import org.grp2.shared.Measurements;
 import org.grp2.shared.ProductionInformation;
 import org.grp2.shared.Recipe;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -24,21 +22,23 @@ public class APIHandler {
     private ScadaDAO scadaDao;
     private IHardwareProvider hardwareProvider;
     private IHardwareSubscriber hardwareSubscriber;
-    private ObjectMapper mapper;
+    private ZoneId copenhagenZoneId;
 
     public APIHandler(IHardware hardware) {
         this.scadaDao = new ScadaDAO();
         this.hardwareProvider = hardware.getProvider();
         this.hardwareSubscriber = hardware.getSubscriber();
-        this.mapper = new ObjectMapper();
+        this.copenhagenZoneId = ZoneId.of("Europe/Copenhagen");
     }
 
     public void listenForStateChanges() {
-        AtomicReference<LocalDateTime> now = new AtomicReference<>(LocalDateTime.now());
+        AtomicReference<LocalDateTime> now = new AtomicReference<>(LocalDateTime.now(copenhagenZoneId));
         AtomicReference<State> previousState = new AtomicReference<>();
         AtomicReference<State> state = new AtomicReference<>();
+
         this.hardwareSubscriber.subscribe(CubeNodeId.READ_STATE, value -> {
-            LocalDateTime stateChanged = LocalDateTime.now();
+            System.out.println("State changed to: " + State.fromCode((int) value));
+            LocalDateTime stateChanged = LocalDateTime.now(copenhagenZoneId);
             long seconds = ChronoUnit.SECONDS.between(now.get(), stateChanged);
 
             if (previousState.get() != State.EXECUTE) { // update of EXECUTE state is handled in completeBatch();
@@ -47,59 +47,49 @@ public class APIHandler {
             previousState.set(state.get());
 
             state.set(State.fromCode((int) value));
-            now.set(LocalDateTime.now());
+            now.set(LocalDateTime.now(copenhagenZoneId));
             if (state.get() != null) {
-                switch (state.get()) {
-                    case IDLE:
-                        try {
-                            this.startBatch();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        break;
-                    case COMPLETE:
-                        this.completeBatch(previousState.get(), Math.toIntExact(seconds));
-                        break;
-                }
+                handleStateChange(state.get(), previousState.get(), Math.toIntExact(seconds));
             }
-        }, 1000);
+        }, 500);
 
-        // Collect measurements
-        this.hardwareSubscriber.subscribe(CubeNodeId.READ_TEMPERAURE, temperatureFloat -> {
-            double temperature = ((Float) temperatureFloat).doubleValue();
-            this.hardwareSubscriber.subscribe(CubeNodeId.READ_HUMIDITY, humidityFloat -> {
-                double humidity = ((Float) humidityFloat).doubleValue();
-                scadaDao.updateMeasurementLogs(temperature, humidity);
-            }, 1000);
-        }, 1000);
-
-        // Collecit accepted and defected
-        this.hardwareSubscriber.subscribe(CubeNodeId.READ_CURRENT_PRODUCED, produced -> {
-            scadaDao.updateCurrentBatchProduced((Integer) produced);
-        }, 1000);
-        this.hardwareSubscriber.subscribe(CubeNodeId.READ_CURRENT_DEFECTIVE, defects -> {
-            scadaDao.updateCurrentBatchDefects((Integer) defects);
-        }, 1000);
+        collectData();
     }
 
     public void startNewProduction(Context context) {
         Message message = new Message(200, "Success");
-        List<ProductionInformation> productInfos = new ArrayList<>();
-        try {
-            Map<String, List<ProductionInformation>> temp = mapper.readValue(context.body(), new TypeReference<Map<String, ArrayList<ProductionInformation>>>() {
-            });
-            productInfos = temp.get("orderItems");
-        } catch (IOException e) {
-            message.set(422, "JSON Error : " + e.getMessage());
-        }
-
-        scadaDao.addToQueueItems(productInfos);
         try {
             message = startBatch();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        context.json(message);
+
+        message.send(context);
+    }
+
+    private Message startBatch() throws InterruptedException {
+        Message message = new Message(200, "Batch started");
+        ProductionInformation startedBatch = scadaDao.startNextBatch();
+
+
+        if (startedBatch != null) {
+            Recipe recipe = scadaDao.getRecipe(startedBatch.getRecipeName());
+
+            hardwareProvider.setBatchId(startedBatch.getBatchId());
+            hardwareProvider.setProduct(recipe.getId());
+            hardwareProvider.setAmountToProduce(startedBatch.getQuantity());
+            hardwareProvider.setMachSpeed(startedBatch.getMachineSpeed());
+
+            hardwareProvider.stop();
+            TimeUnit.SECONDS.sleep(2);
+            hardwareProvider.reset();
+            TimeUnit.SECONDS.sleep(2);
+            hardwareProvider.start();
+        } else {
+            message.set(200, "No batch started. Queue is empty, or another batch is currently executing.");
+        }
+
+        return message;
     }
 
     public void manageProduction(Context context) {
@@ -125,8 +115,8 @@ public class APIHandler {
                 message.setStatus(422);
                 message.setMessage("Choice not supported");
         }
-        context.status(message.getStatus());
-        context.json(message);
+
+        message.send(context);
     }
 
     public void viewScreen(Context context) {
@@ -146,7 +136,7 @@ public class APIHandler {
         Batch batch = scadaDao.getBatch(batchorder.getBatchId());
         if (batch != null) {
             LocalDateTime started = batch.getStarted();
-            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime now = LocalDateTime.now(copenhagenZoneId);
             long minutes = started.until(now, ChronoUnit.MINUTES);
             batchorder.setProductsPerMinute((int) ((batchorder.getAmountToProduce()) / (minutes == 0 ? 1 : minutes)));
         }
@@ -176,39 +166,68 @@ public class APIHandler {
     }
 
 
-    private Message startBatch() throws InterruptedException {
-        Message message = new Message(200, "Order started");
-        ProductionInformation startedBatch = scadaDao.startNextBatch();
-
-        if (startedBatch != null) {
-            Recipe recipe = scadaDao.getRecipe(startedBatch.getRecipeName());
-
-            hardwareProvider.setBatchId(startedBatch.getBatchId());
-            hardwareProvider.setProduct(recipe.getId());
-            hardwareProvider.setAmountToProduce(startedBatch.getQuantity());
-            hardwareProvider.setMachSpeed(startedBatch.getMachineSpeed());
-            if (!startedBatch.validateMachSpeed(recipe.getMinSpeed(), recipe.getMaxSpeed())) {
-                message.setStatus(422);
-                message.setMessage("Invalid Speed");
-            }
-            hardwareProvider.stop();
-            TimeUnit.SECONDS.sleep(1);
-            hardwareProvider.reset();
-            TimeUnit.SECONDS.sleep(1);
-            hardwareProvider.start();
-        } else {
-            message.set(200, "Order placed in queue");
-        }
-
-        return message;
-    }
-
-    private void completeBatch(State state, int timeElapsed) {
+    private void completeBatch(State state, int timeElapsed) throws InterruptedException {
+        System.out.println("Starting complete batch");
         scadaDao.updateStateTimeLogs(state, timeElapsed);
         scadaDao.updateCurrentBatchProduced(hardwareProvider.getAcceptedBeersProduced());
         scadaDao.updateCurrentBatchDefects(hardwareProvider.getDefectiveBeersProduced());
-        scadaDao.updateCurrentBatchFinished();
-        hardwareProvider.stop();
+        Batch finishedBatch = scadaDao.updateCurrentBatchFinished();
+        System.out.println("Completed batch, trying to update status and delete");
+        if (finishedBatch != null) {
+            scadaDao.updateOrderItemStatus(finishedBatch, "processed");
+            scadaDao.deleteQueueItem(finishedBatch);
+        }
+
+        //hardwareProvider.stop();
+        TimeUnit.SECONDS.sleep(2);
         hardwareProvider.reset();
+    }
+
+    private void handleStateChange(State state, State previousState, int seconds) {
+        switch (state) {
+            case IDLE:
+                try {
+                    this.startBatch();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case COMPLETE:
+                try {
+                    this.completeBatch(previousState, seconds);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                break;
+        }
+    }
+
+    private void collectData() {
+        // Collect measurements
+        AtomicReference<Double> vibration = new AtomicReference<>(Double.MIN_VALUE);
+        AtomicReference<Double> humidity =  new AtomicReference<>(Double.MIN_VALUE);
+        AtomicReference<Double> temperature =  new AtomicReference<>(Double.MIN_VALUE);
+
+        this.hardwareSubscriber.subscribe(CubeNodeId.READ_VIBRATION, vibrationFloat -> {
+            vibration.set(((Float) vibrationFloat).doubleValue());
+        }, 1000);
+        this.hardwareSubscriber.subscribe(CubeNodeId.READ_HUMIDITY, humidityFloat -> {
+            humidity.set(((Float) humidityFloat).doubleValue());
+        }, 1000);
+        this.hardwareSubscriber.subscribe(CubeNodeId.READ_TEMPERAURE, temperatureFloat -> {
+            temperature.set(((Float) temperatureFloat).doubleValue());
+            if (temperature.get() != Double.MIN_VALUE && humidity.get() != Double.MIN_VALUE && vibration.get() != Double.MIN_VALUE) {
+                scadaDao.updateMeasurementLogs(temperature.get(), humidity.get(), vibration.get());
+            }
+        }, 1000);
+
+
+        // Collect accepted and defected
+        this.hardwareSubscriber.subscribe(CubeNodeId.READ_CURRENT_PRODUCED, produced -> {
+            scadaDao.updateCurrentBatchProduced((Integer) produced);
+        }, 1000);
+        this.hardwareSubscriber.subscribe(CubeNodeId.READ_CURRENT_DEFECTIVE, defects -> {
+            scadaDao.updateCurrentBatchDefects((Integer) defects);
+        }, 1000);
     }
 }
