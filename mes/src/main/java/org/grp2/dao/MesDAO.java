@@ -101,14 +101,6 @@ public class MesDAO extends DatabaseConnection {
                 PreparedStatement ps = conn.prepareStatement(getOrderQuery);
                 ResultSet rs = ps.executeQuery();
                 while (rs.next()) {
-                    String beerName = rs.getString(1);
-                    int orderNumber = rs.getInt(2);
-                    int batchId = rs.getInt(3);
-                    LocalDateTime started = rs.getTimestamp(4).toLocalDateTime();
-                    LocalDateTime finished = rs.getTimestamp(5).toLocalDateTime();
-                    int accepted = rs.getInt(6);
-                    int defect = rs.getInt(7);
-
                     batches.add(batchFromResultSet(rs));
                 }
 
