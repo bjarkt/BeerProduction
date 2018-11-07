@@ -14,10 +14,15 @@ import org.grp2.shared.Batch;
 import org.grp2.shared.MeasurementLog;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.time.format.DateTimeFormatter;
 
 public class SimplePdfPrinter1 implements IPrintManager {
+	private String path;
+
 	private Paragraph pTitle;
 	private Table tBasicInfo;
 	private Table tMeasurements;
@@ -26,18 +31,26 @@ public class SimplePdfPrinter1 implements IPrintManager {
 	private DecimalFormat df;
 
 	public SimplePdfPrinter1() {
+		path = null;
 		dtf = DateTimeFormatter.ofPattern("uuuu:MM:dd  HH:mm:ss");
 		df = new DecimalFormat("#.0000");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setPath(String path) {
+		this.path = path;
 	}
 
 	/**
 	 * Writes document in a very simple format. It contains a title and two sections.
 	 * The first section is basic information, which includes beer names etc.
 	 * The second section are the measurements in a table with three columns.
-	 * @param path the path to write the document to, including name
 	 * @param batch any batch
 	 */
-	public void writeDocument(String path, Batch batch, MeasurementLog ... logs) {
+	public void writeDocument(Batch batch, MeasurementLog ... logs) {
 		try {
 			PdfWriter writer = new PdfWriter(path);
 			PdfDocument pdf = new PdfDocument(writer);
@@ -52,11 +65,29 @@ public class SimplePdfPrinter1 implements IPrintManager {
 			document.add(tMeasurements);
 
 			document.close();
+
+			pTitle = null;
+			tBasicInfo = null;
+			tMeasurements = null;
 		} catch(FileNotFoundException e) {
 			e.printStackTrace();
 		}
-
 		//System.out.println(FontProgramFactory.getRegisteredFonts());
+	}
+
+	@Override
+	public byte[] getDocument() {
+		byte[] array = null;
+
+		if(path != null) {
+			try {
+				array = Files.readAllBytes(Paths.get(path));
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return array;
 	}
 
 	private void setupDocumentTitle() {
