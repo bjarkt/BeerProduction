@@ -233,9 +233,12 @@ public class MesDAO extends DatabaseConnection {
 
     public OEE getOEE(int batchID) {
 
-        double availability = getOEEAvailability(batchID);
-        double performance = getOEEPerformance(batchID);
-        double quality = getOEEQuality(batchID);
+
+        Batch batch = getBatch(batchID);
+
+        double availability = getOEEAvailability(batch);
+        double performance = getOEEPerformance(batch);
+        double quality = getOEEQuality(batch);
 
         OEE oee = new OEE(availability, performance, quality);
 
@@ -246,35 +249,12 @@ public class MesDAO extends DatabaseConnection {
     /**
      * This method calculates the availability from the data that is in the database. The method is needed to
      * calculate the OEE.
-     * @param batchID
+     * @param batch
      * @return
      */
-    private double getOEEAvailability(int batchID) {
-
-        AtomicReference<Integer> accepted = new AtomicReference<>();
-        AtomicReference<Integer> defect = new AtomicReference<>();
-        AtomicReference<Integer> machineSpeed = new AtomicReference<>();
-
-        this.executeQuery(conn -> {
-            try {
-                PreparedStatement ps = conn.prepareStatement("SELECT accepted, defect, machine_speed" +
-                        "FROM Batches WHERE batch_id = ?");
-                ps.setInt(1, batchID);
-
-                ResultSet rs = ps.executeQuery();
-                while (rs.next()) {
-                    accepted.set(rs.getInt(1));
-                    defect.set(rs.getInt(2));
-                    machineSpeed.set(rs.getInt(3));
-
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
-
-        double plannedProductionTime = (machineSpeed.get()/60) * (accepted.get() + defect.get());
-        double stopTime = getOEEStopTime(batchID);
+    private double getOEEAvailability(Batch batch) {
+        double plannedProductionTime = (60.0/((double) batch.getMachineSpeed())) * (((double) batch.getAccepted()) + ((double)batch.getDefect()));
+        double stopTime = getOEEStopTime(batch.getBatchId());
         double runtime = plannedProductionTime - stopTime;
 
         double availability = runtime / plannedProductionTime;
@@ -307,37 +287,20 @@ public class MesDAO extends DatabaseConnection {
 
     /**
      * Performance cannot be calculated in our system so it will always be 1.
-     * @param batchID
+     * @param batch
      * @return
      */
-    private double getOEEPerformance(int batchID) {
+    private double getOEEPerformance(Batch batch) {
         return 1;
     }
 
     /**
      * The method calculates the quality by getting the amount of accepted and defect beers and dividing the total
-     * @param batchID
+     * @param batch
      * @return
      */
-    private double getOEEQuality(int batchID) {
-        AtomicReference<Integer> accepted = new AtomicReference<>();
-        AtomicReference<Integer> defect = new AtomicReference<>();
-        this.executeQuery(conn -> {
-            try {
-                PreparedStatement ps = conn.prepareStatement("SELECT accepted, defect FROM Batches WHERE batch_id = ? ");
-                ps.setInt(1, batchID);
-
-                ResultSet rs = ps.executeQuery();
-                while (rs.next()) {
-                    accepted.set(rs.getInt(1));
-                    defect.set(rs.getInt(2));
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
-
-        double quality = accepted.get() / (accepted.get() + defect.get());
+    private double getOEEQuality(Batch batch) {
+        double quality = ((double) batch.getAccepted()) / (((double) batch.getAccepted()) + ((double) batch.getDefect()));
 
         return quality;
     }

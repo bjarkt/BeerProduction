@@ -78,4 +78,6 @@ public class Batch {
     public void setDefect(int defect) {
         this.defect = defect;
     }
+
+    public int getMachineSpeed() { return machineSpeed; }
 }
