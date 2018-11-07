@@ -3,6 +3,7 @@ package org.grp2.dao;
 import org.grp2.database.DatabaseConnection;
 import org.grp2.domain.BatchStatistics;
 import org.grp2.domain.MeasurementsStatistics;
+import org.grp2.domain.OEE;
 import org.grp2.domain.Plant;
 import org.grp2.domain.PlantStatistics;
 import org.grp2.enums.OrderItemStatus;
@@ -10,12 +11,18 @@ import org.grp2.enums.OrderStatus;
 import org.grp2.shared.*;
 
 import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class MesDAO extends DatabaseConnection {
@@ -308,4 +315,77 @@ public class MesDAO extends DatabaseConnection {
         return new Batch(beerName, orderNumber, batchId, started, finished, accepted, defect, machineSpeed);
     }
 
+    public OEE getOEE(int batchID) {
+
+
+        Batch batch = getBatch(batchID);
+
+        double availability = getOEEAvailability(batch);
+        double performance = getOEEPerformance(batch);
+        double quality = getOEEQuality(batch);
+
+        OEE oee = new OEE(availability, performance, quality);
+
+        return oee;
+
+    }
+
+    /**
+     * This method calculates the availability from the data that is in the database. The method is needed to
+     * calculate the OEE.
+     * @param batch
+     * @return
+     */
+    private double getOEEAvailability(Batch batch) {
+        double plannedProductionTime = (60.0/((double) batch.getMachineSpeed())) * (((double) batch.getAccepted()) + ((double)batch.getDefect()));
+        double stopTime = getOEEStopTime(batch.getBatchId());
+        double runtime = plannedProductionTime - stopTime;
+
+        double availability = runtime / plannedProductionTime;
+
+        return availability;
+    }
+
+    /**
+     * Method to get the stop time needed to calculate availability.
+     * @param batchID
+     * @return
+     */
+    private int getOEEStopTime(int batchID) {
+        AtomicReference<Integer> stopTime = new AtomicReference<>();
+        this.executeQuery(conn -> {
+            try {
+                PreparedStatement ps = conn.prepareStatement("SELECT sum(time_elapsed) FROM State_time_logs WHERE batch_id = ? AND phase <> 6");
+                ps.setInt(1, batchID);
+
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    stopTime.set(rs.getInt(1));
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
+        return stopTime.get();
+    }
+
+    /**
+     * Performance cannot be calculated in our system so it will always be 1.
+     * @param batch
+     * @return
+     */
+    private double getOEEPerformance(Batch batch) {
+        return 1;
+    }
+
+    /**
+     * The method calculates the quality by getting the amount of accepted and defect beers and dividing the total
+     * @param batch
+     * @return
+     */
+    private double getOEEQuality(Batch batch) {
+        double quality = ((double) batch.getAccepted()) / (((double) batch.getAccepted()) + ((double) batch.getDefect()));
+
+        return quality;
+    }
 }
