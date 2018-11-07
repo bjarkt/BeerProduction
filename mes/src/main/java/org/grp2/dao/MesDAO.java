@@ -166,7 +166,6 @@ public class MesDAO extends DatabaseConnection {
         batchStatistics = new BatchStatistics(avgAccepted, avgDefects, avgProductionSeconds, batches);
 
         return batchStatistics;
-
     }
 
     private MeasurementsStatistics getMeasurementStatistics(List<Batch> batches){
@@ -199,15 +198,8 @@ public class MesDAO extends DatabaseConnection {
 
         measurementStatistics = new MeasurementsStatistics(highestTemp, lowestTemp, avgTemp);
 
-
-
-
-
         return measurementStatistics;
     }
-
-
-
 
 
     /**
