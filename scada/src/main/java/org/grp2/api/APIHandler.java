@@ -71,7 +71,6 @@ public class APIHandler {
         Message message = new Message(200, "Batch started");
         ProductionInformation startedBatch = scadaDao.startNextBatch();
 
-
         if (startedBatch != null) {
             Recipe recipe = scadaDao.getRecipe(startedBatch.getRecipeName());
 
@@ -183,6 +182,24 @@ public class APIHandler {
         hardwareProvider.reset();
     }
 
+    private int calculateMissingBeers(){
+        int quantity = (int) hardwareProvider.getAmountToProduce();
+        int acceptedBeers = hardwareProvider.getAcceptedBeersProduced();
+        if(quantity != acceptedBeers){
+            return quantity - acceptedBeers;
+        }
+        return 0;
+    }
+
+    private void handleRejectedBeers(int rejects) throws InterruptedException{
+            hardwareProvider.setAmountToProduce(rejects);
+            hardwareProvider.stop();
+            TimeUnit.SECONDS.sleep(2);
+            hardwareProvider.reset();
+            TimeUnit.SECONDS.sleep(2);
+            hardwareProvider.start();
+    }
+
     private void handleStateChange(State state, State previousState, int seconds) {
         switch (state) {
             case IDLE:
@@ -194,7 +211,8 @@ public class APIHandler {
                 break;
             case COMPLETE:
                 try {
-                    this.completeBatch(previousState, seconds);
+                    if(calculateMissingBeers() == 0) this.completeBatch(previousState, seconds);
+                    else handleRejectedBeers(calculateMissingBeers());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
