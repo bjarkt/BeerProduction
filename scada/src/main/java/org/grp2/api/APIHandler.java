@@ -12,6 +12,7 @@ import org.grp2.shared.ProductionInformation;
 import org.grp2.shared.Recipe;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -21,21 +22,23 @@ public class APIHandler {
     private ScadaDAO scadaDao;
     private IHardwareProvider hardwareProvider;
     private IHardwareSubscriber hardwareSubscriber;
+    private ZoneId copenhagenZoneId;
 
     public APIHandler(IHardware hardware) {
         this.scadaDao = new ScadaDAO();
         this.hardwareProvider = hardware.getProvider();
         this.hardwareSubscriber = hardware.getSubscriber();
+        this.copenhagenZoneId = ZoneId.of("Europe/Copenhagen");
     }
 
     public void listenForStateChanges() {
-        AtomicReference<LocalDateTime> now = new AtomicReference<>(LocalDateTime.now());
+        AtomicReference<LocalDateTime> now = new AtomicReference<>(LocalDateTime.now(copenhagenZoneId));
         AtomicReference<State> previousState = new AtomicReference<>();
         AtomicReference<State> state = new AtomicReference<>();
 
         this.hardwareSubscriber.subscribe(CubeNodeId.READ_STATE, value -> {
             System.out.println("State changed to: " + State.fromCode((int) value));
-            LocalDateTime stateChanged = LocalDateTime.now();
+            LocalDateTime stateChanged = LocalDateTime.now(copenhagenZoneId);
             long seconds = ChronoUnit.SECONDS.between(now.get(), stateChanged);
 
             if (previousState.get() != State.EXECUTE) { // update of EXECUTE state is handled in completeBatch();
@@ -44,7 +47,7 @@ public class APIHandler {
             previousState.set(state.get());
 
             state.set(State.fromCode((int) value));
-            now.set(LocalDateTime.now());
+            now.set(LocalDateTime.now(copenhagenZoneId));
             if (state.get() != null) {
                 handleStateChange(state.get(), previousState.get(), Math.toIntExact(seconds));
             }
@@ -133,7 +136,7 @@ public class APIHandler {
         Batch batch = scadaDao.getBatch(batchorder.getBatchId());
         if (batch != null) {
             LocalDateTime started = batch.getStarted();
-            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime now = LocalDateTime.now(copenhagenZoneId);
             long minutes = started.until(now, ChronoUnit.MINUTES);
             batchorder.setProductsPerMinute((int) ((batchorder.getAmountToProduce()) / (minutes == 0 ? 1 : minutes)));
         }
