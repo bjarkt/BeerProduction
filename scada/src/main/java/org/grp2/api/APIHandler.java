@@ -37,19 +37,19 @@ public class APIHandler {
         AtomicReference<State> state = new AtomicReference<>();
 
         this.hardwareSubscriber.subscribe(CubeNodeId.READ_STATE, value -> {
-            System.out.println("State changed to: " + State.fromCode((int) value));
             LocalDateTime stateChanged = LocalDateTime.now(copenhagenZoneId);
             long seconds = ChronoUnit.SECONDS.between(now.get(), stateChanged);
-
-            if (previousState.get() != State.EXECUTE) { // update of EXECUTE state is handled in completeBatch();
+            System.out.println(String.format("CURRENT STATE: %s", (State.fromCode((Integer) value))));
+            previousState.set(state.get());
+            if (previousState.get() != null) {
+                System.out.println(String.format("PREVIOUS STATE: %s - time spent %d\n", previousState.get(), seconds));
                 scadaDao.updateStateTimeLogs(previousState.get(), Math.toIntExact(seconds));
             }
-            previousState.set(state.get());
 
             state.set(State.fromCode((int) value));
             now.set(LocalDateTime.now(copenhagenZoneId));
             if (state.get() != null) {
-                handleStateChange(state.get(), previousState.get(), Math.toIntExact(seconds));
+                handleStateChange(state.get());
             }
         }, 500);
 
@@ -166,13 +166,10 @@ public class APIHandler {
     }
 
 
-    private void completeBatch(State state, int timeElapsed) throws InterruptedException {
-        System.out.println("Starting complete batch");
-        scadaDao.updateStateTimeLogs(state, timeElapsed);
+    private void completeBatch() throws InterruptedException {
         scadaDao.updateCurrentBatchProduced(hardwareProvider.getAcceptedBeersProduced());
         scadaDao.updateCurrentBatchDefects(hardwareProvider.getDefectiveBeersProduced());
         Batch finishedBatch = scadaDao.updateCurrentBatchFinished();
-        System.out.println("Completed batch, trying to update status and delete");
         if (finishedBatch != null) {
             scadaDao.updateOrderItemStatus(finishedBatch, "processed");
             scadaDao.deleteQueueItem(finishedBatch);
@@ -183,7 +180,7 @@ public class APIHandler {
         hardwareProvider.reset();
     }
 
-    private void handleStateChange(State state, State previousState, int seconds) {
+    private void handleStateChange(State state) {
         switch (state) {
             case IDLE:
                 try {
@@ -194,7 +191,7 @@ public class APIHandler {
                 break;
             case COMPLETE:
                 try {
-                    this.completeBatch(previousState, seconds);
+                    this.completeBatch();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
