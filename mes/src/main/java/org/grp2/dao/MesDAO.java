@@ -305,4 +305,115 @@ public class MesDAO extends DatabaseConnection {
         return quality;
     }
 
+    public OEE getOEE(int batchID) {
+
+        double availability = getOEEAvailability(batchID);
+        double performance = getOEEPerformance(batchID);
+        double quality = getOEEQuality(batchID);
+
+        OEE oee = new OEE(availability, performance, quality);
+
+        return oee;
+
+    }
+
+    /**
+     * This method calculates the availability from the data that is in the database. The method is needed to
+     * calculate the OEE.
+     * @param batchID
+     * @return
+     */
+    private double getOEEAvailability(int batchID) {
+
+        AtomicReference<Integer> accepted = new AtomicReference<>();
+        AtomicReference<Integer> defect = new AtomicReference<>();
+        AtomicReference<Integer> machineSpeed = new AtomicReference<>();
+
+        this.executeQuery(conn -> {
+            try {
+                PreparedStatement ps = conn.prepareStatement("SELECT accepted, defect, machine_speed" +
+                        "FROM Batches WHERE batch_id = ?");
+                ps.setInt(1, batchID);
+
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    accepted.set(rs.getInt(1));
+                    defect.set(rs.getInt(2));
+                    machineSpeed.set(rs.getInt(3));
+
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
+
+        double plannedProductionTime = (machineSpeed.get()/60) * (accepted.get() + defect.get());
+        double stopTime = getOEEStopTime(batchID);
+        double runtime = plannedProductionTime - stopTime;
+
+        double availability = runtime / plannedProductionTime;
+
+        return availability;
+    }
+
+    /**
+     * Method to get the stop time needed to calculate availability.
+     * @param batchID
+     * @return
+     */
+    private int getOEEStopTime(int batchID) {
+        AtomicReference<Integer> stopTime = new AtomicReference<>();
+        this.executeQuery(conn -> {
+            try {
+                PreparedStatement ps = conn.prepareStatement("SELECT sum(time_elapsed) FROM State_time_logs WHERE batch_id = ? AND phase <> 6");
+                ps.setInt(1, batchID);
+
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    stopTime.set(rs.getInt(1));
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
+        return stopTime.get();
+    }
+
+    /**
+     * Performance cannot be calculated in our system so it will always be 1.
+     * @param batchID
+     * @return
+     */
+    private double getOEEPerformance(int batchID) {
+        return 1;
+    }
+
+    /**
+     * The method calculates the quality by getting the amount of accepted and defect beers and dividing the total
+     * @param batchID
+     * @return
+     */
+    private double getOEEQuality(int batchID) {
+        AtomicReference<Integer> accepted = new AtomicReference<>();
+        AtomicReference<Integer> defect = new AtomicReference<>();
+        this.executeQuery(conn -> {
+            try {
+                PreparedStatement ps = conn.prepareStatement("SELECT accepted, defect FROM Batches WHERE batch_id = ? ");
+                ps.setInt(1, batchID);
+
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    accepted.set(rs.getInt(1));
+                    defect.set(rs.getInt(2));
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
+
+        double quality = accepted.get() / (accepted.get() + defect.get());
+
+        return quality;
+    }
+
 }
