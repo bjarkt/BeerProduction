@@ -7,6 +7,7 @@ import com.mashape.unirest.http.ObjectMapper;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import io.javalin.Context;
+import org.grp2.domain.OEE;
 import org.grp2.javalin.Message;
 import org.grp2.dao.MesDAO;
 import org.grp2.domain.Plant;
@@ -94,6 +95,12 @@ public class APIHandler {
         //context.header("Content-Length", String.valueOf(report.length));
         context.header("Content-Disposition", "attachment;filename=batch-report.pdf");
         //context.result(new ByteArrayInputStream(report));
+    }
+
+    public void getOEE(Context context) {
+        int batchID = Integer.parseInt(context.pathParam("batch-id"));
+        OEE oee = plant.getMesDAO().getOEE(batchID);
+        context.json(oee);
     }
 
 }
