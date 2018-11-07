@@ -12,7 +12,7 @@ public class API {
 
     public void start() {
         Javalin app = JavalinSetup.setup(PORT);
-        APIHandler handler = new APIHandler(new Hardware(IHardware.SIMULATION_URL));
+        APIHandler handler = new APIHandler(new Hardware(IHardware.CUBE_URL));
         handler.listenForStateChanges();
         setRoutes(app, handler);
         app.start();
