@@ -8,6 +8,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import org.grp2.javalin.Message;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class UI {
 
@@ -29,62 +30,67 @@ public class UI {
         } while (true);
     }
 
-    private void changeSystem (SubSystem subSystem)
-    {
-
-    }
-
     private void performCommand(Command command)
     {
         Message message = new Message(200, "Success");
         boolean validCommand = true;
-        String commandURL = "";
+        boolean validArguments = true;
+        StringBuilder sb = new StringBuilder();
 
-        switch (SCADACommands.fromCommand(command.getKeyword()))
+        switch (command.getSubSystem())
         {
-            case START_NEW_BATCH:
-                System.out.println("Start New Batch");
-                commandURL = "http://localhost:7000/api/start-new-production";
+            case SCADA:
+                sb.append("http://localhost:7000/api/");
                 break;
-            case MANAGE_PRODUCTION:
-                if (command.getArgs().length != 1)
-                {
-                    validCommand = false;
-                    break;
-                }
-
-                System.out.println("Manage Production: " + command.getArgs()[0]);
-                commandURL = "http://localhost:7000/api/manage-production/" + command.getArgs()[0];
+            case MES:
+                sb.append("http://localhost:7001/api/");
                 break;
-            case VIEW_SCREEN:
-                System.out.println("View Screen");
-                commandURL = "http://localhost:7000/api/view-screen";
-                break;
-            case VIEW_LOG:
-                if (command.getArgs().length != 1)
-                {
-                    validCommand = false;
-                    break;
-                }
-
-                System.out.println("View log: " + command.getArgs()[0]);
-                commandURL = "http://localhost:7000/api/view-log/" + command.getArgs()[0];
+            case ERP:
+                sb.append("http://localhost:7002/api/");
                 break;
             default:
-                System.out.println("Invalid command in UI");
                 validCommand = false;
-                break;
         }
 
         if (validCommand)
         {
-            try {
-                HttpResponse<Message> postMessage = Unirest.post(commandURL).asObject(Message.class);
-            } catch (UnirestException e) {
-                message.set(422, "Error from SCADA: " + e.getMessage());
+            sb.append(command.getCommandURL());
+
+            if (command.getNumArgs() == command.getArgs().length)
+            {
+                if (command.getNumArgs() > 0)
+                {
+                    for (int i = 0; i < command.getNumArgs(); i++) {
+                        sb.append("/");
+                        sb.append(command.getArgs()[i]);
+                    }
+                }
+            } else
+            {
+                System.err.println("Invalid amount of arguments! [" + command.getArgs().length + "]");
+                validArguments = false;
             }
 
-            System.out.println(message.getMessage());
+            if (validArguments)
+            {
+                System.out.println(command.getKeyword() + ": " + Arrays.toString(command.getArgs()));
+
+                try {
+                    if (command.getUnirestCommand().equals("post"))
+                    {
+                        HttpResponse<Message> postMessage = Unirest.post(sb.toString()).asObject(Message.class);
+                    } else if (command.getUnirestCommand().equals("get")) {
+                        HttpResponse<String> postMessage = Unirest.get(sb.toString()).asString();
+                        System.out.println(postMessage.getBody());
+                    }
+
+                } catch (UnirestException e) {
+                    message.set(422, "Error from SCADA: " + e.getMessage());
+                    e.printStackTrace();
+                }
+
+                System.out.println(message.getMessage());
+            }
         }
     }
 

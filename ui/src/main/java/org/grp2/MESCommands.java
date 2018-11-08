@@ -1,8 +1,13 @@
 package org.grp2;
 
-public enum MESCommands {
+public enum MESCommands implements ICommand{
 
-    VIEW_ORDERS("vorders"), VIEW_ORDER_ITEMS("vitems"), VIEW_ALL_BATCHES("vbatches"), GET_PLANT_STATISTICS("statistics"), GET_REPORT("getreport"), CREATE_BATCHES("createbatches");
+    VIEW_ORDERS("vorders:view-orders:0:get"),
+    VIEW_ORDER_ITEMS("vitems:view-order-items:1:get"),
+    VIEW_ALL_BATCHES("vbatches:view-all-batches:0:get"),
+    GET_PLANT_STATISTICS("statistics:get-plant-statistics:0:get"),
+    GET_REPORT("getreport:get-report:1:get"),
+    CREATE_BATCHES("createbatches:create-batches:0:post");
 
     private String name;
 
@@ -11,15 +16,19 @@ public enum MESCommands {
     }
 
     public String getName() {
-        return name;
+        return name.split(":")[0];
     }
 
-    public static MESCommands fromCommand(String command)
-    {
-        for (MESCommands value : MESCommands.values())
-            if (command.equals(value.getName()))
-                return value;
+    public String getURL() {
+        return name.split(":")[1];
+    }
 
-        return null;
+    public int getNumArgs() {
+        return Integer.parseInt(name.split(":")[2]);
+    }
+
+    public String getUnirestCommand ()
+    {
+        return name.split(":")[3];
     }
 }

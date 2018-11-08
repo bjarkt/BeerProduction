@@ -1,7 +1,7 @@
 package org.grp2;
 
 public enum SubSystem {
-    SCADA("scada"), MES("mes"), ERP("erp");
+    SCADA("s"), MES("m"), ERP("e");
 
     private String name;
 
@@ -11,5 +11,13 @@ public enum SubSystem {
 
     public String getName() {
         return name;
+    }
+
+    public static SubSystem fromCommand(String code) {
+        for (SubSystem subSystem : SubSystem.values())
+            if (subSystem.name.equals(code))
+                return subSystem;
+
+        return null;
     }
 }
