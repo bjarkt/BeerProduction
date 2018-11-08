@@ -24,6 +24,9 @@ public class APIHandler {
     private IHardwareSubscriber hardwareSubscriber;
     private ZoneId copenhagenZoneId;
 
+    private int previousAccepted = 0;
+    private int previousDefect = 0;
+
     public APIHandler(IHardware hardware) {
         this.scadaDao = new ScadaDAO();
         this.hardwareProvider = hardware.getProvider();
@@ -189,17 +192,18 @@ public class APIHandler {
     }
 
     private void handleRejectedBeers(int rejects) throws InterruptedException{
+        previousAccepted = 0;
+        previousDefect = 0;
+        hardwareProvider.setBatchId(scadaDao.getCurrentBatch().getBatchId());
+        hardwareProvider.setProduct(scadaDao.getRecipe(scadaDao.getCurrentBatch().getBeerName()).getId());
+        hardwareProvider.setAmountToProduce(rejects);
+        hardwareProvider.setMachSpeed(scadaDao.getCurrentBatch().getMachineSpeed());
 
-            hardwareProvider.setBatchId(scadaDao.getCurrentBatch().getBatchId());
-            hardwareProvider.setProduct(scadaDao.getRecipe(scadaDao.getCurrentBatch().getBeerName()).getId());
-            hardwareProvider.setAmountToProduce(rejects);
-            hardwareProvider.setMachSpeed(scadaDao.getCurrentBatch().getMachineSpeed());
-
-            hardwareProvider.stop();
-            TimeUnit.SECONDS.sleep(2);
-            hardwareProvider.reset();
-            TimeUnit.SECONDS.sleep(2);
-            hardwareProvider.start();
+        hardwareProvider.stop();
+        TimeUnit.SECONDS.sleep(2);
+        hardwareProvider.reset();
+        TimeUnit.SECONDS.sleep(2);
+        hardwareProvider.start();
     }
 
     private void handleStateChange(State state) {
@@ -244,10 +248,22 @@ public class APIHandler {
 
         // Collect accepted and defected
         this.hardwareSubscriber.subscribe(CubeNodeId.READ_CURRENT_PRODUCED, produced -> {
-            scadaDao.updateCurrentBatchProduced((Integer) produced);
+            int currentAccepted = this.hardwareProvider.getAcceptedBeersProduced();
+            //int currentAccepted = (int)produced;
+            int difference = Math.abs(previousAccepted - currentAccepted);
+            scadaDao.updateCurrentBatchProduced(difference);
+
+            System.out.println("ACCEPTED: " + previousAccepted  + " - " + currentAccepted + " = " + difference);
+            previousAccepted = currentAccepted;
         }, 1000);
         this.hardwareSubscriber.subscribe(CubeNodeId.READ_CURRENT_DEFECTIVE, defects -> {
-            scadaDao.updateCurrentBatchDefects((Integer) defects);
+            int currentDefect = this.hardwareProvider.getDefectiveBeersProduced();
+            //int currentDefect = (int)defects;
+            int difference = Math.abs(previousDefect - currentDefect);
+            scadaDao.updateCurrentBatchDefects(difference);
+
+            System.out.println("DEFECT: " + previousDefect  + " - " + currentDefect + " = " + difference);
+            previousDefect = currentDefect;
         }, 1000);
     }
 }
