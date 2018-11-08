@@ -5,11 +5,8 @@ import org.grp2.domain.*;
 import org.grp2.javalin.Message;
 import org.grp2.enums.State;
 import org.grp2.hardware.*;
-import org.grp2.shared.Batch;
 import org.grp2.shared.Measurements;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class APIHandler {
@@ -71,14 +68,7 @@ public class APIHandler {
 
         batchorder.setBatchId((int) machinery.getHardware().getProvider().getBatchId());
         batchorder.setAmountToProduce((int) machinery.getHardware().getProvider().getAmountToProduce());
-
-        Batch batch = machinery.getScadaDAO().getBatch(batchorder.getBatchId());
-        if (batch != null) {
-            LocalDateTime started = batch.getStarted();
-            LocalDateTime now = LocalDateTime.now(machinery.getCopenhagenZoneId());
-            long minutes = started.until(now, ChronoUnit.MINUTES);
-            batchorder.setProductsPerMinute((int) ((batchorder.getAmountToProduce()) / (minutes == 0 ? 1 : minutes)));
-        }
+        batchorder.setProductsPerMinute((int) machinery.getHardware().getProvider().getMachSpeed());
 
         batchdata.setProduced(machinery.getHardware().getProvider().getCurrentBeersProduced());
         batchdata.setAcceptable(machinery.getHardware().getProvider().getAcceptedBeersProduced());
