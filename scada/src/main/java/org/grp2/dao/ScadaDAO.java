@@ -325,13 +325,15 @@ public class ScadaDAO extends DatabaseConnection {
     public void updateCurrentBatchProduced(int accepted) {
         Batch currentBatch = getCurrentBatch();
 
-        this.executeQuery(conn -> {
-            PreparedStatement ps = conn.prepareStatement("UPDATE batches SET accepted = accepted + ? WHERE batch_id = ?");
-            ps.setInt(1, accepted);
-            ps.setInt(2, currentBatch.getBatchId());
+        if (currentBatch != null) {
+            this.executeQuery(conn -> {
+                PreparedStatement ps = conn.prepareStatement("UPDATE batches SET accepted = accepted + ? WHERE batch_id = ?");
+                ps.setInt(1, accepted);
+                ps.setInt(2, currentBatch.getBatchId());
 
-            ps.executeUpdate();
-        });
+                ps.executeUpdate();
+            });
+        }
     }
 
     /**
@@ -341,13 +343,15 @@ public class ScadaDAO extends DatabaseConnection {
     public void updateCurrentBatchDefects(int defects) {
         Batch currentBatch = getCurrentBatch();
 
-        this.executeQuery(conn -> {
-            PreparedStatement ps = conn.prepareStatement("UPDATE batches SET defect = defect + ? WHERE batch_id = ?");
-            ps.setInt(1, defects);
-            ps.setInt(2, currentBatch.getBatchId());
+        if (currentBatch != null) {
+            this.executeQuery(conn -> {
+                PreparedStatement ps = conn.prepareStatement("UPDATE batches SET defect = defect + ? WHERE batch_id = ?");
+                ps.setInt(1, defects);
+                ps.setInt(2, currentBatch.getBatchId());
 
-            ps.executeUpdate();
-        });
+                ps.executeUpdate();
+            });
+        }
     }
 
     public void updateOrderItemStatus(Batch finishedBatch, String status) {
