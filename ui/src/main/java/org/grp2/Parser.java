@@ -9,7 +9,6 @@ public class Parser {
 
     public Parser() {
         validator = new Validator();
-        validator.setCurrentSystem(SubSystem.SCADA);
         reader = new Scanner(System.in);
     }
 
@@ -18,15 +17,37 @@ public class Parser {
         String inputLine = reader.nextLine();
         String[] inputs = inputLine.split(" ");
 
-        String command = inputs[0];
+        SubSystem subSystem = SubSystem.fromCommand(inputs[0]);
 
-        if (!validator.isCommand(command))
+        if (subSystem == null)
+        {
+            System.err.println("Wrong subsystem!");
             return null;
+        }
 
-        String[] arguments = new String[inputs.length - 1];
-        for (int i = 0; i < arguments.length - 1; i++)
-            arguments[i] = inputs[i + 1];
+        String commandInput = inputs[1];
 
-        return new Command(command, arguments);
+        ICommand commandInfo = validator.validateCommandAndGetInfo(subSystem, commandInput);
+
+        if (commandInfo == null)
+        {
+            System.err.println("Invalid command!");
+            return null;
+        }
+
+        String[] arguments = new String[0];
+        if (inputs.length > 2)
+        {
+            arguments = new String[inputs.length - 2];
+            for (int i = 0; i < arguments.length; i++)
+                arguments[i] = inputs[i + 2];
+        }
+
+        String commandKeyword = commandInfo.getName();
+        String commandURL = commandInfo.getURL();
+        int numArgs = commandInfo.getNumArgs();
+        String unirestCommand = commandInfo.getUnirestCommand();
+
+        return new Command(subSystem, commandKeyword, arguments, commandURL, numArgs, unirestCommand);
     }
 }
