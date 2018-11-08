@@ -27,7 +27,7 @@ public class Parser {
 
         String commandInput = inputs[1];
 
-        ICommand commandInfo = validator.getCommandInfo(subSystem, commandInput);
+        ICommand commandInfo = validator.validateCommandAndGetInfo(subSystem, commandInput);
 
         if (commandInfo == null)
         {

@@ -10,7 +10,7 @@ public class Validator {
      * @param command any string represented in a Commands Enum
      * @return the value of the command enum
      */
-    public ICommand getCommandInfo(SubSystem subSystem, String command)
+    public ICommand validateCommandAndGetInfo(SubSystem subSystem, String command)
     {
         switch (subSystem)
         {
