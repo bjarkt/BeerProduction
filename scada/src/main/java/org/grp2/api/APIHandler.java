@@ -189,7 +189,13 @@ public class APIHandler {
     }
 
     private void handleRejectedBeers(int rejects) throws InterruptedException{
+
+            hardwareProvider.setBatchId(scadaDao.getCurrentBatch().getBatchId());
+            hardwareProvider.setProduct(scadaDao.getRecipe(scadaDao.getCurrentBatch().getBeerName()).getId());
             hardwareProvider.setAmountToProduce(rejects);
+            //hardwareProvider.setMachSpeed(scadaDao.getCurrentBatch());
+
+
             hardwareProvider.stop();
             TimeUnit.SECONDS.sleep(2);
             hardwareProvider.reset();
