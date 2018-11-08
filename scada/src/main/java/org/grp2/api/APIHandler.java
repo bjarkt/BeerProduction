@@ -193,8 +193,7 @@ public class APIHandler {
             hardwareProvider.setBatchId(scadaDao.getCurrentBatch().getBatchId());
             hardwareProvider.setProduct(scadaDao.getRecipe(scadaDao.getCurrentBatch().getBeerName()).getId());
             hardwareProvider.setAmountToProduce(rejects);
-            //hardwareProvider.setMachSpeed(scadaDao.getCurrentBatch());
-
+            hardwareProvider.setMachSpeed(scadaDao.getCurrentBatch().getMachineSpeed());
 
             hardwareProvider.stop();
             TimeUnit.SECONDS.sleep(2);
@@ -203,7 +202,7 @@ public class APIHandler {
             hardwareProvider.start();
     }
 
-    private void handleStateChange(State state, State previousState, int seconds) {
+    private void handleStateChange(State state) {
         switch (state) {
             case IDLE:
                 try {
@@ -214,7 +213,7 @@ public class APIHandler {
                 break;
             case COMPLETE:
                 try {
-                    if(calculateMissingBeers() == 0) this.completeBatch(previousState, seconds);
+                    if(calculateMissingBeers() == 0) this.completeBatch();
                     else handleRejectedBeers(calculateMissingBeers());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
