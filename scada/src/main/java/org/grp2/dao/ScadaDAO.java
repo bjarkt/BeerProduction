@@ -140,7 +140,7 @@ public class ScadaDAO extends DatabaseConnection {
      */
     private void addBatch(ProductionInformation productionInformation) {
         this.executeQuery(conn -> {
-            PreparedStatement ps = conn.prepareStatement("INSERT INTO batches VALUES (?, ?, ?, now(), null, null, null, ?)");
+            PreparedStatement ps = conn.prepareStatement("INSERT INTO batches VALUES (?, ?, ?, now(), null, 0, 0, ?)");
             ps.setString(1, productionInformation.getRecipeName());
             ps.setInt(2, productionInformation.getOrderNumber());
             ps.setInt(3, productionInformation.getBatchId());
@@ -327,7 +327,7 @@ public class ScadaDAO extends DatabaseConnection {
 
         if (currentBatch != null) {
             this.executeQuery(conn -> {
-                PreparedStatement ps = conn.prepareStatement("UPDATE batches SET accepted = ? WHERE batch_id = ?");
+                PreparedStatement ps = conn.prepareStatement("UPDATE batches SET accepted = accepted + ? WHERE batch_id = ?");
                 ps.setInt(1, accepted);
                 ps.setInt(2, currentBatch.getBatchId());
 
@@ -345,7 +345,7 @@ public class ScadaDAO extends DatabaseConnection {
 
         if (currentBatch != null) {
             this.executeQuery(conn -> {
-                PreparedStatement ps = conn.prepareStatement("UPDATE batches SET defect = ? WHERE batch_id = ?");
+                PreparedStatement ps = conn.prepareStatement("UPDATE batches SET defect = defect + ? WHERE batch_id = ?");
                 ps.setInt(1, defects);
                 ps.setInt(2, currentBatch.getBatchId());
 
