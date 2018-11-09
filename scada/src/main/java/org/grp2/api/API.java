@@ -1,24 +1,27 @@
 package org.grp2.api;
 
 import io.javalin.Javalin;
+import org.grp2.javalin.AbstractAPI;
 import org.grp2.javalin.JavalinSetup;
 import org.grp2.hardware.Hardware;
 import org.grp2.hardware.IHardware;
 
 import static io.javalin.apibuilder.ApiBuilder.*;
 
-public class API {
-    private final int PORT = 7000;
+public class API extends AbstractAPI {
+
+    public API(int port) {
+        super(port);
+    }
 
     public void start() {
         Javalin app = JavalinSetup.setup(PORT);
-        APIHandler handler = new APIHandler(new Hardware(IHardware.CUBE_URL));
-        handler.listenForStateChanges();
+        APIHandler handler = new APIHandler(new Hardware(IHardware.SIMULATION_URL));
         setRoutes(app, handler);
         app.start();
     }
 
-    public void setRoutes(Javalin app, APIHandler handler) {
+    private void setRoutes(Javalin app, APIHandler handler) {
         app.routes(() -> {
             path("/api", () -> {
                 post("/start-new-production", handler::startNewProduction);
