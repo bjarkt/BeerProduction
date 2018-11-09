@@ -20,6 +20,9 @@ public class Machinery {
     private IHardware hardware;
     private ZoneId copenhagenZoneId;
 
+    private int previousAccepted = 0;
+    private int previousDefect = 0;
+
     public Machinery(IHardware hardware) {
         scadaDAO = new ScadaDAO();
         this.hardware = hardware;
@@ -62,7 +65,8 @@ public class Machinery {
                 break;
             case COMPLETE:
                 try {
-                    this.completeBatch();
+                    if(calculateMissingBeers() == 0) this.completeBatch();
+                    else handleRejectedBeers(calculateMissingBeers());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -91,11 +95,23 @@ public class Machinery {
 
 
         // Collect accepted and defected
-        hardware.getSubscriber().subscribe(CubeNodeId.READ_CURRENT_PRODUCED, produced -> {
-            scadaDAO.updateCurrentBatchProduced((Integer) produced);
+        this.getHardware().getSubscriber().subscribe(CubeNodeId.READ_CURRENT_PRODUCED, produced -> {
+            int currentAccepted = this.getHardware().getProvider().getAcceptedBeersProduced();
+            //int currentAccepted = (int)produced;
+            int difference = Math.abs(previousAccepted - currentAccepted);
+            this.scadaDAO.updateCurrentBatchProduced(difference);
+
+            System.out.println("ACCEPTED: " + previousAccepted  + " - " + currentAccepted + " = " + difference);
+            previousAccepted = currentAccepted;
         }, 1000);
-        hardware.getSubscriber().subscribe(CubeNodeId.READ_CURRENT_DEFECTIVE, defects -> {
-            scadaDAO.updateCurrentBatchDefects((Integer) defects);
+        this.getHardware().getSubscriber().subscribe(CubeNodeId.READ_CURRENT_DEFECTIVE, defects -> {
+            int currentDefect = this.getHardware().getProvider().getDefectiveBeersProduced();
+            //int currentDefect = (int)defects;
+            int difference = Math.abs(previousDefect - currentDefect);
+            this.scadaDAO.updateCurrentBatchDefects(difference);
+
+            System.out.println("DEFECT: " + previousDefect  + " - " + currentDefect + " = " + difference);
+            previousDefect = currentDefect;
         }, 1000);
     }
 
@@ -139,6 +155,33 @@ public class Machinery {
         TimeUnit.SECONDS.sleep(2);
         hardware.getProvider().reset();
     }
+
+
+    private int calculateMissingBeers(){
+        int quantity = (int) getHardware().getProvider().getAmountToProduce();
+        int acceptedBeers = getHardware().getProvider().getAcceptedBeersProduced();
+        if(quantity != acceptedBeers){
+            return quantity - acceptedBeers;
+        }
+        return 0;
+    }
+
+    private void handleRejectedBeers(int rejects) throws InterruptedException{
+        previousAccepted = 0;
+        previousDefect = 0;
+
+        this.getHardware().getProvider().setBatchId(this.scadaDAO.getCurrentBatch().getBatchId());
+        this.getHardware().getProvider().setProduct(this.scadaDAO.getRecipe(this.scadaDAO.getCurrentBatch().getBeerName()).getId());
+        this.getHardware().getProvider().setAmountToProduce(rejects);
+        this.getHardware().getProvider().setMachSpeed(this.scadaDAO.getCurrentBatch().getMachineSpeed());
+
+        getHardware().getProvider().stop();
+        TimeUnit.SECONDS.sleep(2);
+        getHardware().getProvider().reset();
+        TimeUnit.SECONDS.sleep(2);
+        getHardware().getProvider().start();
+    }
+
 
     public ScadaDAO getScadaDAO() {
         return scadaDAO;
