@@ -1,0 +1,37 @@
+version: '3'
+services:
+  scada:
+    build:
+      context: .
+      dockerfile: DockerfileJava
+      args:
+        PORT: 7000
+        SERVICE: scada
+    ports:
+      - "7000:7000"
+    environment:
+      - inDocker=1
+
+  mes:
+    build:
+      context: .
+      dockerfile: DockerfileJava
+      args:
+        PORT: 7001
+        SERVICE: mes
+    ports:
+      - "7001:7001"
+    environment:
+      - inDocker=1
+
+  erp:
+    build:
+      context: .
+      dockerfile: DockerfileJava
+      args:
+        PORT: 7002
+        SERVICE: erp
+    ports:
+      - "7002:7002"
+    environment:
+      - inDocker=1
