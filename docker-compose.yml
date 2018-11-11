@@ -9,6 +9,7 @@ services:
         SERVICE: scada
     ports:
       - "7000:7000"
+    network_mode: host
     environment:
       - inDocker=true
       - useSimulation=false
@@ -22,6 +23,7 @@ services:
         SERVICE: mes
     ports:
       - "7001:7001"
+    network_mode: host
     environment:
       - inDocker=true
     depends_on:
@@ -36,6 +38,7 @@ services:
         SERVICE: erp
     ports:
       - "7002:7002"
+    network_mode: host
     environment:
       - inDocker=true
     depends_on:
