@@ -5,7 +5,7 @@ import java.util.Optional;
 public class DockerUtility {
 
     public static boolean isInDocker() {
-        return getEnv("inDocker").isPresent();
+        return getBooleanEnv("inDocker");
     }
 
     public static String dockerValueOrDefault(String dockerValue, String defaultValue) {
@@ -25,5 +25,12 @@ public class DockerUtility {
         return Optional.ofNullable(System.getenv(envVar));
     }
 
+    public static Boolean getBooleanEnv(String envVar) {
+        if (getEnv(envVar).isPresent()) {
+            return Boolean.valueOf(getEnv(envVar).get());
+        } else {
+            return false;
+        }
+    }
 
 }

@@ -11,7 +11,8 @@ services:
       - "7000:7000"
     network_mode: host
     environment:
-      - inDocker=1
+      - inDocker=true
+      - useSimulation=true
 
   mes:
     build:
@@ -24,7 +25,7 @@ services:
       - "7001:7001"
     network_mode: host
     environment:
-      - inDocker=1
+      - inDocker=true
     depends_on:
       - scada
 
@@ -39,7 +40,7 @@ services:
       - "7002:7002"
     network_mode: host
     environment:
-      - inDocker=1
+      - inDocker=true
     depends_on:
       - mes
       - scada
