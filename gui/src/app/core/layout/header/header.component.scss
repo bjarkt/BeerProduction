@@ -1,0 +1,35 @@
+:host{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(to bottom, #080809, #1D2027);
+}
+
+.nav-item{
+    user-select: none;
+    outline: none;
+    color: #A3A3AB;
+    font-weight: 600;
+    opacity: 0.56;
+    padding: 0 18px;
+    height: 60px;
+    line-height: 60px;
+    vertical-align: middle;
+    &:hover{
+        cursor: pointer;
+    }
+    &.active{
+        color: white;
+        opacity: 1;
+        box-shadow: inset 0 -2px 0 0 white; 
+    }
+}
+
+.logo{
+     height: 40px;
+     margin: 0 24px;
+}
