@@ -1,0 +1,19 @@
+<div class="order-management">
+  <div class="header">
+    <div class="upper">
+        <span class="title">Order Management</span>
+        <div class="spacer"></div>
+        <div class="navbar">
+          <div [routerLink]="['./open-orders']" [routerLinkActive]="['active']" class="nav-item">Open Orders</div>
+          <div [routerLink]="['./locked-orders']" [routerLinkActive]="['active']" class="nav-item">Locked Orders</div>
+          <div [routerLink]="['./finished-orders']" [routerLinkActive]="['active']" class="nav-item">Finished Orders</div>
+        </div>
+        <button class="new-order">New Order</button>
+    </div>
+  </div>
+
+  <div class="content">
+      <router-outlet></router-outlet>
+  </div>
+
+</div>

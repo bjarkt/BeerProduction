@@ -93,5 +93,4 @@ public class APIHandler {
 
         context.json(map);
     }
-
 }

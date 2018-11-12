@@ -140,7 +140,7 @@ public class ScadaDAO extends DatabaseConnection {
      */
     private void addBatch(ProductionInformation productionInformation) {
         this.executeQuery(conn -> {
-            PreparedStatement ps = conn.prepareStatement("INSERT INTO batches VALUES (?, ?, ?, now(), null, null, null, ?)");
+            PreparedStatement ps = conn.prepareStatement("INSERT INTO batches VALUES (?, ?, ?, now(), null, 0, 0, ?)");
             ps.setString(1, productionInformation.getRecipeName());
             ps.setInt(2, productionInformation.getOrderNumber());
             ps.setInt(3, productionInformation.getBatchId());
@@ -324,11 +324,23 @@ public class ScadaDAO extends DatabaseConnection {
      */
     public void updateCurrentBatchProduced(int accepted) {
         Batch currentBatch = getCurrentBatch();
+        AtomicInteger acceptedBeers = new AtomicInteger();
 
         if (currentBatch != null) {
             this.executeQuery(conn -> {
-                PreparedStatement ps = conn.prepareStatement("UPDATE batches SET accepted = ? WHERE batch_id = ?");
-                ps.setInt(1, accepted);
+                PreparedStatement ps = conn.prepareStatement("SELECT accepted FROM batches WHERE batch_id = ?");
+                ps.setInt(1, currentBatch.getBatchId());
+                ResultSet rs = ps.executeQuery();
+                if(rs.next()){
+                    acceptedBeers.set(rs.getInt("accepted"));
+                }
+            });
+
+            int difference = acceptedBeers.get() - accepted;
+
+            this.executeQuery(conn -> {
+                PreparedStatement ps = conn.prepareStatement("UPDATE batches SET accepted = accepted + ? WHERE batch_id = ?");
+                ps.setInt(1, difference);
                 ps.setInt(2, currentBatch.getBatchId());
 
                 ps.executeUpdate();
@@ -342,15 +354,29 @@ public class ScadaDAO extends DatabaseConnection {
      */
     public void updateCurrentBatchDefects(int defects) {
         Batch currentBatch = getCurrentBatch();
+        AtomicInteger defectedBeers = new AtomicInteger();
 
         if (currentBatch != null) {
             this.executeQuery(conn -> {
-                PreparedStatement ps = conn.prepareStatement("UPDATE batches SET defect = ? WHERE batch_id = ?");
-                ps.setInt(1, defects);
+                PreparedStatement ps = conn.prepareStatement("SELECT defect FROM batches WHERE batch_id = ?");
+                ps.setInt(1, currentBatch.getBatchId());
+                ResultSet rs = ps.executeQuery();
+                if(rs.next()){
+                    defectedBeers.set(rs.getInt("defect"));
+                }
+            });
+
+            int difference = defectedBeers.get() - defects;
+
+            this.executeQuery(conn -> {
+                PreparedStatement ps = conn.prepareStatement("UPDATE batches SET defect = defect + ? WHERE batch_id = ?");
+                ps.setInt(1, difference);
                 ps.setInt(2, currentBatch.getBatchId());
 
                 ps.executeUpdate();
             });
+
+            System.out.println(defects);
         }
     }
 
