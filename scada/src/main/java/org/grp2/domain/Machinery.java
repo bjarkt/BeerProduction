@@ -96,7 +96,7 @@ public class Machinery {
 
         // Collect accepted and defected
         this.getHardware().getSubscriber().subscribe(CubeNodeId.READ_CURRENT_PRODUCED, produced -> {
-            updateDefective();
+            updateAccepted();
         }, 500);
         this.getHardware().getSubscriber().subscribe(CubeNodeId.READ_CURRENT_DEFECTIVE, defects -> {
             updateDefective();
