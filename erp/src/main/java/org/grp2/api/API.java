@@ -1,12 +1,16 @@
 package org.grp2.api;
 
 import io.javalin.Javalin;
+import org.grp2.javalin.AbstractAPI;
 import org.grp2.javalin.JavalinSetup;
 
 import static io.javalin.apibuilder.ApiBuilder.*;
 
-public class API {
-    private final int PORT = 7002;
+public class API extends AbstractAPI {
+
+    public API(int port) {
+        super(port);
+    }
 
     public void start() {
         Javalin app = JavalinSetup.setup(PORT);
