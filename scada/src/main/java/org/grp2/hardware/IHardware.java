@@ -2,6 +2,7 @@ package org.grp2.hardware;
 
 public interface IHardware {
 	String SIMULATION_URL = "opc.tcp://127.0.0.1:4840";
+	String DOCKER_SIMULATION_URL = "opc.tcp://host.docker.internal:4840";
 	String CUBE_URL = "opc.tcp://10.112.254.165:4840";
 
 	/**

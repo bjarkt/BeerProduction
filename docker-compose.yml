@@ -1,0 +1,50 @@
+# IF YOU ARE RUNNING THIS ON WINDOWS
+# THE LINES 'network_mode: host' SHOULD BE COMMENTED OUT
+# OTHERWISE YOU CANNOT ACCESS THE CONTAINERS (http://localhost:7000)
+
+# IF YOU ARE RUNNING THIS ON LINUX
+# THE LINES 'network_mode: host' SHOULD NOT BE COMMENTED OUT.
+
+version: '3'
+services:
+  scada:
+    build:
+      context: .
+      dockerfile: DockerfileJava
+      args:
+        PORT: 7000
+        SERVICE: scada
+    ports:
+      - "7000:7000"
+#    network_mode: host
+    environment:
+      - inDocker=true
+      - useSimulation=false
+
+  mes:
+    build:
+      context: .
+      dockerfile: DockerfileJava
+      args:
+        PORT: 7001
+        SERVICE: mes
+    ports:
+      - "7001:7001"
+#    network_mode: host
+    environment:
+      - inDocker=true
+    depends_on:
+      - scada
+
+  erp:
+    build:
+      context: .
+      dockerfile: DockerfileJava
+      args:
+        PORT: 7002
+        SERVICE: erp
+    ports:
+      - "7002:7002"
+#    network_mode: host
+    environment:
+      - inDocker=true
