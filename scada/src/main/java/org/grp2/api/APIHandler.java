@@ -12,9 +12,6 @@ import java.util.*;
 public class APIHandler {
     private Machinery machinery;
 
-    private int previousAccepted = 0;
-    private int previousDefect = 0;
-
     public APIHandler(IHardware hardware) {
         this.machinery = new Machinery(hardware);
         this.machinery.listenForStateChanges();
