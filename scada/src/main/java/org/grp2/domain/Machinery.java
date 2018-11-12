@@ -22,6 +22,7 @@ public class Machinery {
 
     private int previousAccepted = 0;
     private int previousDefect = 0;
+    private boolean restartingBatch = false;
 
     public Machinery(IHardware hardware) {
         scadaDAO = new ScadaDAO();
@@ -64,12 +65,14 @@ public class Machinery {
                 }
                 break;
             case COMPLETE:
+                restartingBatch = true;
                 try {
                     if(calculateMissingBeers() == 0) this.completeBatch();
                     else handleRejectedBeers(calculateMissingBeers());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                restartingBatch = false;
                 break;
         }
     }
@@ -96,10 +99,14 @@ public class Machinery {
 
         // Collect accepted and defected
         this.getHardware().getSubscriber().subscribe(CubeNodeId.READ_CURRENT_PRODUCED, produced -> {
-            updateDefective();
+            if (!restartingBatch) {
+                updateAccepted();
+            }
         }, 500);
         this.getHardware().getSubscriber().subscribe(CubeNodeId.READ_CURRENT_DEFECTIVE, defects -> {
-            updateDefective();
+            if (!restartingBatch) {
+                updateDefective();
+            }
         }, 500);
     }
 
@@ -115,10 +122,7 @@ public class Machinery {
         if (startedBatch != null) {
             Recipe recipe = scadaDAO.getRecipe(startedBatch.getRecipeName());
 
-            hardware.getProvider().setBatchId(startedBatch.getBatchId());
-            hardware.getProvider().setProduct(recipe.getId());
-            hardware.getProvider().setAmountToProduce(startedBatch.getQuantity());
-            hardware.getProvider().setMachSpeed(startedBatch.getMachineSpeed());
+            setupBatch(startedBatch.getBatchId(), recipe.getId(), startedBatch.getQuantity(), startedBatch.getMachineSpeed());
 
             hardware.getProvider().stop();
             TimeUnit.SECONDS.sleep(2);
@@ -134,8 +138,8 @@ public class Machinery {
 
 
     private void completeBatch() throws InterruptedException {
-        this.scadaDAO.updateCurrentBatchProduced(this.getHardware().getProvider().getAcceptedBeersProduced());
-        this.scadaDAO.updateCurrentBatchDefects(this.getHardware().getProvider().getDefectiveBeersProduced());
+        updateAccepted();
+        updateDefective();
 
         Batch finishedBatch = scadaDAO.updateCurrentBatchFinished();
         if (finishedBatch != null) {
@@ -143,7 +147,6 @@ public class Machinery {
             scadaDAO.deleteQueueItem(finishedBatch);
         }
 
-        //hardwareProvider.stop();
         TimeUnit.SECONDS.sleep(2);
         hardware.getProvider().reset();
     }
@@ -159,19 +162,28 @@ public class Machinery {
     }
 
     private void handleRejectedBeers(int rejects) throws InterruptedException{
+        updateAccepted();
+        updateDefective();
+
         previousAccepted = 0;
         previousDefect = 0;
 
-        this.getHardware().getProvider().setBatchId(this.scadaDAO.getCurrentBatch().getBatchId());
-        this.getHardware().getProvider().setProduct(this.scadaDAO.getRecipe(this.scadaDAO.getCurrentBatch().getBeerName()).getId());
-        this.getHardware().getProvider().setAmountToProduce(rejects);
-        this.getHardware().getProvider().setMachSpeed(this.scadaDAO.getCurrentBatch().getMachineSpeed());
+        setupBatch(this.scadaDAO.getCurrentBatch().getBatchId(),
+                this.scadaDAO.getRecipe(this.scadaDAO.getCurrentBatch().getBeerName()).getId(), rejects,
+                this.scadaDAO.getCurrentBatch().getMachineSpeed());
 
         getHardware().getProvider().stop();
         TimeUnit.SECONDS.sleep(2);
         getHardware().getProvider().reset();
         TimeUnit.SECONDS.sleep(2);
         getHardware().getProvider().start();
+    }
+
+    private void setupBatch(int batchId, int recipeId, int amountToProduce, int machineSpeed) {
+        this.getHardware().getProvider().setBatchId(batchId);
+        this.getHardware().getProvider().setProduct(recipeId);
+        this.getHardware().getProvider().setAmountToProduce(amountToProduce);
+        this.getHardware().getProvider().setMachSpeed(machineSpeed);
     }
 
 
