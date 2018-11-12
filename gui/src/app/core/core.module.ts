@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { CoreRoutingModule } from './core-routing.module';
 import { RouterModule, RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './layout/header/header.component';
-
 @NgModule({
     declarations: [
         HeaderComponent
@@ -12,7 +11,7 @@ import { HeaderComponent } from './layout/header/header.component';
     ],
     imports: [ 
         RouterModule,
-        CoreRoutingModule
+        CoreRoutingModule,
     ],
     providers: []
   })

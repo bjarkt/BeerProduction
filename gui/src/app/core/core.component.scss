@@ -1,22 +1,12 @@
 :host{
     display: grid;
-    grid-template-areas: "header" 
-                         "main";
-    grid-template-rows: auto 1fr;
+    grid-template-areas:"header" 
+                        "main";
+    grid-template-rows: 44px 1fr;
     min-height: 100vh;
-}
-
-header{
-    grid-area: "header";
-    height: 60px;   
 }
 
 main{
     grid-area: "main";
-    background-color: #1D2027;   
-}
-
-/deep/ router-outlet ~ * {
-    position: absolute;
-    width: 100vw;
+    background-color: black;   
 }

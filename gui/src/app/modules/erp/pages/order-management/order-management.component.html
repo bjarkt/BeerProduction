@@ -1,16 +1,14 @@
 <div class="order-management">
-  <div class="header">
-    <div class="upper">
-        <span class="title">Order Management</span>
-        <div class="spacer"></div>
-        <div class="navbar">
+
+  <app-subheader [title]="'Order Management'">
+      <div class="spacer"></div>
+      <div class="navbar">
           <div [routerLink]="['./open-orders']" [routerLinkActive]="['active']" class="nav-item">Open Orders</div>
           <div [routerLink]="['./locked-orders']" [routerLinkActive]="['active']" class="nav-item">Locked Orders</div>
           <div [routerLink]="['./finished-orders']" [routerLinkActive]="['active']" class="nav-item">Finished Orders</div>
-        </div>
-        <button class="new-order">New Order</button>
-    </div>
-  </div>
+      </div>
+      <app-button [cta]="'New Order'" id="new-order-button"></app-button>
+  </app-subheader>
 
   <div class="content">
       <router-outlet></router-outlet>
