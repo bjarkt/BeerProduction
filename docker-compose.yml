@@ -48,6 +48,3 @@ services:
 #    network_mode: host
     environment:
       - inDocker=true
-    depends_on:
-      - mes
-      - scada

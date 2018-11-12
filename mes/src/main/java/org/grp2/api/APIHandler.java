@@ -14,6 +14,7 @@ import org.grp2.dao.MesDAO;
 import org.grp2.domain.Plant;
 import org.grp2.enums.OrderItemStatus;
 import org.grp2.shared.*;
+import org.grp2.utility.DockerUtility;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -72,7 +73,8 @@ public class APIHandler {
             plant.getMesDAO().addToQueueItems(orderList);
 
             try {
-                HttpResponse<Message> postMessage = Unirest.post("http://localhost:7000/api/start-new-production").asObject(Message.class);
+                String url = DockerUtility.dockerValueOrDefault("http://scada:7000/api/start-new-production", "http://localhost:7000/api/start-new-production");
+                HttpResponse<Message> postMessage = Unirest.post(url).asObject(Message.class);
             } catch (UnirestException e) {
                 message.set(422, "Error from SCADA : " + e.getMessage());
             }
