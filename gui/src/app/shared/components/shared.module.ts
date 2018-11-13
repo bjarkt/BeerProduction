@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SubheaderComponent } from './subheader/subheader.component';
-import {MatButtonModule, MatTabsModule} from '@angular/material';
+import {MatButtonModule, MatTabsModule, MatTableModule} from '@angular/material';
 import { Routes, RouterModule } from '@angular/router';
 
 
@@ -13,13 +13,15 @@ import { Routes, RouterModule } from '@angular/router';
         RouterModule,
         CommonModule,
         MatButtonModule,
-        MatTabsModule    
+        MatTabsModule,
+        MatTableModule 
     ],
     exports: [
         RouterModule,
         SubheaderComponent,
         MatButtonModule,
-        MatTabsModule
+        MatTabsModule,
+        MatTableModule
     ],
     providers: []
   })
