@@ -6,13 +6,15 @@ import { OpenOrdersComponent } from './pages/open-orders/open-orders.component';
 import { LockedOrdersComponent } from './pages/locked-orders/locked-orders.component';
 import { FinishedOrdersComponent } from './pages/finished-orders/finished-orders.component';
 import { SharedModule } from 'src/app/shared/components/shared.module';
+import { CreateOrderComponent } from './pages/create-order/create-order.component';
 
 @NgModule({
     declarations: [
         OrderManagementComponent,
         OpenOrdersComponent,
         LockedOrdersComponent,
-        FinishedOrdersComponent
+        FinishedOrdersComponent,
+        CreateOrderComponent
     ],
     imports: [ 
         CommonModule,

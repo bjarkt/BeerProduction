@@ -1,24 +1,38 @@
 import { Injectable } from "@angular/core";
-import { HttpClient } from '@angular/common/http';
-import { Observable } from "rxjs";
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { Observable, of } from "rxjs";
+import { map, catchError, tap } from 'rxjs/operators';
+
+const ErpEndpoint = 'http://localhost:7002/api/';
+const MesEndpoint = 'http://localhost:7001/api/';
+const ScadaEndpoint = 'http://localhost:7000/api/';
+const httpOptions = {
+    headers: new HttpHeaders({
+        'Content-Type': 'application/json'
+    })
+};
 
 @Injectable()
 export class DataService {
-    ErpUrl = 'http://localhost:7002';
-    MesUrl = 'http://localhost:7001';
-    ScadaUrl = 'http://localhost:7000';
 
+    constructor(private http: HttpClient) { }
 
-    constructor(private http: HttpClient){}
+    private extractData(res: Response) {
+        let body = res;
+        return body || {};
+    }
 
     //Template
-    public uploadImage(title: string, image: File, albumId?: number): Observable<void>{
+    public uploadImage(title: string, image: File, albumId?: number): Observable<void> {
         const uploadData = new FormData();
-        uploadData.append('myFile',image, image.name);
+        uploadData.append('myFile', image, image.name);
         console.log(uploadData);
         return null;
     }
-  
+
+   /* public createOrder(): Observable<any> {
+        return this.http.post<any>(ErpEndpoint + 'create-order', httpOptions).
+    }*/
 
 
 }

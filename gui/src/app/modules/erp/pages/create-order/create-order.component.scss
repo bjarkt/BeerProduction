@@ -1,0 +1,59 @@
+.create-order-header{
+    margin-bottom: 25px;
+    mat-toolbar{
+        .create-order-row{
+            justify-content: space-between;
+        }
+    }        
+}
+
+.order-details{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    .base-info{
+        flex-grow: 1;
+        max-width: calc(50% - 10px);
+        > * {
+            width: 100%;
+        }
+        mat-card-content .form-group > * {
+            width: 100%;
+            display: block;
+        }
+
+        mat-card-actions{
+            text-align: right;
+        }
+
+        .input-card{
+            margin-bottom: 22px;
+        }
+
+        .status-card{
+            margin-bottom: 13px;
+            mat-card-content > * {
+                width: 100%;
+            }
+        }
+    }
+
+    .order-items{
+        flex-grow: 1;
+        max-width: calc(50% - 10px);
+        mat-card{
+            margin-bottom: 10px;
+        }
+    }
+
+}
+
+.create-order-container{
+    display: flex;
+    flex-direction: column;
+    
+    > * {
+        width: 100%;
+    }
+}
