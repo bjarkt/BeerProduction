@@ -12,7 +12,7 @@ import { HeaderComponent } from './layout/header/header.component';
     ],
     imports: [ 
         RouterModule,
-        CoreRoutingModule
+        CoreRoutingModule,
     ],
     providers: []
   })

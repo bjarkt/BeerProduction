@@ -1,4 +1,29 @@
-<img class="logo" src="assets/images/beer.png">
-<div [routerLink]="['/erp']" [routerLinkActive]="['active']" class="nav-item">ERP</div>
-<div [routerLink]="['/mes']" [routerLinkActive]="['active']" class="nav-item">MES</div>
-<div [routerLink]="['/scada']" [routerLinkActive]="['active']" class="nav-item">SCADA</div>
+<nav id="nav">
+
+    <div class="content">
+        <div class="inner">
+            <div class="logo" routerLink="['/erp/open-orders']">
+                <img id="beerlogo" src="assets/images/beer.png">
+            </div>
+            <span class="app-title" routerLink="['/erp/open-orders']">Beer Production</span>
+
+            <div class="tabs">
+                <div [routerLink]="['/erp']" [routerLinkActive]="['active']" class="tab">ERP</div>
+                <div [routerLink]="['/mes']" [routerLinkActive]="['active']" class="tab">MES</div>
+                <div [routerLink]="['/scada']" [routerLinkActive]="['active']" class="tab">SCADA</div>
+            </div>
+        </div>
+    </div>
+    
+</nav>
+
+<!--
+<div class="inner">
+    <div class="background"></div>
+    <div class="content">
+        <img class="logo" src="assets/images/beer.png">
+        
+    </div>
+</div>
+
+-->

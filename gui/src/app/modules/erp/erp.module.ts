@@ -5,6 +5,7 @@ import { OrderManagementComponent } from './pages/order-management/order-managem
 import { OpenOrdersComponent } from './pages/open-orders/open-orders.component';
 import { LockedOrdersComponent } from './pages/locked-orders/locked-orders.component';
 import { FinishedOrdersComponent } from './pages/finished-orders/finished-orders.component';
+import { SharedModule } from 'src/app/shared/components/shared.module';
 
 @NgModule({
     declarations: [
@@ -15,7 +16,8 @@ import { FinishedOrdersComponent } from './pages/finished-orders/finished-orders
     ],
     imports: [ 
         CommonModule,
-        ErpRoutingModule
+        ErpRoutingModule,
+        SharedModule
     ],
     providers: []
   })
