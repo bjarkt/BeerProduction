@@ -23,7 +23,6 @@
     z-index: 1;
 
     .background{
-        background-color: rgba(0,0,0,0.85);
         position: absolute;
         left: 0;
         top: 0;
@@ -58,8 +57,9 @@
 
         .title{
             font-size: 1.25em;
-            color: white;
+            color: black;
             font-weight: 700;
+            margin-right: 16px;
         }
         
         .inner-content{

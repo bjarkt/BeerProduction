@@ -1,13 +1,17 @@
 <div class="order-management">
 
   <app-subheader [title]="'Order Management'">
-      <div class="spacer"></div>
-      <div class="navbar">
-          <div [routerLink]="['./open-orders']" [routerLinkActive]="['active']" class="nav-item">Open Orders</div>
-          <div [routerLink]="['./locked-orders']" [routerLinkActive]="['active']" class="nav-item">Locked Orders</div>
-          <div [routerLink]="['./finished-orders']" [routerLinkActive]="['active']" class="nav-item">Finished Orders</div>
-      </div>
-      <app-button [cta]="'New Order'" id="new-order-button"></app-button>
+    <nav mat-tab-nav-bar>
+        <a mat-tab-link
+            *ngFor="let tab of tabs"
+            [routerLink]="tab.path"
+            routerLinkActive #rla="routerLinkActive"
+            [active]="rla.isActive">
+            {{tab.label}}
+        </a>
+    </nav>
+    
+      <button mat-button color="primary" id="new-order-button">New Order</button>
   </app-subheader>
 
   <div class="content">
