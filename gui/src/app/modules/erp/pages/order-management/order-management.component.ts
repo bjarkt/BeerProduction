@@ -7,6 +7,12 @@ import { Component, OnInit } from '@angular/core';
 })
 export class OrderManagementComponent implements OnInit {
 
+  tabs = [
+    { path: './open-orders', label: 'Open Orders' },
+    { path: './locked-orders', label: 'Locked Orders' },
+    { path: './finished-orders', label: 'Finished Orders' }
+  ]
+
   constructor() { }
 
   ngOnInit() {

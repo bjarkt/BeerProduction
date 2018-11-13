@@ -1,18 +1,22 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SubheaderComponent } from './subheader/subheader.component';
-import { ButtonComponent } from './button/button.component';
+import {MatButtonModule, MatTabsModule} from '@angular/material';
+
+
 @NgModule({
     declarations: [
-        SubheaderComponent,
-        ButtonComponent
+        SubheaderComponent
     ],
     imports: [ 
-        CommonModule        
+        CommonModule,
+        MatButtonModule,
+        MatTabsModule    
     ],
     exports: [
         SubheaderComponent,
-        ButtonComponent
+        MatButtonModule,
+        MatTabsModule
     ],
     providers: []
   })
