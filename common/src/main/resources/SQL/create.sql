@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS Order_items, Orders, /*Recipes,*/ Queue_items, Batches, Mea
 
 CREATE TABLE Orders (
 	date_created TIMESTAMP default CURRENT_TIMESTAMP,
-	status VARCHAR(255) default ('nonProcessed'),
+	status VARCHAR(255) default ('open'),
 	order_number BIGSERIAL PRIMARY KEY
 );
 
