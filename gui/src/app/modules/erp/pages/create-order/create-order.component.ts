@@ -14,7 +14,7 @@ export class CreateOrderComponent implements OnInit {
   orderItems: OrderItem[] = [];
   orderStatus: string;
 
-  constructor(public data : DataService) { 
+  constructor() { 
     this.orderStatus = 'Open';
   }
 

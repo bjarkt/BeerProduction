@@ -13,22 +13,7 @@
 <div class="order-details">
 
   <div class="base-info">
-
-    <mat-card class="status-card">
-      <mat-card-header>
-          <mat-card-title>Order Status</mat-card-title>
-          <mat-card-subtitle>Set the order status</mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-        <mat-form-field>
-          <mat-select placeholder="Order Status" [value]="orderStatus">
-            <mat-option value="Open">Open</mat-option>
-            <mat-option value="Locked">Locked</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </mat-card-content>
-    </mat-card>
-
+    
     <mat-card class="input-card">
       <mat-card-header>
         <mat-card-title>Add Beers to Order</mat-card-title>
@@ -37,6 +22,7 @@
 
       <form #orderForm="ngForm" (ngSubmit)="onSubmit(orderForm); newOrderItem();">
         <mat-card-content>
+
           <div class="form-group">
             <mat-form-field>
               <mat-select required class="form-control" id="beerName" [(ngModel)]="model.beerName" name="beerName"
@@ -51,7 +37,7 @@
 
           <div class="form-group">
             <mat-form-field>
-              <input #quantityInput class="form-control" id="quantity" [(ngModel)]="model.quantity" name="quantity"
+              <input #quantityInput minlength="" class="form-control" id="quantity" [(ngModel)]="model.quantity" name="quantity"
                 required type="number" matInput placeholder="Quantity">
             </mat-form-field>
           </div>
@@ -61,8 +47,9 @@
           <button mat-stroked-button type="submit" [disabled]="!orderForm.form.valid" color="primary">Add
             To Order</button>
         </mat-card-actions>
-
       </form>
+
+
     </mat-card>
   </div>
 
@@ -77,4 +64,5 @@
       </mat-list-item>
     </mat-list>
   </div>
+  
 </div>
