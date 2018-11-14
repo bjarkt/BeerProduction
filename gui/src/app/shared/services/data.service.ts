@@ -3,6 +3,8 @@ import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http
 import { Observable, of } from "rxjs";
 import { map, catchError, tap } from 'rxjs/operators';
 
+// TODO: Use correct endpoints when inDocker
+
 const ErpEndpoint = 'http://localhost:7002/api/';
 const MesEndpoint = 'http://localhost:7001/api/';
 const ScadaEndpoint = 'http://localhost:7000/api/';

@@ -7,6 +7,18 @@
 
 version: '3'
 services:
+  web:
+    build: gui/
+    ports:
+      - "80:80"
+#    network_mode: host
+    environment:
+      - inDocker=true
+    depends_on:
+      - erp
+      - mes
+      - scada
+
   scada:
     build:
       context: .
