@@ -2,12 +2,11 @@ import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, of } from "rxjs";
 import { map, catchError, tap } from 'rxjs/operators';
+import { environment} from "../../../environments/environment";
 
-// TODO: Use correct endpoints when inDocker
-
-const ErpEndpoint = 'http://localhost:7002/api/';
-const MesEndpoint = 'http://localhost:7001/api/';
-const ScadaEndpoint = 'http://localhost:7000/api/';
+const ErpEndpoint = environment.erpUrl;
+const MesEndpoint = environment.mesUrl;
+const ScadaEndpoint = environment.scadaUrl;
 const httpOptions = {
     headers: new HttpHeaders({
         'Content-Type': 'application/json'
@@ -36,6 +35,10 @@ export class DataService {
      */
     public addOrderItem(orderNumber: number, beerName: string, quantity: number): Observable<any>{
         return this.http.post(ErpEndpoint + 'add-order-item/' + orderNumber + '/' + beerName + '/' + quantity, null, httpOptions);
+    }
+
+    public viewOrderItems(orderId: number): Observable<any> {
+        return this.http.get(ErpEndpoint + 'view-order-items/' + orderId);
     }
 
 

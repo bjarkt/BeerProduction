@@ -8,7 +8,11 @@
 version: '3'
 services:
   web:
-    build: gui/
+    build:
+      context: ./gui/
+      dockerfile: Dockerfile
+      args:
+        PORT: 80
     ports:
       - "80:80"
 #    network_mode: host

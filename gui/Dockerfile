@@ -4,6 +4,10 @@ RUN apk update && apk add --no-cache make git
 
 WORKDIR /usr/src/app
 
+## Setup arguments
+ARG PORT
+ENV PORT=$PORT
+
 ## Install angular CLI
 RUN npm install -g @angular/cli
 
@@ -14,7 +18,7 @@ COPY package.json package-lock.json /usr/src/app/
 COPY . /usr/src/app
 
 ## Install dependencies and compile angular project
-RUN npm install && npm run build
+RUN npm install && npm run build --prod
 
 # STEP 2 build nginx with compiled project
 FROM nginx:alpine
@@ -27,5 +31,5 @@ COPY --from=builder /usr/src/app/dist/gui /usr/share/nginx/html
 ## Update nginx config (Prevents 404 errors, when there should not be any)
 COPY --from=builder /usr/src/app/nginx.conf /etc/nginx/nginx.conf
 
-EXPOSE 80
+EXPOSE $PORT
 CMD ["nginx", "-g", "daemon off;"]

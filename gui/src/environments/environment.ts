@@ -3,7 +3,10 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  erpUrl: 'http://localhost:7002/api/',
+  mesUrl: 'http://localhost:7001/api/',
+  scadaUrl: 'http://localhost:7000/api/'
 };
 
 /*
