@@ -1,18 +1,6 @@
 <div class="order-management">
 
-  <app-subheader [title]="'Order Management'">
-    <nav mat-tab-nav-bar>
-        <a mat-tab-link
-            *ngFor="let tab of tabs"
-            [routerLink]="tab.path"
-            routerLinkActive #rla="routerLinkActive"
-            [active]="rla.isActive">
-            {{tab.label}}
-        </a>
-    </nav>
-    
-      <button mat-button color="primary" id="new-order-button">New Order</button>
-  </app-subheader>
+  <app-subheader [title]="'Order Management'" [tabs]="tabs"></app-subheader>
 
   <div class="content">
       <router-outlet></router-outlet>

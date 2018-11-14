@@ -9,6 +9,7 @@ export class SubheaderComponent implements OnInit {
 
   @HostBinding('class.sticky') sticky : boolean = false;
   @Input() title: string;
+  @Input() tabs: any[];
 
   constructor() { 
     window.addEventListener("scroll", (event) => {

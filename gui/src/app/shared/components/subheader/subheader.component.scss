@@ -23,6 +23,7 @@
     z-index: 1;
 
     .background{
+        background-color: white;
         position: absolute;
         left: 0;
         top: 0;
@@ -39,7 +40,7 @@
             width: 980px;
             height: 1px;
             z-index: 1;
-            background-color: rgba(51,51,51,0.75);
+            background-color: #ebebeb;
             margin-left: 0;
             left: 0;
             width: 100%;
@@ -66,9 +67,14 @@
             display: flex;
             align-items: center;
             flex-grow: 1;
+
+            .mat-tab-header, .mat-tab-nav-bar{
+                border-color: #ebebeb !important;
+            }
+            
+            .mat-tab-link{
+                height: 53px;
+            }
         }
-
-
-
     }
 }

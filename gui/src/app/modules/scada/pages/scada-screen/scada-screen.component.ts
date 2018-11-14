@@ -7,6 +7,11 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ScadaScreenComponent implements OnInit {
 
+  tabs = [
+    { path: './screen', label: 'Screen' },
+    { path: './logs', label: 'Logs' }
+  ];
+
   constructor() { }
 
   ngOnInit() {

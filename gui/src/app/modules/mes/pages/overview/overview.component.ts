@@ -7,9 +7,16 @@ import { Component, OnInit } from '@angular/core';
 })
 export class OverviewComponent implements OnInit {
 
+  tabs = [
+    { path: './sub-overview', label: 'Overview' },
+    { path: './production-planning', label: 'Production Planning' },
+    { path: './statistics', label: 'Statistics' }
+  ]
+
   constructor() { }
 
   ngOnInit() {
   }
 
 }
+
