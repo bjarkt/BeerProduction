@@ -22,17 +22,19 @@ export class DataService {
         return body || {};
     }
 
-    //Template
-    public uploadImage(title: string, image: File, albumId?: number): Observable<void> {
-        const uploadData = new FormData();
-        uploadData.append('myFile', image, image.name);
-        console.log(uploadData);
-        return null;
+    /**
+     * Create new order and retrieve order number.
+     */
+    public createOrder(): Observable<any> {
+        return this.http.post(ErpEndpoint + 'create-order', null, httpOptions);
     }
 
-   /* public createOrder(): Observable<any> {
-        return this.http.post<any>(ErpEndpoint + 'create-order', httpOptions).
-    }*/
+    /**
+     * /add-order-item/:order-id/:beer-name/:quantity
+     */
+    public addOrderItem(orderNumber: number, beerName: string, quantity: number): Observable<any>{
+        return this.http.post(ErpEndpoint + 'add-order-item/' + orderNumber + '/' + beerName + '/' + quantity, null, httpOptions);
+    }
 
 
 }
