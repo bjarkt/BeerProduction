@@ -92,5 +92,11 @@ public class APIHandler {
         context.json(order);
     }
 
+    public void viewOrders(Context context) {
+        String status = context.pathParam("status");
+        List<Order> orders = erpDAO.getOrders(status);
+        context.json(orders);
+    }
+
 
 }

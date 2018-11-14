@@ -1,6 +1,7 @@
 package org.grp2.dao;
 
 import org.grp2.database.DatabaseConnection;
+import org.grp2.enums.OrderStatus;
 import org.grp2.shared.Order;
 import org.grp2.shared.OrderItem;
 
@@ -33,6 +34,29 @@ public class ErpDAO extends DatabaseConnection {
         });
 
         return orderID.get().intValue();
+    }
+
+    public List<Order> getOrders(String status){
+        List<Order> orders = new ArrayList<>();
+
+        this.executeQuery(conn -> {
+            try {
+                String getOrderQuery = "SELECT date_created, status, order_number FROM Orders WHERE status = ?";
+                PreparedStatement ps = conn.prepareStatement(getOrderQuery);
+                ps.setString(1, status.toLowerCase());
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    Timestamp dateCreated = rs.getTimestamp(1);
+                    String retrievedStatus = rs.getString(2);
+                    int orderNumber = rs.getBigDecimal(3).intValue();
+                    orders.add(new Order(orderNumber, dateCreated, retrievedStatus));
+                }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
+        return orders;
     }
 
     /**

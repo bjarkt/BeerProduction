@@ -29,6 +29,7 @@ public class API extends AbstractAPI {
                 post("/delete-order-item/:order-id/:beer-name", handler::deleteOrderItem);
                 get("/view-order-items/:order-id", handler::viewOrderItems);
                 get("/view-order-details/:order-id", handler::viewOrderDetails);
+                get("/view-orders/:status", handler::viewOrders);
             });
         });
     }

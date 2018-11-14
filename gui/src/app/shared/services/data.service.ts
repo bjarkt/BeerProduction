@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, of } from "rxjs";
 import { map, catchError, tap } from 'rxjs/operators';
+import { Order } from "../models/order";
 
 const ErpEndpoint = 'http://localhost:7002/api/';
 const MesEndpoint = 'http://localhost:7001/api/';
@@ -34,6 +35,10 @@ export class DataService {
      */
     public addOrderItem(orderNumber: number, beerName: string, quantity: number): Observable<any>{
         return this.http.post(ErpEndpoint + 'add-order-item/' + orderNumber + '/' + beerName + '/' + quantity, null, httpOptions);
+    }
+
+    public getOrders(status: string): Observable<any> {
+        return this.http.get(ErpEndpoint + 'view-orders/' + status);
     }
 
 
