@@ -36,5 +36,16 @@ export class DataService {
         return this.http.post(ErpEndpoint + 'add-order-item/' + orderNumber + '/' + beerName + '/' + quantity, null, httpOptions);
     }
 
+    /**
+     * /view-orders
+     */
+    public getOrders(): Observable<any>{
+        return this.http.get(ErpEndpoint + 'view-orders', httpOptions);
+    }
+
+
+
+
+
 
 }
