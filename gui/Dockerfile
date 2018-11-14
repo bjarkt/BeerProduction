@@ -6,7 +6,9 @@ WORKDIR /usr/src/app
 
 ## Setup arguments
 ARG PORT
+ARG PROD
 ENV PORT=$PORT
+ENV PROD=$PROD
 
 ## Install angular CLI
 RUN npm install -g @angular/cli
@@ -19,7 +21,7 @@ RUN npm install
 COPY . /usr/src/app
 
 ## compile angular project
-RUN ng build --prod
+RUN ng build --prod=$PROD
 
 # STEP 2 build nginx with compiled project
 FROM nginx:alpine

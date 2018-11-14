@@ -3,6 +3,9 @@
 *.class
 */target/**
 
+# Maven
+**/dependency-reduced-pom.xml
+
 # Log file
 *.log
 
