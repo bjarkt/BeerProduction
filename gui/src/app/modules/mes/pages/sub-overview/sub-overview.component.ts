@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Order } from 'src/app/shared/models/order'
+import { DataService } from 'src/app/shared/services/data.service';
 @Component({
   selector: 'app-sub-overview',
   templateUrl: './sub-overview.component.html',
@@ -8,24 +9,29 @@ import { Order } from 'src/app/shared/models/order'
 export class SubOverviewComponent implements OnInit {
 
   model: Order = {orderNumber: null, status: null, date: null};
-  Orders: Order[] = [];
+  orders: Order[] = [];
 
   
-  constructor() { }
+  constructor(private data: DataService) { }
 
 
   ngOnInit() {
-    this.addOrder();
+    this.addOrders();
+    this.orders.push({orderNumber: 123123, status: "processing", date: new Date()});
   }
 
 
     /**
    * Add Order  to orders list.
    */
-  public addOrder(): void{
+  public addOrders(): void{
+    this.data.getOrders().subscribe(result => {
+      this.orders = result
+      const order: Order = {orderNumber: this.model.orderNumber, status: this.model.status, date: this.model.date};
+      this.orders.push(order);
+    })
 
-    const order: Order = {orderNumber: this.model.orderNumber, status: this.model.status, date: this.model.date};
-    this.Orders.push(order);
+
   }
 
 }
