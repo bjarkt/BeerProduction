@@ -48,7 +48,7 @@ export class CreateOrderComponent implements OnInit {
             this.data.addOrderItem(this.orderNumber, orderItem.beerName, orderItem.quantity).subscribe(res => {
               if(res != null){
                 this.snackBar.open("Order created with order number " + this.orderNumber, 'Done', { duration: 4000 });
-                //this.router.navigate(['/erp/open-orders']);
+                this.router.navigate(['/erp/open-orders']);
               }
             });
           })

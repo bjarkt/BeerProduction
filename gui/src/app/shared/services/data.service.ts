@@ -16,6 +16,8 @@ const httpOptions = {
 @Injectable()
 export class DataService {
 
+    public loading: boolean;
+
     constructor(private http: HttpClient) { }
 
     private extractData(res: Response) {
