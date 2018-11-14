@@ -90,6 +90,11 @@ export class DataService {
         return this.http.post(ErpEndpoint + 'delete-order-item/' + orderNumber + '/' + beerName,null,httpOptions);
     }
 
+
+
+
+
+
     public updateOrderItem(orderNumber: number, beerName: string, quantity: number): Observable<any>{
         return this.http.post(ErpEndpoint + 'edit-order-item/' + orderNumber + '/' + beerName + '?quantity=' + quantity,null,httpOptions);
     }
