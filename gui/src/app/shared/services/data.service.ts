@@ -22,8 +22,18 @@ export class DataService {
         return body || {};
     }
 
+    /**
+     * Create new order and retrieve order number.
+     */
     public createOrder(): Observable<any> {
-        return this.http.post<any>(ErpEndpoint + 'create-order', httpOptions);
+        return this.http.post(ErpEndpoint + 'create-order', null, httpOptions);
+    }
+
+    /**
+     * /add-order-item/:order-id/:beer-name/:quantity
+     */
+    public addOrderItem(orderNumber: number, beerName: string, quantity: number): Observable<any>{
+        return this.http.post(ErpEndpoint + 'add-order-item/' + orderNumber + '/' + beerName + '/' + quantity, null, httpOptions);
     }
 
 

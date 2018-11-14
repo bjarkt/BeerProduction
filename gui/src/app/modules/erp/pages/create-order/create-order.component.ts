@@ -2,6 +2,8 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { OrderItem } from 'src/app/shared/models/orderItem';
 import { NgForm } from '@angular/forms';
 import { DataService } from 'src/app/shared/services/data.service';
+import { MatSnackBar, MatSnackBarRef } from '@angular/material';
+import { Router } from '@angular/router';
 
 export interface BeerSelect {
   value: string;
@@ -18,8 +20,9 @@ export class CreateOrderComponent implements OnInit {
   model: OrderItem = { orderNumber: null, beerName: null, status: null, quantity: null };
   orderItems: OrderItem[] = [];
   options: BeerSelect[];
+  orderNumber: number;
 
-  constructor(private data: DataService) {
+  constructor(private data: DataService, private snackBar: MatSnackBar, private router: Router) {
     this.options = [
       { value: 'pilsner', viewValue: 'Pilsner' },
       { value: 'ale', viewValue: 'Ale' },
@@ -33,11 +36,25 @@ export class CreateOrderComponent implements OnInit {
   ngOnInit() {
   }
 
-
+  /**
+   * Creates order and inserts order items.
+   */
   createOrder() {
-    this.data.createOrder().subscribe(response => {
-      console.log(response);
-    })
+    if (this.orderItems.length > 0) {
+      this.data.createOrder().subscribe(res => {
+        if(res.message != null){
+          this.orderNumber = res.message;
+          this.orderItems.forEach(orderItem => {
+            this.data.addOrderItem(this.orderNumber, orderItem.beerName, orderItem.quantity).subscribe(res => {
+              if(res != null){
+                this.snackBar.open("Order created with order number " + this.orderNumber, 'Done', { duration: 4000 });
+                this.router.navigate(['/erp/open-orders']);
+              }
+            });
+          })
+        }
+      })
+    }
   }
 
   /**
@@ -68,9 +85,9 @@ export class CreateOrderComponent implements OnInit {
     this.model = { orderNumber: null, beerName: null, status: null, quantity: null };
   }
 
-  deleteOrderItem(orderitem){
+  deleteOrderItem(orderitem) {
     this.orderItems.splice(this.orderItems.indexOf(orderitem), 1);
-    const beerSelect: BeerSelect = {value: orderitem.beerName, viewValue: orderitem.beerName}
+    const beerSelect: BeerSelect = { value: orderitem.beerName, viewValue: orderitem.beerName }
     this.options.push(beerSelect);
   }
 
