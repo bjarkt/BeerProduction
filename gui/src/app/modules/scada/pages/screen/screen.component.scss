@@ -1,5 +1,6 @@
 :host {
     display: flex;
+    flex: auto;
     flex-direction: row;
     height: 100%;
     width: 100%;
@@ -8,6 +9,7 @@
 .navbuttons {
     display: flex;
     flex-direction: column;
+    justify-content: center;
     width: 150px;
 
     button {
@@ -17,10 +19,46 @@
 
 .panel {
     width: 100%;
+    margin: 10px 10px;
     display: grid;
     grid-template-columns: auto auto auto;
 
     .griditem {
-        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-weight: 600;
+        font-size: 1em;
+    
+        span {
+            display: flex;
+            align-items: center;
+            font-size: 1.5em;
+
+            i {
+                margin-right: 5px;
+            }
+        }
     }
+}
+
+.red {
+    color: red;
+}
+
+.orange {
+    color: orange;
+}
+
+.blue {
+    color: darkslateblue;
+}
+
+.green {
+    color: green;
+}
+
+.redorange {
+    color: #FF4500;
 }
