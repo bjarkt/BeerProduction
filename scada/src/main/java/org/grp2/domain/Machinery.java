@@ -142,6 +142,9 @@ public class Machinery {
         updateAccepted();
         updateDefective();
 
+        previousAccepted = 0;
+        previousDefect = 0;
+
         Batch finishedBatch = scadaDAO.updateCurrentBatchFinished();
         if (finishedBatch != null) {
             scadaDAO.updateOrderItemStatus(finishedBatch, "processed");
