@@ -108,6 +108,7 @@ public class Machinery {
                 updateDefective();
             }
         }, 500);
+
     }
 
 
