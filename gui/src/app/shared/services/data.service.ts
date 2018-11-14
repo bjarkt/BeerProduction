@@ -94,4 +94,16 @@ export class DataService {
     public manageProduction(action: string): Observable<any> {
         return this.http.post(ScadaEndpoint + 'manage-production/' + action, null, httpOptions);
     }
+
+    public getMesOrders(orderNumber: number): Observable<any> {
+        return this.http.get(MesEndpoint + 'view-order-items/' + orderNumber, httpOptions);
+    }
+
+    public viewStatistics(days?: number): Observable<any> {
+        if (days) {
+            return this.http.get(MesEndpoint + 'get-plant-statistics/?days=' + days, httpOptions);
+        } else {
+            return this.http.get(MesEndpoint + 'get-plant-statistics/', httpOptions)
+        }
+    }
 }
