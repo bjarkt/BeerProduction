@@ -11,14 +11,15 @@ ENV PORT=$PORT
 ## Install angular CLI
 RUN npm install -g @angular/cli
 
-## Copy dependency information
+## Copy dependency information, and install it
 COPY package.json package-lock.json /usr/src/app/
+RUN npm install
 
 ## Copy project files
 COPY . /usr/src/app
 
-## Install dependencies and compile angular project
-RUN npm install && npm run build --prod
+## compile angular project
+RUN ng build --prod
 
 # STEP 2 build nginx with compiled project
 FROM nginx:alpine

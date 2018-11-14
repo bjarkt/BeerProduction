@@ -2,11 +2,10 @@ import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, of } from "rxjs";
 import { map, catchError, tap } from 'rxjs/operators';
-import { environment} from "../../../environments/environment";
 
-const ErpEndpoint = environment.erpUrl;
-const MesEndpoint = environment.mesUrl;
-const ScadaEndpoint = environment.scadaUrl;
+const ErpEndpoint = 'http://localhost:7002/api/';
+const MesEndpoint = 'http://localhost:7001/api/';
+const ScadaEndpoint ='http://localhost:7000/api/';
 const httpOptions = {
     headers: new HttpHeaders({
         'Content-Type': 'application/json'
