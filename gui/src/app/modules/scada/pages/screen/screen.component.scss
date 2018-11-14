@@ -1,0 +1,26 @@
+:host {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    width: 100%;
+}
+
+.navbuttons {
+    display: flex;
+    flex-direction: column;
+    width: 150px;
+
+    button {
+        margin: 10px 10px;
+    }
+}
+
+.panel {
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto auto auto;
+
+    .griditem {
+        text-align: center;
+    }
+}
