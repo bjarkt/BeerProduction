@@ -13,7 +13,7 @@
 <div class="order-details">
 
   <div class="base-info">
-    
+
     <mat-card class="input-card">
       <mat-card-header>
         <mat-card-title>Add Beers to Order</mat-card-title>
@@ -27,10 +27,7 @@
             <mat-form-field>
               <mat-select required class="form-control" id="beerName" [(ngModel)]="model.beerName" name="beerName"
                 placeholder="Select beer">
-                <mat-option value="Pilsner">Pilsner</mat-option>
-                <mat-option value="Ale">Ale</mat-option>
-                <mat-option value="Stout">Stout</mat-option>
-                <mat-option value="IPA">IPA</mat-option>
+                <mat-option *ngFor="let option of options" [value]="option.value">{{option.viewValue | titlecase}}</mat-option>
               </mat-select>
             </mat-form-field>
           </div>
@@ -57,9 +54,9 @@
     <mat-list>
       <h3 mat-subheader>Your Order Items</h3>
       <mat-list-item *ngFor="let orderitem of orderItems">
-        <h4 mat-line>{{orderitem.beerName}}</h4>
+        <h4 mat-line>{{orderitem.beerName | titlecase}}</h4>
         <p mat-line>Quantity: {{orderitem.quantity}}</p>
-        <button mat-button color="warn">Delete</button>
+        <button mat-button color="warn" (click)="deleteOrderItem(orderitem);">Delete</button>
         <mat-divider></mat-divider>
       </mat-list-item>
     </mat-list>

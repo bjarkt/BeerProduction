@@ -22,17 +22,9 @@ export class DataService {
         return body || {};
     }
 
-    //Template
-    public uploadImage(title: string, image: File, albumId?: number): Observable<void> {
-        const uploadData = new FormData();
-        uploadData.append('myFile', image, image.name);
-        console.log(uploadData);
-        return null;
+    public createOrder(): Observable<any> {
+        return this.http.post<any>(ErpEndpoint + 'create-order', httpOptions);
     }
-
-   /* public createOrder(): Observable<any> {
-        return this.http.post<any>(ErpEndpoint + 'create-order', httpOptions).
-    }*/
 
 
 }
