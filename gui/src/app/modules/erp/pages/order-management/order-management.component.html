@@ -1,6 +1,8 @@
 <div class="order-management">
 
-  <app-subheader [title]="'Order Management'" [tabs]="tabs"></app-subheader>
+  <app-subheader [title]="'Order Management'" [tabs]="tabs">
+      <button mat-stroked-button color="primary" [routerLink]="['/erp/create-order']">New Order</button>
+  </app-subheader>
 
   <div class="content">
       <router-outlet></router-outlet>
