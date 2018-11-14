@@ -20,6 +20,11 @@ public class Machinery {
     private IHardware hardware;
     private ZoneId copenhagenZoneId;
 
+    private int previousAccepted = 0;
+    private int previousDefect = 0;
+
+    private boolean restartingBatch = false;
+
     public Machinery(IHardware hardware) {
         scadaDAO = new ScadaDAO();
         this.hardware = hardware;
@@ -61,11 +66,14 @@ public class Machinery {
                 }
                 break;
             case COMPLETE:
+                restartingBatch = true;
                 try {
-                    this.completeBatch();
+                    if(calculateMissingBeers() == 0) this.completeBatch();
+                    else handleRejectedBeers(calculateMissingBeers());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                restartingBatch = false;
                 break;
         }
     }
@@ -91,11 +99,11 @@ public class Machinery {
 
 
         // Collect accepted and defected
-        hardware.getSubscriber().subscribe(CubeNodeId.READ_CURRENT_PRODUCED, produced -> {
-            scadaDAO.updateCurrentBatchProduced((Integer) produced);
-        }, 1000);
-        hardware.getSubscriber().subscribe(CubeNodeId.READ_CURRENT_DEFECTIVE, defects -> {
-            scadaDAO.updateCurrentBatchDefects((Integer) defects);
+        this.getHardware().getSubscriber().subscribe(CubeNodeId.READ_CURRENT_PRODUCED, produced -> {
+            if (!restartingBatch) {
+                updateAccepted(this.getHardware().getProvider().getAcceptedBeersProduced());
+                updateDefective(this.getHardware().getProvider().getDefectiveBeersProduced());
+            }
         }, 1000);
     }
 
@@ -104,14 +112,14 @@ public class Machinery {
         Message message = new Message(200, "Batch started");
         ProductionInformation startedBatch = scadaDAO.startNextBatch();
 
+        previousAccepted = 0;
+        previousDefect = 0;
+
 
         if (startedBatch != null) {
             Recipe recipe = scadaDAO.getRecipe(startedBatch.getRecipeName());
 
-            hardware.getProvider().setBatchId(startedBatch.getBatchId());
-            hardware.getProvider().setProduct(recipe.getId());
-            hardware.getProvider().setAmountToProduce(startedBatch.getQuantity());
-            hardware.getProvider().setMachSpeed(startedBatch.getMachineSpeed());
+            setupBatch(startedBatch.getBatchId(), recipe.getId(), startedBatch.getQuantity(), startedBatch.getMachineSpeed());
 
             hardware.getProvider().stop();
             TimeUnit.SECONDS.sleep(2);
@@ -127,18 +135,59 @@ public class Machinery {
 
 
     private void completeBatch() throws InterruptedException {
-        scadaDAO.updateCurrentBatchProduced(hardware.getProvider().getAcceptedBeersProduced());
-        scadaDAO.updateCurrentBatchDefects(hardware.getProvider().getDefectiveBeersProduced());
+        updateAccepted(this.hardware.getProvider().getAcceptedBeersProduced());
+        updateDefective(this.hardware.getProvider().getDefectiveBeersProduced());
+
+        previousAccepted = 0;
+        previousDefect = 0;
+
         Batch finishedBatch = scadaDAO.updateCurrentBatchFinished();
         if (finishedBatch != null) {
             scadaDAO.updateOrderItemStatus(finishedBatch, "processed");
             scadaDAO.deleteQueueItem(finishedBatch);
         }
 
-        //hardwareProvider.stop();
         TimeUnit.SECONDS.sleep(2);
         hardware.getProvider().reset();
     }
+
+
+    private int calculateMissingBeers(){
+        int quantity = (int) getHardware().getProvider().getAmountToProduce();
+        int acceptedBeers = getHardware().getProvider().getAcceptedBeersProduced();
+        if(quantity != acceptedBeers){
+            return quantity - acceptedBeers;
+        }
+        return 0;
+    }
+
+    private void handleRejectedBeers(int rejects) throws InterruptedException{
+        updateAccepted(this.hardware.getProvider().getAcceptedBeersProduced());
+        updateDefective(this.hardware.getProvider().getDefectiveBeersProduced());
+
+        previousAccepted = 0;
+        previousDefect = 0;
+
+        Batch currentBatch = this.scadaDAO.getCurrentBatch();
+        if (currentBatch != null) {
+            Recipe recipe = this.scadaDAO.getRecipe(currentBatch.getBeerName());
+            setupBatch(currentBatch.getBatchId(), recipe.getId(), rejects, currentBatch.getMachineSpeed());
+
+            getHardware().getProvider().stop();
+            TimeUnit.SECONDS.sleep(2);
+            getHardware().getProvider().reset();
+            TimeUnit.SECONDS.sleep(2);
+            getHardware().getProvider().start();
+        }
+    }
+
+    private void setupBatch(int batchId, int recipeId, int amountToProduce, int machineSpeed) {
+        this.getHardware().getProvider().setBatchId(batchId);
+        this.getHardware().getProvider().setProduct(recipeId);
+        this.getHardware().getProvider().setAmountToProduce(amountToProduce);
+        this.getHardware().getProvider().setMachSpeed(machineSpeed);
+    }
+
 
     public ScadaDAO getScadaDAO() {
         return scadaDAO;
@@ -150,5 +199,21 @@ public class Machinery {
 
     public ZoneId getCopenhagenZoneId() {
         return copenhagenZoneId;
+    }
+
+    private void updateDefective(int currentDefect) {
+        int difference = Math.abs(previousDefect - currentDefect);
+        this.scadaDAO.updateCurrentBatchDefects(difference);
+
+        System.out.println("DEFECT: " + previousDefect  + " - " + currentDefect + " = " + difference);
+        previousDefect = currentDefect;
+    }
+
+    private void updateAccepted(int currentAccepted) {
+        int difference = Math.abs(previousAccepted - currentAccepted);
+        this.scadaDAO.updateCurrentBatchProduced(difference);
+
+        System.out.println("ACCEPTED: " + previousAccepted  + " - " + currentAccepted + " = " + difference);
+        previousAccepted = currentAccepted;
     }
 }

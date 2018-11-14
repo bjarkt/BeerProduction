@@ -25,7 +25,13 @@ CREATE TABLE Order_items (
 	name VARCHAR(255) UNIQUE,
 	min_speed INT,
 	max_speed INT
-);*/
+);
+INSERT INTO Recipes VALUES (0, 'pilsner', 0, 600);
+INSERT INTO Recipes VALUES (1, 'wheat', 0, 300);
+INSERT INTO Recipes VALUES (2, 'ipa', 0, 150);
+INSERT INTO Recipes VALUES (3, 'stout', 0, 200);
+INSERT INTO Recipes VALUES (4, 'ale', 0, 100);
+INSERT INTO Recipes VALUES (5, 'alcohol free', 0, 125);*/
 
 CREATE TABLE Queue_items (
 	batches_id BIGSERIAL PRIMARY KEY,
@@ -41,8 +47,8 @@ CREATE TABLE Batches (
 	batch_id BIGINT UNIQUE,
 	started TIMESTAMP default CURRENT_TIMESTAMP,
 	finished TIMESTAMP,
-	accepted INT,
-	defect INT,
+	accepted INT default 0,
+	defect INT default 0,
 	machine_speed INT,
 	PRIMARY KEY(beer_name, order_number)
 );
