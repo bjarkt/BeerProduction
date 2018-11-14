@@ -4,7 +4,7 @@
       <button [routerLink]="['/erp/open-orders']" color="warn" mat-stroked-button><i class="material-icons">keyboard_backspace</i>
         Cancel</button>
       <span>Create New Order</span>
-      <button color="primary" mat-raised-button><i class="material-icons md-18">done</i> Create Order</button>
+      <button (click)="createOrder();" color="primary" mat-raised-button><i class="material-icons md-18">done</i> Create Order</button>
     </mat-toolbar-row>
   </mat-toolbar>
   <mat-divider></mat-divider>

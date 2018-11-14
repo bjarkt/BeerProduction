@@ -35,7 +35,9 @@ export class CreateOrderComponent implements OnInit {
 
 
   createOrder() {
-
+    this.data.createOrder().subscribe(response => {
+      console.log(response);
+    })
   }
 
   /**
@@ -43,11 +45,6 @@ export class CreateOrderComponent implements OnInit {
    */
   onSubmit(form: NgForm) {
     this.addOrderItem();
-
-    this.data.createOrder().subscribe(response => {
-      console.log(response);
-    })
-
     form.reset();
   }
 
