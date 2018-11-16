@@ -4,6 +4,7 @@ import { Observable, of } from "rxjs";
 import { map, catchError, tap } from 'rxjs/operators';
 import { Order } from "../models/order";
 import { environment } from '../../../environments/environment'
+import { ProductionInfo } from "../models/ProductionInfo";
 
 const ErpEndpoint = environment.erpUrl;
 const MesEndpoint = environment.mesUrl;
@@ -71,12 +72,29 @@ export class DataService {
         return this.http.get(ErpEndpoint + 'view-orders/' + status);
     }
 
-    public getOrderItems(orderNumber: number | string){
-        return this.http.get(ErpEndpoint + 'view-order-items/' + (+orderNumber));
-    }
-
     public deleteOrderItem(orderNumber: number, beerName: string): Observable<any> {
         return this.http.post(ErpEndpoint + 'delete-order-item/' + orderNumber + '/' + beerName,null,httpOptions);
+    }
+
+    public getMesOrders(): Observable<any>{
+        return this.http.get(MesEndpoint + 'view-orders', httpOptions);
+    }
+
+    /**
+     * /get-orders
+     */
+    public getOrderItems(orderNumber: number): Observable<any>{
+        return this.http.get(MesEndpoint + 'view-order-items/' + orderNumber, httpOptions);
+    }
+
+    /**
+     * /create-batches
+     */
+    public createBatches(batches: ProductionInfo[]){
+        const batchesMap = {orderItems: batches}
+        console.log(batches)
+        return this.http.post(MesEndpoint + 'create-batches', batchesMap, httpOptions );
+    
     }
 
 
