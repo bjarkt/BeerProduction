@@ -1,52 +1,56 @@
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
 
 <div class="navbuttons">
-  <button mat-flat-button color="primary">Start</button>
-  <button mat-flat-button color="accent">Stop</button>
-  <button mat-flat-button color="accent">Clear</button>
-  <button mat-flat-button color="warn">Abort</button>
-  <button mat-flat-button color="warn">Reset</button>
+  <button mat-flat-button color="primary" (click)="manageProduction('start');">Start</button>
+  <button mat-flat-button color="accent" (click)="manageProduction('stop');">Stop</button>
+  <button mat-flat-button color="accent" (click)="manageProduction('clear');">Clear</button>
+  <button mat-flat-button color="warn" (click)="manageProduction('abort');">Abort</button>
+  <button mat-flat-button color="warn" (click)="manageProduction('reset');">Reset</button>
 </div>
 
 <div class="panel">
   <div class="griditem">
     BatchID
-    <span><i class="material-icons">archive</i> 1253</span>
+    <span><i class="material-icons">archive</i> {{model.batchID}}</span>
   </div>
   <div class="griditem">
     OrderNr
-    <span><i class="fas fa-folder-open"></i> 154</span>
+    <span><i class="fas fa-folder-open"></i> {{model.orderNumber}}</span>
   </div>
   <div class="griditem">
     Beer Type
-    <span class="orange"><i class="fas fa-beer"></i> Tuborg</span>
+    <span class="orange"><i class="fas fa-beer"></i> {{model.beerType | titlecase}}</span>
   </div>
   <div class="griditem">
-    Product Amount
-    <span><i class="fas fa-sort-amount-up"></i> 1000</span>
+    Produced
+    <span><i class="fas fa-sort-amount-up"></i> {{model.produced}}</span>
   </div>
   <div class="griditem">
     Accepted
-    <span class="green"><i class="material-icons">done</i> 500</span>
+    <span class="green"><i class="material-icons">done</i> {{model.accepted}}</span>
   </div>
   <div class="griditem">
     Defected
-    <span class="red"><i class="material-icons">clear</i> 500</span>
+    <span class="red"><i class="material-icons">clear</i> {{model.defective}}</span>
   </div>
   <div class="griditem">
     Temperature
-    <span class="redorange"><i class="fas fa-temperature-low"></i> 500</span>
+    <span class="redorange"><i class="fas fa-temperature-low"></i> {{model.temperature}}</span>
   </div>
   <div class="griditem">
     Humidity
-    <span class="blue"><i class="fas fa-tint"></i> 500</span>
+    <span class="blue"><i class="fas fa-tint"></i> {{model.humidity}}</span>
   </div>
   <div class="griditem">
     Vibration
-    <span><i class="fas fa-water"></i> 500</span>
+    <span><i class="fas fa-water"></i> {{model.vibration}}</span>
+  </div>
+  <div class="griditem">
+    Product Amount
+    <span><i class="fas fa-sort-amount-up"></i> {{model.productAmount}}</span>
   </div>
   <div class="griditem">
     Speed
-    <span><i class="fas fa-tachometer-alt"></i> 500</span>
+    <span><i class="fas fa-tachometer-alt"></i> {{model.machineSpeed}}</span>
   </div>
 </div>

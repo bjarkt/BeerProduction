@@ -81,6 +81,7 @@ public class APIHandler {
         map.put("BatchData", batchdata);
         map.put("State", State.fromCode(machinery.getHardware().getProvider().getState()));
         map.put("AmountInQueue", machinery.getScadaDAO().getQueueItems().size());
+        map.put("BatchInfo", machinery.getScadaDAO().getCurrentBatch());
 
         context.json(map);
     }

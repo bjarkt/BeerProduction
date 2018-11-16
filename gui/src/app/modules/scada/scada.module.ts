@@ -5,20 +5,19 @@ import { ScadaScreenComponent } from './pages/scada-screen/scada-screen.componen
 import { SharedModule } from 'src/app/shared/components/shared.module';
 import { ScreenComponent } from './pages/screen/screen.component';
 import { LogsComponent } from './pages/logs/logs.component';
+import { DataService } from 'src/app/shared/services/data.service';
 
 @NgModule({
-    declarations: [
-        
-    ScadaScreenComponent,
-        
-    ScreenComponent,
-        
-    LogsComponent],
+    declarations: [    
+        ScadaScreenComponent,
+        ScreenComponent,
+        LogsComponent
+    ],
     imports: [ 
         CommonModule,
         ScadaRoutingModule,
         SharedModule
     ],
-    providers: []
+    providers: [DataService]
   })
   export class ScadaModule { }

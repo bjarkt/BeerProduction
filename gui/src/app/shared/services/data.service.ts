@@ -37,4 +37,16 @@ export class DataService {
     }
 
 
+    // *******************************
+    // **********   SCADA   **********
+    // *******************************
+    public viewScreen(): Observable<any> {
+        return this.http.get(ScadaEndpoint + 'view-screen');
+    }
+
+    public manageProduction(action: string): Observable<any> {
+        console.log(action);
+        
+        return this.http.post(ScadaEndpoint + 'manage-production/' + action, null, httpOptions);
+    }
 }
