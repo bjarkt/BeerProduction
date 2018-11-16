@@ -1,79 +1,99 @@
-<div class="start-order-header">
-  <mat-toolbar>
-    <mat-toolbar-row class="start-order-row">
-      <button [routerLink]="['/mes/overview']" color="warn" mat-stroked-button>
-        <i class="material-icons">keyboard_backspace</i> Cancel
-      </button>
-      <span>Start Production</span>
-      <button (click)="createBatch()" color="primary" mat-raised-button>
-        <i class="material-icons md-18">done</i> Start Order
-      </button>
-    </mat-toolbar-row>
-  </mat-toolbar>
-  <mat-divider></mat-divider>
-</div>
+<div class="content">
+  <div class="start-order-header">
+    <mat-toolbar>
+      <mat-toolbar-row class="start-order-row">
+        <button
+          [routerLink]="['/mes/overview']"
+          color="warn"
+          mat-stroked-button
+        >
+          <i class="material-icons">keyboard_backspace</i> Cancel
+        </button>
+        <span>Start Production</span>
+        <button (click)="createBatch()" color="primary" mat-raised-button>
+          <i class="material-icons md-18">done</i> Start Order
+        </button>
+      </mat-toolbar-row>
+    </mat-toolbar>
+    <mat-divider></mat-divider>
+  </div>
 
-<mat-card class="select-order-card">
-  <mat-card-header>
-    <mat-card-title>Select Order</mat-card-title>
-    <mat-card-subtitle>Select an order to start a production</mat-card-subtitle>
-  </mat-card-header>
+  <div class="order-details">
+    <mat-card class="select-order-card">
+      <mat-card-header>
+        <mat-card-title>Select Order</mat-card-title>
+        <mat-card-subtitle
+          >Select an order to start a production</mat-card-subtitle
+        >
+      </mat-card-header>
 
-  <form #startForm="ngForm">
-    <mat-card-content>
-      <div class="form-group">
-        <mat-form-field>
-          <mat-select
-            required
-            class="form-control"
-            id="orderNumber"
-            [(ngModel)]="order.orderNumber"
-            (selectionChange)="getOrderItems($event)"
-            name="orderNumber"
-            placeholder="Select Order Number"
-          >
-            <mat-option
-              *ngFor="let order of orders"
-              [value]="order.orderNumber"
-            >
-              {{ order.orderNumber }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+      <form #startForm="ngForm">
+        <mat-card-content>
+          <div class="form-group">
+            <mat-form-field>
+              <mat-select
+                required
+                class="form-control"
+                id="orderNumber"
+                [(ngModel)]="order.orderNumber"
+                (selectionChange)="getOrderItems($event)"
+                name="orderNumber"
+                placeholder="Select Order Number"
+              >
+                <mat-option
+                  *ngFor="let order of orders"
+                  [value]="order.orderNumber"
+                >
+                  {{ order.orderNumber }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </form>
+    </mat-card>
+
+    <div class="order-info">
+      <div class="info" [hidden]="order.orderNumber == null">
+        <mat-list>
+          <h3 mat-subheader>Choose production speed for each beer</h3>
+          <mat-list-item *ngIf="order.orderNumber">
+            <h4 mat-line>Order: {{ order.orderNumber }}</h4>
+            <p mat-line>Status: {{ order.status }}</p>
+            <p mat-line>
+              Date Created: {{ order.date.hour }}:{{ order.date.minute }}:{{
+                order.date.second
+              }}
+              | {{ order.date.dayOfWeek | lowercase | titlecase }}
+              {{ order.date.dayOfMonth }}/{{ order.date.monthValue }}/{{
+                order.date.year
+              }}
+            </p>
+            <mat-divider></mat-divider>
+          </mat-list-item>
+        </mat-list>
       </div>
-    </mat-card-content>
-  </form>
-</mat-card>
 
-<div class="order-info" [hidden]="order.orderNumber == null">
-  <mat-list>
-    <h3 mat-subheader>Choose production speed for each beer</h3>
-    <mat-list-item>
-      <h4 mat-line>Order: {{ order.orderNumber }}</h4>
-      <p mat-line>Status: {{ order.status }}</p>
-      <p mat-line>Date Created: {{ order.date }}</p>
-      <mat-divider></mat-divider>
-    </mat-list-item>
-  </mat-list>
-</div>
-
-<div class="order-items" [hidden]="order.orderNumber == null">
-  <div *ngFor="let produductInfo of batches; let i = index">
-    <div>{{ produductInfo.quantity }} {{ produductInfo.recipeName }}</div>
-    <mat-form-field>
-      <div>
-        <input
-          #SpeedInput
-          class="form-control"
-          id="machSpeed"
-          name="machSpeed"
-          [(ngModel)]="batches[i].machineSpeed"
-          required
-          type="number"
-          matInput
-          placeholder="machine speed"
-        />
+      <div class="items" [hidden]="order.orderNumber == null">
+        <div *ngFor="let produductInfo of batches; let i = index">
+          <div>{{ produductInfo.quantity }} {{ produductInfo.recipeName | titlecase }}</div>
+          <mat-form-field>
+            <div>
+              <input
+                #SpeedInput
+                class="form-control"
+                id="machSpeed"
+                name="machSpeed"
+                [(ngModel)]="batches[i].machineSpeed"
+                required
+                type="number"
+                matInput
+                placeholder="machine speed"
+              />
+            </div>
+          </mat-form-field>
+        </div>
       </div>
-    </mat-form-field>
+    </div>
   </div>
 </div>

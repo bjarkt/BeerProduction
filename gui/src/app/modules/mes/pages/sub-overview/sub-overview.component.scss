@@ -1,3 +1,8 @@
+.content {
+    padding:0 22px;
+    margin-top: 22px;
+}
+
 .start-order-header{
     display: flex;
     margin-bottom: 25px;
@@ -8,14 +13,34 @@
     }        
 }
 
-.select-order-card{
-    flex-grow: 1;
-    max-width: calc(50% - 10px);
-    mat-form-field {
-        width: 100%;
+.order-details{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    
+
+    .select-order-card{
+        flex-grow: 1;
+        max-width: calc(50% - 10px);
+        mat-form-field {
+            width: 100%;
+        }
     }
 
+    .order-info{
+        flex-grow: 1;
+        max-width: calc(50% - 10px);
+        mat-form-field {
+            width: 100%;
+        }
+    }
 }
+
+
+
+
+
+
 
 
 
