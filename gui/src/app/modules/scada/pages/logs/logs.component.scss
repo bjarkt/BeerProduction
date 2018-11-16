@@ -1,3 +1,15 @@
+button {
+    background-color: lightblue;
+    margin: 8px 8px;
+}
+
 table {
     width: 100%;
+}
+
+tr:nth-child(even) {
+    background: #EEE
+}
+tr:nth-child(odd) {
+    background: #FFF
 }

@@ -36,5 +36,7 @@ export class DataService {
         return this.http.post(ErpEndpoint + 'add-order-item/' + orderNumber + '/' + beerName + '/' + quantity, null, httpOptions);
     }
 
-
+    public getScadaLogs(batchId: number): Observable<any> {
+        return this.http.post(ScadaEndpoint + 'view-log/' + batchId, null, httpOptions);
+    }
 }
