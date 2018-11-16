@@ -10,7 +10,7 @@ import { ScadaScreen } from 'src/app/shared/models/scadaScreen';
 export class ScreenComponent implements OnInit, OnDestroy {
   timer;
   time: 0;
-  model: ScadaScreen = {batchID: null, orderNumber: null, beerType: null, produced: null, accepted: null, defective: null, temperature: null, humidity: null, vibration: null, productAmount: null, machineSpeed: null};
+  model: ScadaScreen = {batchID: null, orderNumber: null, beerType: null, produced: null, accepted: null, defective: null, temperature: null, humidity: null, vibration: null, productAmount: null, machineSpeed: null, state: null};
   
   constructor(private data: DataService) { }
 
@@ -31,7 +31,7 @@ export class ScreenComponent implements OnInit, OnDestroy {
 
   updateScreen (res) {
     this.model.state = res["State"];
-
+    
     if (res["BatchInfo"] != null && res["State"] == "EXECUTE") {
       this.model.batchID = res["BatchOrder"]["batchId"];
       this.model.orderNumber = res["BatchInfo"]["orderNumber"];
@@ -45,7 +45,6 @@ export class ScreenComponent implements OnInit, OnDestroy {
       this.model.productAmount = res["BatchOrder"]["amountToProduce"];
       this.model.machineSpeed = res["BatchOrder"]["productsPerMinute"];
     }
-    
   }
   
   manageProduction (action: string) {
