@@ -1,0 +1,11 @@
+.content{
+    > table{
+        width: 100%;
+        .hide{
+            display: none;
+        }
+        .button-cell{
+            text-align: right;
+        }
+    }
+}

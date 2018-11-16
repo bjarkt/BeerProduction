@@ -39,22 +39,18 @@ export class CreateOrderComponent implements OnInit {
   /**
    * Creates order and inserts order items.
    */
-  createOrder() {
-    if (this.orderItems.length > 0) {
-      this.data.createOrder().subscribe(res => {
-        if(res.message != null){
-          this.orderNumber = res.message;
-          this.orderItems.forEach(orderItem => {
-            this.data.addOrderItem(this.orderNumber, orderItem.beerName, orderItem.quantity).subscribe(res => {
-              if(res != null){
-                this.snackBar.open("Order created with order number " + this.orderNumber, 'Done', { duration: 4000 });
-                this.router.navigate(['/erp/open-orders']);
-              }
-            });
-          })
-        }
-      })
+   async createOrder(){
+    const newOrderNumber = await this.data.createOrder().toPromise();
+    this.orderNumber = newOrderNumber.message;
+
+    if(this.orderItems.length > 0){
+      for(const orderitem of this.orderItems){
+        await this.data.addOrderItem(this.orderNumber, orderitem.beerName, orderitem.quantity).toPromise();
+      }
     }
+
+    this.snackBar.open("Order created with order number " + this.orderNumber, 'Dismiss', { duration: 4000 });
+    this.router.navigate(['/erp/open-orders']);
   }
 
   /**

@@ -1,0 +1,24 @@
+<div class="create-order-header">
+<mat-toolbar>
+  <mat-toolbar-row class="create-order-row">
+    <button [routerLink]="['/erp/open-orders']" color="primary" mat-stroked-button><i class="material-icons">keyboard_backspace</i>
+      Go back</button>
+    <span>Edit Order {{order.orderNumber}}</span>
+    <span></span>
+  </mat-toolbar-row>
+</mat-toolbar>
+<mat-divider></mat-divider>
+</div>
+
+<mat-list>
+  <h3 mat-subheader>Your Order Items</h3>
+  <mat-list-item *ngFor="let orderitem of orderItems">
+    <h4 mat-line>{{orderitem.beerName | titlecase}}</h4>
+    <mat-form-field>
+      <input #quantityInput id="{{orderitem.beerName}}" matInput placeholder="Quantity" value="{{orderitem.quantity}}">
+    </mat-form-field>
+    <button mat-button color="warn" (click)="deleteOrderItem(orderitem);">Delete</button>
+    <button mat-button (click)="updateOrderItem(orderitem);">Update</button>
+    <mat-divider></mat-divider>
+  </mat-list-item>
+</mat-list>

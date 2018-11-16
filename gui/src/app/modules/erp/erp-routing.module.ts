@@ -1,10 +1,11 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { Routes, RouterModule} from '@angular/router';
 import { OrderManagementComponent } from './pages/order-management/order-management.component';
 import { OpenOrdersComponent } from './pages/open-orders/open-orders.component';
 import { LockedOrdersComponent } from './pages/locked-orders/locked-orders.component';
 import { FinishedOrdersComponent } from './pages/finished-orders/finished-orders.component';
 import { CreateOrderComponent } from './pages/create-order/create-order.component';
+import { EditOrderComponent } from './pages/edit-order/edit-order.component';
 
 const routes: Routes = [
     {
@@ -15,7 +16,8 @@ const routes: Routes = [
         {path: 'open-orders', component: OpenOrdersComponent},
         {path: 'locked-orders', component: LockedOrdersComponent},
         {path: 'finished-orders', component: FinishedOrdersComponent},
-        {path: 'create-order', component: CreateOrderComponent}
+        {path: 'create-order', component: CreateOrderComponent},
+        {path: 'edit-order/:id', component: EditOrderComponent},
       ]
     }
 

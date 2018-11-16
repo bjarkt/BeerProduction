@@ -76,6 +76,12 @@ public class APIHandler {
         }
     }
 
+    public void lockOrder(Context context){
+        int orderNumber = Integer.parseInt(context.pathParam("order-id"));
+        erpDAO.lockOrder(orderNumber);
+        context.json(new Message(200, "Order with order number:" + orderNumber + " has been locked."));
+    }
+
     public void viewOrderItems(Context context){
         int orderNumber = Integer.parseInt(context.pathParam("order-id"));
 
@@ -90,6 +96,12 @@ public class APIHandler {
         Order order = erpDAO.viewOrderDetails(orderNumber);
 
         context.json(order);
+    }
+
+    public void viewOrders(Context context) {
+        String status = context.pathParam("status");
+        List<Order> orders = erpDAO.getOrders(status);
+        context.json(orders);
     }
 
 

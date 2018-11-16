@@ -8,6 +8,7 @@ import { FinishedOrdersComponent } from './pages/finished-orders/finished-orders
 import { SharedModule } from 'src/app/shared/components/shared.module';
 import { CreateOrderComponent } from './pages/create-order/create-order.component';
 import { DataService } from 'src/app/shared/services/data.service';
+import { EditOrderComponent } from './pages/edit-order/edit-order.component';
 
 @NgModule({
     declarations: [
@@ -15,7 +16,8 @@ import { DataService } from 'src/app/shared/services/data.service';
         OpenOrdersComponent,
         LockedOrdersComponent,
         FinishedOrdersComponent,
-        CreateOrderComponent
+        CreateOrderComponent,
+        EditOrderComponent
     ],
     imports: [ 
         CommonModule,

@@ -1,5 +1,5 @@
+<mat-progress-bar *ngIf="loaderService.isLoading | async" class="loader" mode="indeterminate"></mat-progress-bar>
 <app-header></app-header>
-
 <main class="mat-app-background">
   <router-outlet></router-outlet>
 </main>
