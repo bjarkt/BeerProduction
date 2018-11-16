@@ -21,5 +21,4 @@ export class SubOverviewComponent implements OnInit {
   ngOnInit() {
     
   }
-
 }
