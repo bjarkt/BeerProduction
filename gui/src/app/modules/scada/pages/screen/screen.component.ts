@@ -9,16 +9,12 @@ import { ScadaScreen } from 'src/app/shared/models/scadaScreen';
 })
 export class ScreenComponent implements OnInit, OnDestroy {
   timer;
-  time: 0;
   model: ScadaScreen = {batchID: null, orderNumber: null, beerType: null, produced: null, accepted: null, defective: null, temperature: null, humidity: null, vibration: null, productAmount: null, machineSpeed: null, state: null};
   
   constructor(private data: DataService) { }
 
   ngOnInit() {
-    this.time = 0;
-    this.timer = setInterval(() => {         //replaced function() by ()=>
-      this.time += 1;
-      console.log('time: ' + this.time); // just testing if it is working
+    this.timer = setInterval(() => {
       this.data.viewScreen().subscribe(res => {
         this.updateScreen(res);
       });
