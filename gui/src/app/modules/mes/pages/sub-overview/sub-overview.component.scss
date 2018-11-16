@@ -3,7 +3,14 @@
     margin-top: 22px;
 }
 
+.select-order-card{
+    flex-grow: 1;
+    max-width: calc(50% - 10px);
+    mat-form-field {
+        width: 100%;
+    }
 
+}
 
 
 
