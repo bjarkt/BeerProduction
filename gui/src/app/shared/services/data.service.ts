@@ -4,6 +4,7 @@ import { Observable, of } from "rxjs";
 import { map, catchError, tap } from 'rxjs/operators';
 import { Order } from "../models/order";
 import { environment } from '../../../environments/environment'
+import { ProductionInfo } from "../models/ProductionInfo";
 
 const ErpEndpoint = environment.erpUrl;
 const MesEndpoint = environment.mesUrl;
@@ -69,6 +70,16 @@ export class DataService {
      */
     public getOrders(status: string): Observable<any> {
         return this.http.get(ErpEndpoint + 'view-orders/' + status);
+    }
+
+    /**
+     * /create-batches
+     */
+    public createBatches(batches: ProductionInfo[]){
+        const batchesMap = {orderItems: batches}
+        console.log(batches)
+        return this.http.post(MesEndpoint + 'create-batches', batchesMap, httpOptions );
+    
     }
 
     public getOrderItems(orderNumber: number | string){
