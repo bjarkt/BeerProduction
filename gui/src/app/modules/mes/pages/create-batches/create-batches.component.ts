@@ -57,7 +57,7 @@ export class CreateBatchesComponent implements OnInit {
           machineSpeed: null,
           recipeName: orderItem.beerName
         });
-        this.recipes.push(result.Recipe[i]);
+        this.recipes.push(((result.Recipe) as Recipe[]).find(r => r.name === orderItem.beerName));
       }
     });
 
