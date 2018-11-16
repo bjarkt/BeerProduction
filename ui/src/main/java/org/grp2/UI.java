@@ -58,7 +58,7 @@ public class UI {
 
             if (command.getNumArgs() == command.getArgs().length)
             {
-                if (command.getNumArgs() > 0)
+                if (command.getNumArgs() > 0 && !command.getCommandURL().equals("create-batches"))
                 {
                     for (int i = 0; i < command.getNumArgs(); i++) {
                         sb.append("/");
@@ -76,8 +76,9 @@ public class UI {
                 System.out.println(command.getKeyword() + ": " + Arrays.toString(command.getArgs()));
 
                 try {
-                    if (command.getUnirestCommand().equals("post"))
-                    {
+                    if (command.getCommandURL().equals("create-batches")) {
+                        HttpResponse<Message> postMessage = Unirest.post(sb.toString()).header("accept","application/json").body(command.getArgs()[0]).asObject(Message.class);
+                    } else if (command.getUnirestCommand().equals("post")) {
                         HttpResponse<Message> postMessage = Unirest.post(sb.toString()).asObject(Message.class);
                     } else if (command.getUnirestCommand().equals("get")) {
                         HttpResponse<String> postMessage = Unirest.get(sb.toString()).asString();

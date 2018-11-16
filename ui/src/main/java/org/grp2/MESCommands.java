@@ -7,7 +7,8 @@ public enum MESCommands implements ICommand{
     VIEW_ALL_BATCHES("vbatches:view-all-batches:0:get"),
     GET_PLANT_STATISTICS("statistics:get-plant-statistics:0:get"),
     GET_REPORT("getreport:get-report:1:get"),
-    CREATE_BATCHES("createbatches:create-batches:0:post");
+    CREATE_BATCHES("createbatches:create-batches:1:post"),
+    GET_OEE("oee:get-oee:1:get");
 
     private String name;
 
