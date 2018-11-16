@@ -2,7 +2,7 @@ package org.grp2;
 
 public enum ERPCommands implements ICommand {
 
-    CREATE_ORDER("create:create-order:0:port"),
+    CREATE_ORDER("create:create-order:0:post"),
     ADD_ORDER_ITEM("additem:add-order-item:3:post"),
     DELETE_ORDER("deleteorder:delete-order:1:post"),
     EDIT_ORDER_ITEM("edititem:edit-order-item:2:post"),
