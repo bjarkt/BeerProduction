@@ -6,6 +6,8 @@ import { SharedModule } from 'src/app/shared/components/shared.module';
 import { ScreenComponent } from './pages/screen/screen.component';
 import { LogsComponent } from './pages/logs/logs.component';
 import { DataService } from 'src/app/shared/services/data.service';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatTableModule } from '@angular/material/table';
 
 @NgModule({
     declarations: [    
@@ -16,7 +18,9 @@ import { DataService } from 'src/app/shared/services/data.service';
     imports: [ 
         CommonModule,
         ScadaRoutingModule,
-        SharedModule
+        SharedModule,
+        MatPaginatorModule,
+        MatTableModule
     ],
     providers: [DataService]
   })
