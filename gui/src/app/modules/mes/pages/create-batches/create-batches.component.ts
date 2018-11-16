@@ -2,7 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { Order } from "src/app/shared/models/order";
 import { DataService } from "src/app/shared/services/data.service";
 import { ProductionInfo } from "src/app/shared/models/ProductionInfo";
-import { OrderItem } from "src/app/shared/models/OrderItem";
+import { OrderItem } from "src/app/shared/models/orderItem";
 import { Observable } from "rxjs";
 @Component({
   selector: "app-create-batches",
@@ -37,7 +37,7 @@ export class CreateBatchesComponent implements OnInit {
    * Add Order  to orders list.
    */
   public addOrders(): void {
-    this.data.getOrders().subscribe(result => {
+    this.data.getMesOrders().subscribe(result => {
       this.orders = result;
     });
   }
