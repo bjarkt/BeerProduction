@@ -129,18 +129,20 @@ public class SimplePdfPrinter2 implements IPrintManager {
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-uuuu   HH:mm:ss");
 		Cell cellBold = new Cell().setMinHeight(15).setBold();
 
-		UnitValue[] measurementColumnWidth = {UnitValue.createPercentValue(30), UnitValue.createPercentValue(35), UnitValue.createPercentValue(35)};
+		UnitValue[] measurementColumnWidth = {UnitValue.createPercentValue(25), UnitValue.createPercentValue(25), UnitValue.createPercentValue(25),UnitValue.createPercentValue(25)};
 		Table measurementTable = new Table(measurementColumnWidth);
 		measurementTable.setWidth(UnitValue.createPercentValue(100));
-		measurementTable.addCell(new Cell(1,3).add(new Paragraph("Measurements").setFontSize(15).setBold()).setMinHeight(15).setBold().setTextAlignment(TextAlignment.CENTER));
+		measurementTable.addCell(new Cell(1,4).add(new Paragraph("Measurements").setFontSize(15).setBold()).setMinHeight(15).setBold().setTextAlignment(TextAlignment.CENTER));
 		measurementTable.addCell(cellBold.clone(true).add(new Paragraph("Time")).setTextAlignment(TextAlignment.CENTER));
 		measurementTable.addCell(cellBold.clone(true).add(new Paragraph("Temperature")).setTextAlignment(TextAlignment.CENTER));
 		measurementTable.addCell(cellBold.clone(true).add(new Paragraph("Humidity")).setTextAlignment(TextAlignment.CENTER));
+		measurementTable.addCell(cellBold.clone(true).add(new Paragraph("Vibration")).setTextAlignment(TextAlignment.CENTER));
 
 		for (MeasurementLog log : logs) {
 			measurementTable.addCell(log.getMeasurementTime().format(dateTimeFormatter)).setTextAlignment(TextAlignment.CENTER);
 			measurementTable.addCell(String.valueOf(Math.round(log.getMeasurements().getTemperature() * 100) / 100.)).setTextAlignment(TextAlignment.CENTER);
 			measurementTable.addCell(String.valueOf(Math.round(log.getMeasurements().getHumidity() * 100) / 100.)).setTextAlignment(TextAlignment.CENTER);
+			measurementTable.addCell(String.valueOf(Math.round(log.getMeasurements().getVibration() * 100) / 100.)).setTextAlignment(TextAlignment.CENTER);
 		}
 
 		return measurementTable;

@@ -99,7 +99,6 @@ public class APIHandler {
             MeasurementLog[] mesLogs = new MeasurementLog[measurementLogs.size()];
             mesLogs = measurementLogs.toArray(mesLogs);
 
-            plant.getPrintManager().setPath("report");
             plant.getPrintManager().writeDocument(batch, mesLogs);
             byte[] report = plant.getPrintManager().getDocument();
             context.header("Content-Type", "application/pdf");
