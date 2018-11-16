@@ -7,6 +7,23 @@
 
 version: '3'
 services:
+  web:
+    build:
+      context: ./gui/
+      dockerfile: Dockerfile
+      args:
+        PORT: 80
+        PROD: "false"
+    ports:
+      - "80:80"
+    # network_mode: host
+    environment:
+      - inDocker=true
+    depends_on:
+      - erp
+      - mes
+      - scada
+
   scada:
     build:
       context: .
@@ -16,7 +33,7 @@ services:
         SERVICE: scada
     ports:
       - "7000:7000"
-#    network_mode: host
+    # network_mode: host
     environment:
       - inDocker=true
       - useSimulation=false
@@ -30,7 +47,7 @@ services:
         SERVICE: mes
     ports:
       - "7001:7001"
-#    network_mode: host
+    # network_mode: host
     environment:
       - inDocker=true
     depends_on:
@@ -45,6 +62,6 @@ services:
         SERVICE: erp
     ports:
       - "7002:7002"
-#    network_mode: host
+    # network_mode: host
     environment:
       - inDocker=true

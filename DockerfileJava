@@ -1,27 +1,42 @@
+# Minimal docker image with maven and jdk8
 FROM zenika/alpine-maven:latest
 
+# Copy parent pom.xml
 COPY ./pom.xml /usr/src/
 
+# Copy common module
 COPY ./common /usr/src/common/
-WORKDIR /usr/src/common/
-RUN mvn clean compile assembly:single && \
-    mkdir -p /usr/src/app/target && \
-    cp /usr/src/common/target/common-1.0-SNAPSHOT-jar-with-dependencies.jar /usr/src/app/target/
 
+# Download common dependencies.
+WORKDIR /usr/src/common/
+RUN mvn dependency:resolve
+
+# Create fat jar (jar with dependencies included) of common module
+RUN mvn package -DskipTests
+
+# Setup arguments
 ARG PORT
 ARG SERVICE
-
 ENV SERVICE=$SERVICE
 ENV PORT=$PORT
 
-COPY ./$SERVICE /usr/src/app/
+# Copy service pom.xml to container, install common module jar file, and download dependencies
+COPY ./$SERVICE/pom.xml /usr/src/app
 WORKDIR /usr/src/app/
-EXPOSE $PORT
 RUN mvn install:install-file \
-   -Dfile=/usr/src/app/target/common-1.0-SNAPSHOT-jar-with-dependencies.jar \
-   -DgroupId=org.grp2 \
-   -DartifactId=common \
-   -Dversion=1.0-SNAPSHOT \
-   -Dpackaging=jar && \
-    mvn clean compile assembly:single
-CMD ["sh", "-c", "java -jar /usr/src/app/target/${SERVICE}-1.0-SNAPSHOT-jar-with-dependencies.jar"]
+       -Dfile=/usr/src/common/target/common.jar \
+       -DgroupId=org.grp2 \
+       -DartifactId=common \
+       -Dversion=1.0-SNAPSHOT \
+       -Dpackaging=jar && \
+       mvn dependency:resolve
+
+# Copy source code to container, and create fat jar
+COPY ./$SERVICE/src /usr/src/app/src
+RUN mvn package -DskipTests
+
+# Expose port defined in env, or docker-compose args
+EXPOSE $PORT
+
+# Run java -jar in shell, so it expands environment variable $SERVICE
+CMD ["sh", "-c", "java -jar /usr/src/app/target/${SERVICE}.jar"]
