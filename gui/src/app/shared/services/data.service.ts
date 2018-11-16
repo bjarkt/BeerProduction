@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, of } from "rxjs";
 import { map, catchError, tap } from 'rxjs/operators';
+import { ProductionInfo } from "../models/productionInfo";
 
 const ErpEndpoint = 'http://localhost:7002/api/';
 const MesEndpoint = 'http://localhost:7001/api/';
@@ -40,7 +41,24 @@ export class DataService {
      * /view-orders
      */
     public getOrders(): Observable<any>{
-        return this.http.get(ErpEndpoint + 'view-orders', httpOptions);
+        return this.http.get(MesEndpoint + 'view-orders', httpOptions);
+    }
+
+    /**
+     * /get-orders
+     */
+    public getOrderItems(orderNumber: number): Observable<any>{
+        return this.http.get(MesEndpoint + 'view-order-items/' + orderNumber, httpOptions);
+    }
+
+    /**
+     * /create-batches
+     */
+    public createBatches(batches: ProductionInfo[]){
+        const batchesMap = {orderItems: batches}
+        console.log(batches)
+        return this.http.post(MesEndpoint + 'create-batches', batchesMap, httpOptions );
+    
     }
 
 
