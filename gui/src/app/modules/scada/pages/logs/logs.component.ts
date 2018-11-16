@@ -37,6 +37,8 @@ export class LogsComponent implements OnInit {
     this.totalRefresh = 0;
   }
 
+  }
+
   ngOnInit() {
     this.addTemporaryMeasures();
     this.addTemporaryStates();
