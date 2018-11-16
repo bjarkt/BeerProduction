@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -93,12 +94,21 @@ public class APIHandler {
         int batchID = Integer.parseInt(context.pathParam("batch-id"));
         List<MeasurementLog> measurementLogs = plant.getMesDAO().getMeasurementLogs(batchID);
         Batch batch = plant.getMesDAO().getBatch(batchID);
-        // TODO: Get byte[] from PrintManager
-        //byte[] report = plant.getPrintManager().getDocument(batch, measurementLogs);
-        context.header("Content-Type", "application/pdf");
-        //context.header("Content-Length", String.valueOf(report.length));
-        context.header("Content-Disposition", "attachment;filename=batch-report.pdf");
-        //context.result(new ByteArrayInputStream(report));
+
+        if(batch != null && measurementLogs!=null){
+            MeasurementLog[] mesLogs = new MeasurementLog[measurementLogs.size()];
+            mesLogs = measurementLogs.toArray(mesLogs);
+
+            plant.getPrintManager().writeDocument(batch, mesLogs);
+            byte[] report = plant.getPrintManager().getDocument();
+            context.header("Content-Type", "application/pdf");
+            context.header("Content-Length", String.valueOf(report.length));
+            context.header("Content-Disposition", "attachment;filename=batch-report.pdf");
+            context.result(new ByteArrayInputStream(report));
+        } else{
+            context.json(new Message(404, "No measurement logs exists."));
+        }
+
     }
 
     public void getOEE(Context context) {

@@ -125,22 +125,24 @@ public class SimplePdfPrinter1 implements IPrintManager {
 	}
 
 	private void setupMeasurements(MeasurementLog ... logs) {
-		tMeasurements = new Table(3, true);
-		tMeasurements.addHeaderCell(new Cell(0, 3).add(new Paragraph("Measurements")
+		tMeasurements = new Table(4, true);
+		tMeasurements.addHeaderCell(new Cell(0, 4).add(new Paragraph("Measurements")
 				.setFontSize(18))
 				.setTextAlignment(TextAlignment.CENTER));
 
 		tMeasurements.startNewRow().setTextAlignment(TextAlignment.CENTER)
 				.addCell("Time").setBold()
 				.addCell("Temperature").setBold()
-				.addCell("Humidity").setBold();
+				.addCell("Humidity").setBold()
+				.addCell("Vibration").setBold();
+
 
 		for(MeasurementLog log : logs) {
 			tMeasurements.startNewRow()
 					.addCell(log.getMeasurementTime().format(dtf))
-					.addCell(df.format(log.getMeasurements().getTemperature()))
-					.addCell(df.format(log.getMeasurements().getHumidity()));
-					//.addCell(String.valueOf(log.getMeasurements().getVibration()));
+					.addCell(String.valueOf(log.getMeasurements().getTemperature()))
+					.addCell(String.valueOf(log.getMeasurements().getHumidity()))
+					.addCell(String.valueOf(log.getMeasurements().getVibration()));
 		}
 
 		tMeasurements.setBorderCollapse(BorderCollapsePropertyValue.SEPARATE);
