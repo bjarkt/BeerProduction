@@ -1,0 +1,8 @@
+.create-order-header{
+    margin-bottom: 25px;
+    mat-toolbar{
+        .create-order-row{
+            justify-content: space-between;
+        }
+    }        
+}

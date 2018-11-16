@@ -27,7 +27,6 @@ export class EditOrderComponent implements OnInit {
     this.order = await this.data.getOrderDetails(id).toPromise();
     const orderItemsRes = await this.data.getOrderItems(this.order.orderNumber).toPromise();
     this.orderItems = orderItemsRes as OrderItem[];
-    console.log(this.orderItems);
   }
 
 
