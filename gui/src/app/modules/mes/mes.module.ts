@@ -7,6 +7,7 @@ import { ProductionPlanningComponent } from './pages/production-planning/product
 import { StatisticsComponent } from './pages/statistics/statistics.component';
 import { SubOverviewComponent } from './pages/sub-overview/sub-overview.component';
 import { DataService } from 'src/app/shared/services/data.service';
+import { CreateBatchesComponent } from './pages/create-batches/create-batches.component';
 @NgModule({
     declarations: [
         
@@ -16,7 +17,9 @@ import { DataService } from 'src/app/shared/services/data.service';
         
     StatisticsComponent,
         
-    SubOverviewComponent],
+    SubOverviewComponent,
+        
+    CreateBatchesComponent],
     imports: [ 
         CommonModule,
         MesRoutingModule,
