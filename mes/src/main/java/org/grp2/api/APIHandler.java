@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +44,11 @@ public class APIHandler {
     public void viewOrderItems(Context context) {
         int orderNumber = Integer.parseInt(context.pathParam("order-number"));
         Map<OrderItem, Recipe> orderItems = plant.getMesDAO().getOrderItems(orderNumber);
-        context.json(orderItems);
+        Map<String, Object> recipeAndItem = new HashMap<>();
+        recipeAndItem.put("Recipe", orderItems.values());
+        recipeAndItem.put("OrderItems", orderItems.keySet());
+
+        context.json(recipeAndItem);
     }
 
     public void viewAllBatches(Context context) {
