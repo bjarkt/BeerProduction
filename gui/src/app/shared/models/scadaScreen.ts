@@ -10,4 +10,6 @@ export interface ScadaScreen {
     vibration: number;
     productAmount: number;
     machineSpeed: number;
+
+    state: string;
 }
