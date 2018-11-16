@@ -12,7 +12,7 @@ import { OrderItem } from 'src/app/shared/models/orderItem';
 })
 export class EditOrderComponent implements OnInit {
 
-  order: Order = { orderNumber: null, date: null, status: null};
+  order: Order = { orderNumber: null, date: null, status: null };
   orderItems: OrderItem[] = [];
 
   constructor(private route: ActivatedRoute,
@@ -22,19 +22,15 @@ export class EditOrderComponent implements OnInit {
     this.loadData();
   }
 
-  async loadData(){
-    this.route.paramMap.pipe(
-      switchMap(async (params: ParamMap) =>
-        await this.data.getOrderDetails(params.get('id')).toPromise()
-      )
-    ).subscribe(res => this.order = res as Order);
-
+  async loadData() {
+    const id = this.route.snapshot.paramMap.get('id');
+    this.order = await this.data.getOrderDetails(id).toPromise();
     const orderItemsRes = await this.data.getOrderItems(this.order.orderNumber).toPromise();
     this.orderItems = orderItemsRes as OrderItem[];
     console.log(this.orderItems);
   }
 
-  
+
 
 
 }
