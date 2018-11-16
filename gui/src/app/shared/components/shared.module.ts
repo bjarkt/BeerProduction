@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SubheaderComponent } from './subheader/subheader.component';
-import {MatProgressBarModule, MatPaginatorModule, MatSnackBarModule, MatListModule, MatToolbarModule, MatDividerModule, MatButtonModule, MatTabsModule, MatTableModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatCardModule} from '@angular/material';
+import {MatProgressBarModule, MatSortModule, MatPaginatorModule, MatSnackBarModule, MatListModule, MatToolbarModule, MatDividerModule, MatButtonModule, MatTabsModule, MatTableModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatCardModule} from '@angular/material';
 import { Routes, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
@@ -26,7 +26,8 @@ import { FormsModule } from '@angular/forms';
         MatListModule,
         FormsModule,
         MatSnackBarModule,
-        MatProgressBarModule
+        MatProgressBarModule,
+        MatSortModule
     ],
     exports: [
         RouterModule,
@@ -44,7 +45,8 @@ import { FormsModule } from '@angular/forms';
         MatListModule,
         FormsModule,
         MatSnackBarModule,
-        MatProgressBarModule
+        MatProgressBarModule,
+        MatSortModule
     ],
     providers: []
   })

@@ -156,7 +156,7 @@ public class ErpDAO extends DatabaseConnection {
             }
         });
 
-        if (status.get().equals("nonProcessed")) return false;
+        if (status.get().equals("open")) return false;
         else return true;
     }
 

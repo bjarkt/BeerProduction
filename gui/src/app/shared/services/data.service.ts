@@ -33,14 +33,40 @@ export class DataService {
     }
 
     /**
+     * Delete order with given ID.
+     * @param orderNumber order to delete.
+     */
+    public deleteOrder(orderNumber: number): Observable<any> {
+        return this.http.post(ErpEndpoint + 'delete-order/' + orderNumber, null, httpOptions);
+    }
+
+    /**
+     * 
+     * @param orderNumber order details to retrieve
+     */
+    public getOrderDetails(orderNumber: number | string) {
+        return this.http.get(ErpEndpoint + 'view-order-details/' + (+orderNumber)).pipe(map(res => res as Order));
+    }
+
+    /**
+     * Add orderitem to order.
      * /add-order-item/:order-id/:beer-name/:quantity
      */
-    public addOrderItem(orderNumber: number, beerName: string, quantity: number): Observable<any>{
+    public addOrderItem(orderNumber: number, beerName: string, quantity: number): Observable<any> {
         return this.http.post(ErpEndpoint + 'add-order-item/' + orderNumber + '/' + beerName + '/' + quantity, null, httpOptions);
     }
 
+    /**
+     * Get all order with given status.
+     * /add-order-item/:order-id/:beer-name/:quantity
+     * @param status order status
+     */
     public getOrders(status: string): Observable<any> {
         return this.http.get(ErpEndpoint + 'view-orders/' + status);
+    }
+
+    public getOrderItems(orderNumber: number | string){
+        return this.http.get(ErpEndpoint + 'view-order-items/' + (+orderNumber));
     }
 
 
