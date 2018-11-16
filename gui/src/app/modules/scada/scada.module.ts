@@ -5,19 +5,21 @@ import { ScadaScreenComponent } from './pages/scada-screen/scada-screen.componen
 import { SharedModule } from 'src/app/shared/components/shared.module';
 import { ScreenComponent } from './pages/screen/screen.component';
 import { LogsComponent } from './pages/logs/logs.component';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatTableModule } from '@angular/material/table';
 
 @NgModule({
     declarations: [
-        
     ScadaScreenComponent,
-        
     ScreenComponent,
-        
-    LogsComponent],
-    imports: [ 
+    LogsComponent
+],
+    imports: [
         CommonModule,
         ScadaRoutingModule,
-        SharedModule
+        SharedModule,
+        MatPaginatorModule,
+        MatTableModule
     ],
     providers: []
   })
