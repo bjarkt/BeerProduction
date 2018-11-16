@@ -117,4 +117,7 @@ export class DataService {
     public manageProduction(action: string): Observable<any> {
         return this.http.post(ScadaEndpoint + 'manage-production/' + action, null, httpOptions);
     }
+    public getScadaLogs(batchId: number): Observable<any> {
+        return this.http.post(ScadaEndpoint + 'view-log/' + batchId, null, httpOptions);
+    }
 }
