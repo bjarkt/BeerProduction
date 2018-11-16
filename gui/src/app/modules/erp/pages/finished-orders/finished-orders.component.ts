@@ -12,11 +12,7 @@ export class FinishedOrdersComponent implements OnInit {
 
   orders: Order[] = [];
   dataSource: MatTableDataSource<Order> = new MatTableDataSource();
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-
   columnsToDisplay = ['orderNumber', 'date', 'status'];
-  @ViewChild(MatSort) sort: MatSort; 
-
   
   constructor(private data: DataService) { }
 
@@ -28,8 +24,6 @@ export class FinishedOrdersComponent implements OnInit {
     const res = await this.data.getOrders("done").toPromise();
     this.orders = res as Order[];
     this.dataSource.data = this.orders;
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
   }
 
 }

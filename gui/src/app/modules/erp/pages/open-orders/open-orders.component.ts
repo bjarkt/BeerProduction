@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnChanges } from '@angular/core';
 import { Order } from 'src/app/shared/models/order';
 import { DataService } from 'src/app/shared/services/data.service';
 import { MatTableDataSource, MatPaginator, MatSort, MatSnackBar } from '@angular/material';
@@ -11,13 +11,12 @@ import { MatTableDataSource, MatPaginator, MatSort, MatSnackBar } from '@angular
 export class OpenOrdersComponent implements OnInit {
 
   orders: Order[] = [];
-  dataSource: MatTableDataSource<Order> = new MatTableDataSource();
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-
+  dataSource: MatTableDataSource<Order>;
   columnsToDisplay = ['orderNumber', 'date', 'status', 'button'];
-  @ViewChild(MatSort) sort: MatSort; 
 
-  constructor(private data: DataService, private snackBar: MatSnackBar) {   }
+  constructor(private data: DataService, private snackBar: MatSnackBar) {   
+    this.dataSource = new MatTableDataSource(this.orders);
+  }
 
   ngOnInit() {
     this.loadOrders();
@@ -26,9 +25,7 @@ export class OpenOrdersComponent implements OnInit {
   async loadOrders(){
     const res = await this.data.getOrders("open").toPromise();
     this.orders = res as Order[];
-    this.dataSource.data = this.orders;
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    this.dataSource.data = res as Order[];
   }
 
   async deleteOrder(order:Order){
@@ -42,5 +39,6 @@ export class OpenOrdersComponent implements OnInit {
     this.snackBar.open(res.message, 'Dismiss', { duration: 4000 });
     this.loadOrders();
   }
+  
 
 }
