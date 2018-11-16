@@ -48,6 +48,10 @@ export class DataService {
         return this.http.get(ErpEndpoint + 'view-order-details/' + (+orderNumber)).pipe(map(res => res as Order));
     }
 
+    public lockOrder(orderNumber: number): Observable<any>{
+        return this.http.post(ErpEndpoint + 'lock-order/' + orderNumber, null, httpOptions);
+    }
+
     /**
      * Add orderitem to order.
      * /add-order-item/:order-id/:beer-name/:quantity

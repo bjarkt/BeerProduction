@@ -37,4 +37,10 @@ export class OpenOrdersComponent implements OnInit {
     this.loadOrders();
   }
 
+  async lockOrder(order: Order){
+    const res = await this.data.lockOrder(order.orderNumber).toPromise()
+    this.snackBar.open(res.message, 'Dismiss', { duration: 4000 });
+    this.loadOrders();
+  }
+
 }

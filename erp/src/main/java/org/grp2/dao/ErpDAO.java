@@ -369,6 +369,7 @@ public class ErpDAO extends DatabaseConnection {
             try {
                 String lockOrderQuery = "UPDATE Orders SET status = 'locked' WHERE order_number = ?";
                 PreparedStatement ps = conn.prepareStatement(lockOrderQuery);
+                ps.setInt(1, orderNumber);
                 ps.execute();
             } catch (SQLException e) {
                 e.printStackTrace();
