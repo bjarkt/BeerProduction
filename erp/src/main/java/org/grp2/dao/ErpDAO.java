@@ -364,6 +364,19 @@ public class ErpDAO extends DatabaseConnection {
         return false;
     }
 
+    public void lockOrder(int orderNumber){
+        this.executeQuery(conn -> {
+            try {
+                String lockOrderQuery = "UPDATE Orders SET status = 'locked' WHERE order_number = ?";
+                PreparedStatement ps = conn.prepareStatement(lockOrderQuery);
+                ps.execute();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+        });
+    }
+
     /**
      *
      * @param orderNumber
