@@ -26,7 +26,7 @@
             <td mat-cell *matCellDef="let order" class="button-cell"> 
                 <button [routerLink]="['/erp/edit-order/' + order.orderNumber]" mat-stroked-button><i class="material-icons md-18">edit</i></button>
                 <button (click)="deleteOrder(order)" mat-stroked-button><i class="material-icons md-18">delete_outline</i></button>
-                <button (click)="lockOrder(order)" mat-stroked-button><i class="material-icons md-18">check</i></button>
+                <button (click)="lockOrder(order)" mat-stroked-button><i class="material-icons md-18">lock</i> Lock order</button>
             </td>
         </ng-container>
 
