@@ -88,7 +88,9 @@
                 required
                 type="number"
                 matInput
-                placeholder="machine speed"
+                min="{{ recipes[i].minSpeed }}"
+                max="{{ recipes[i].maxSpeed }}"
+                placeholder="Machine speed: [{{recipes[i].minSpeed}};{{recipes[i].maxSpeed}}]"
               />
             </div>
           </mat-form-field>

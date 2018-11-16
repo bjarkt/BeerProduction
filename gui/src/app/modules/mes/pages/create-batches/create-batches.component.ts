@@ -4,6 +4,7 @@ import { DataService } from "src/app/shared/services/data.service";
 import { ProductionInfo } from "src/app/shared/models/ProductionInfo";
 import { OrderItem } from "src/app/shared/models/orderItem";
 import { Observable } from "rxjs";
+import { Recipe } from "src/app/shared/models/recipe";
 @Component({
   selector: "app-create-batches",
   templateUrl: "./create-batches.component.html",
@@ -23,6 +24,7 @@ export class CreateBatchesComponent implements OnInit {
     batchId: null
   };
   batches: ProductionInfo[] = [];
+  recipes: Recipe[] = [];
 
   constructor(private data: DataService) {}
 
@@ -45,7 +47,9 @@ export class CreateBatchesComponent implements OnInit {
   public getOrderItems(event: any): void {
     this.data.getOrderItems(this.order.orderNumber).subscribe(result => {
       this.batches = [];
-      for (const orderItem of result.OrderItems) {
+      this.recipes = [];
+      for (let i = 0; i < result.OrderItems.length; i++) {
+        let orderItem = result.OrderItems[i];
         this.batches.push({
           quantity: orderItem.quantity,
           orderNumber: orderItem.orderNumber,
@@ -53,6 +57,7 @@ export class CreateBatchesComponent implements OnInit {
           machineSpeed: null,
           recipeName: orderItem.beerName
         });
+        this.recipes.push(result.Recipe[i]);
       }
     });
 
