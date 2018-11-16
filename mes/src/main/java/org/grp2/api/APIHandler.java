@@ -54,10 +54,14 @@ public class APIHandler {
     }
 
     public void viewPlantStatistics(Context context) {
-
-        PlantStatistics plantStatistics = plant.getMesDAO().viewPlantStatistics(LocalDateTime.now().minusDays(1), LocalDateTime.now());
-        context.json(plantStatistics);
-
+        String daysParam = context.queryParam("days");
+        try {
+            Integer days = daysParam != null ? Integer.parseInt(daysParam) : 1;
+            PlantStatistics plantStatistics = plant.getMesDAO().viewPlantStatistics(LocalDateTime.now().minusDays(days), LocalDateTime.now());
+            context.json(plantStatistics);
+        } catch (NumberFormatException nfe) {
+            context.json(new Message(422, "Bad value for query-param: " + daysParam));
+        }
     }
 
     public void createBatches(Context context) {
