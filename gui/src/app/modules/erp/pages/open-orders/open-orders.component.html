@@ -1,4 +1,8 @@
 <div *ngIf="dataSource.data!=null" class="content">
+
+    <mat-paginator #paginator [length]="100" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]">
+    </mat-paginator>
+
     <table mat-table [dataSource]="orders">
         <!-- OrderNumber Column -->
         <ng-container matColumnDef="orderNumber">
@@ -23,20 +27,21 @@
         <!-- Buttons Column -->
         <ng-container matColumnDef="button">
             <th mat-header-cell *matHeaderCellDef></th>
-            <td mat-cell *matCellDef="let order" class="button-cell"> 
+            <td mat-cell *matCellDef="let order" class="button-cell">
                 <button [routerLink]="['/erp/edit-order/' + order.orderNumber]" mat-stroked-button><i class="material-icons md-18">edit</i></button>
                 <button (click)="deleteOrder(order)" mat-stroked-button><i class="material-icons md-18">delete_outline</i></button>
-                <button (click)="lockOrder(order)" mat-stroked-button><i class="material-icons md-18">lock</i> Lock order</button>
+                <button (click)="lockOrder(order)" mat-stroked-button><i class="material-icons md-18">lock</i> Lock
+                    order</button>
             </td>
         </ng-container>
 
         <ng-container matColumnDef="loading">
             <mat-footer-cell *matFooterCellDef>Loading data...</mat-footer-cell>
         </ng-container>
-        
+
         <ng-container matColumnDef="noData">
-                <mat-footer-cell *matFooterCellDef>You have no open orders.</mat-footer-cell>
-            </ng-container>
+            <mat-footer-cell *matFooterCellDef>You have no open orders.</mat-footer-cell>
+        </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
         <tr mat-row *matRowDef="let row; columns: columnsToDisplay;"></tr>
