@@ -1,27 +1,59 @@
 <button mat-button (click)="refreshLogs()">Refresh</button>
 
-<table mat-table [dataSource]="dataSource">
+<div class="splitcontainer">
+  <div class="right-border border-width-2">
+      <mat-paginator #measurepaginator [length]="100"
+        [pageSize]="10"
+        [pageSizeOptions]="[5, 10, 25, 100]">
+      </mat-paginator>
 
-  <ng-container matColumnDef="temperature">
-    <th mat-header-cell *matHeaderCellDef> Temperature </th>
-    <td mat-cell *matCellDef="let element"> {{ element.temperature | number: '1.2-2' }} </td>
-  </ng-container>
+    <table #measuretable mat-table [dataSource]="dataMeasureSource">
 
-  <ng-container matColumnDef="humidity">
-    <th mat-header-cell *matHeaderCellDef> Humidity </th>
-    <td mat-cell *matCellDef="let element"> {{ element.humidity | number: '1.2-2' }} </td>
-  </ng-container>
+      <ng-container matColumnDef="datetime">
+        <th mat-header-cell *matHeaderCellDef> Time </th>
+        <td mat-cell *matCellDef="let element"> {{ element.datetime }} </td>
+      </ng-container>
+    
+      <ng-container matColumnDef="temperature">
+        <th mat-header-cell *matHeaderCellDef> Temperature </th>
+        <td mat-cell *matCellDef="let element"> {{ element.temperature | number: '1.2-2' }} </td>
+      </ng-container>
+    
+      <ng-container matColumnDef="humidity">
+        <th mat-header-cell *matHeaderCellDef> Humidity </th>
+        <td mat-cell *matCellDef="let element"> {{ element.humidity | number: '1.2-2' }} </td>
+      </ng-container>
+    
+      <ng-container matColumnDef="vibration">
+        <th mat-header-cell *matHeaderCellDef> Vibration </th>
+        <td mat-cell *matCellDef="let element"> {{ element.vibration | number: '1.2-2' }} </td>
+      </ng-container>
+    
+      <tr mat-header-row *matHeaderRowDef="displayedMeasureColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedMeasureColumns;"></tr>
+    </table>
+  </div>
 
-  <ng-container matColumnDef="vibration">
-    <th mat-header-cell *matHeaderCellDef> Vibration </th>
-    <td mat-cell *matCellDef="let element"> {{ element.vibration | number: '1.2-2' }} </td>
-  </ng-container>
+  <div class="left-border border-width-2">
+    <mat-paginator #statepaginator [length]="100"
+      [pageSize]="10"
+      [pageSizeOptions]="[5, 10, 25, 100]">
+    </mat-paginator>
 
-  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-</table>
+    <table #statetable mat-table [dataSource]="dataStateSource">
 
-<mat-paginator [length]="100"
-              [pageSize]="10"
-              [pageSizeOptions]="[5, 10, 25, 100]">
-</mat-paginator>
+      <ng-container matColumnDef="phase">
+        <th mat-header-cell *matHeaderCellDef> Phase </th>
+        <td mat-cell *matCellDef="let element"> {{ element.phase }} </td>
+      </ng-container>
+    
+      <ng-container matColumnDef="timeElapsed">
+        <th mat-header-cell *matHeaderCellDef> Time Elapsed </th>
+        <td mat-cell *matCellDef="let element"> {{ element.timeElapsed | number: '1.2-2' }} </td>
+      </ng-container>
+    
+      <tr mat-header-row *matHeaderRowDef="displayedStateColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedStateColumns;"></tr>
+    </table>
+  </div>
+</div>
