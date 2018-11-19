@@ -37,7 +37,7 @@ public class API extends AbstractAPI {
                 post("/start-new-production", handler::startNewProduction);
                 post("/manage-production/:choice", handler::manageProduction);
                 get("/view-screen", handler::viewScreen);
-                get("/view-log/:batch-id", handler::viewLog);
+                get("/view-log/", handler::viewLog);
             });
         });
     }

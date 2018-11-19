@@ -5,6 +5,7 @@ import org.grp2.domain.*;
 import org.grp2.javalin.Message;
 import org.grp2.enums.State;
 import org.grp2.hardware.*;
+import org.grp2.shared.Batch;
 import org.grp2.shared.Measurements;
 
 import java.util.*;
@@ -87,12 +88,28 @@ public class APIHandler {
     }
 
     public void viewLog(Context context) {
-        int batchId = Integer.parseInt(context.pathParam("batch-id"));
+        String batchParam = context.queryParam("batch-id");
 
+        Integer batchId = null;
+        try {
+            if (batchParam != null)
+                batchId = Integer.parseInt(batchParam);
+        } catch (NumberFormatException e) {
+            context.json(new Message(422, "Bad value for query-param: " + batchParam));
+        }
+
+        Batch currentBatch = machinery.getScadaDAO().getCurrentBatch();
         Map<String, List> map = new HashMap<>();
-        map.put("MeasurementLogs", machinery.getScadaDAO().getMeasurementLogs(batchId));
-        map.put("StateTimeLogs", machinery.getScadaDAO().getStateTimeLogs(batchId));
+        if (batchId == null && currentBatch != null)
+            batchId = currentBatch.getBatchId();
 
-        context.json(map);
+        if (batchId != null)
+        {
+            map.put("MeasurementLogs", machinery.getScadaDAO().getMeasurementLogs(batchId));
+            map.put("StateTimeLogs", machinery.getScadaDAO().getStateTimeLogs(batchId));
+            context.json(map);
+        } else {
+            context.json(new Message(422, "There need to be batch running if no batch id is sent"));
+        }
     }
 }

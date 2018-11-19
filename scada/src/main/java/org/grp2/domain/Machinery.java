@@ -205,7 +205,6 @@ public class Machinery {
         int difference = Math.abs(previousDefect - currentDefect);
         this.scadaDAO.updateCurrentBatchDefects(difference);
 
-        System.out.println("DEFECT: " + previousDefect  + " - " + currentDefect + " = " + difference);
         previousDefect = currentDefect;
     }
 
@@ -213,7 +212,6 @@ public class Machinery {
         int difference = Math.abs(previousAccepted - currentAccepted);
         this.scadaDAO.updateCurrentBatchProduced(difference);
 
-        System.out.println("ACCEPTED: " + previousAccepted  + " - " + currentAccepted + " = " + difference);
         previousAccepted = currentAccepted;
     }
 }
