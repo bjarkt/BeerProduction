@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  erpUrl: 'http://erp:7002/api/', // TODO replace {erp,mes,scada} with ip/domain of azure server
-  mesUrl: 'http://mes:7001/api/',
-  scadaUrl: 'http://scada:7000/api/'
+  erpUrl: 'http://13.73.145.103:7002/api/',
+  mesUrl: 'http://13.73.145.103:7001/api/',
+  scadaUrl: 'http://13.73.145.103:7000/api/'
 };
