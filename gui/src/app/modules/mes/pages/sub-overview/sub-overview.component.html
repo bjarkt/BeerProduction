@@ -14,9 +14,11 @@
           <!-- Date Column -->
           <ng-container matColumnDef="date">
               <th mat-header-cell *matHeaderCellDef> Created </th>
-              <td mat-cell *matCellDef="let order">{{order.date.hour}}:{{order.date.minute}}:{{order.date.second}} |
+              <td mat-cell *matCellDef="let order">
+                {{order.date.hour | number:'2.0'}}:{{order.date.minute | number:'2.0'}}:{{order.date.second | number:'2.0'}} |
                   {{order.date.dayOfWeek | lowercase | titlecase}}
-                  {{order.date.dayOfMonth}}/{{order.date.monthValue}}/{{order.date.year}}</td>
+                  {{order.date.dayOfMonth | number:'2.0'}}/{{order.date.monthValue | number:'2.0'}}/{{order.date.year}}
+                </td>
           </ng-container>
     
           <!-- Status Column -->
@@ -83,8 +85,8 @@
         <ng-container matColumnDef="started">
             <th mat-header-cell *matHeaderCellDef> Started </th>
             <td mat-cell *matCellDef="let batch"> 
-                {{batch.started.hour}}:{{batch.started.minute}}:{{batch.started.second}} <br>
-                {{batch.started.dayOfMonth}}/{{batch.started.monthValue}}/{{batch.started.year}} 
+                {{batch.started.hour | number:'2.0'}}:{{batch.started.minute | number:'2.0'}}:{{batch.started.second | number:'2.0'}} <br>
+                {{batch.started.dayOfMonth | number:'2.0'}}/{{batch.started.monthValue | number:'2.0'}}/{{batch.started.year}}
             </td>
         </ng-container>
   
@@ -93,8 +95,8 @@
             <th mat-header-cell *matHeaderCellDef> Finished </th>
             <td mat-cell *matCellDef="let batch"> 
               <span *ngIf="batch.finished">
-                {{batch.finished.hour}}:{{batch.finished.minute}}:{{batch.finished.second}} <br>
-                {{batch.finished.dayOfMonth}}/{{batch.finished.monthValue}}/{{batch.finished.year}}
+                {{batch.finished.hour | number:'2.0'}}:{{batch.finished.minute | number:'2.0'}}:{{batch.finished.second | number:'2.0'}} <br>
+                {{batch.finished.dayOfMonth | number:'2.0'}}/{{batch.finished.monthValue | number:'2.0'}}/{{batch.finished.year}}
               </span>
               <span *ngIf="!batch.finished">
                   Not finished
