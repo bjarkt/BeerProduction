@@ -45,7 +45,11 @@ export class CreateBatchesComponent implements OnInit {
   }
 
   public getOrderItems(event: any): void {
+<<<<<<< HEAD
     this.data.getMesOrderItems(this.order.orderNumber).subscribe(result => {
+=======
+    this.data.getOrderItems(this.order.orderNumber).subscribe(result => {
+>>>>>>> dc116a0f05eb825beecb168dbe3953ec497f0aaa
       this.batches = [];
       this.recipes = [];
       for (let i = 0; i < result.OrderItems.length; i++) {
