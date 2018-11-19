@@ -3,6 +3,8 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    margin-left: 5px;
+    margin-right: 5px;
     
 
     .info-card{
@@ -14,5 +16,11 @@
         flex-grow: 1;
         max-width: calc(50% - 10px);
     }
-
+    
+    table{
+        width: 100%;
+        .hide{
+            display: none;
+        }
+    }
 }
