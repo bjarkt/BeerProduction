@@ -12,7 +12,7 @@
 
 <mat-list>
   <h3 mat-subheader>Your Order Items</h3>
-  <mat-list-item *ngFor="let orderitem of orderItems">
+  <mat-list-item id="{{orderitem.beerName}}" *ngFor="let orderitem of orderItems">
     <h4 mat-line>{{orderitem.beerName | titlecase}}</h4>
     <mat-form-field style="margin-top: 1.1em; transform: scale(0.8)">
       <input #quantityInput id="{{orderitem.beerName}}" matInput placeholder="Quantity" value="{{orderitem.quantity}}">
