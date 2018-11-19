@@ -1,0 +1,18 @@
+
+.overview {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    
+
+    .info-card{
+        flex-grow: 1;
+        max-width: calc(50% - 10px);
+    }
+
+    .overview-batches{
+        flex-grow: 1;
+        max-width: calc(50% - 10px);
+    }
+
+}

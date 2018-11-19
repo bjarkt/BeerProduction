@@ -8,6 +8,7 @@ import { Component, OnInit } from '@angular/core';
 export class OverviewComponent implements OnInit {
 
   tabs = [
+    { path: './overview', label: 'Overview' },
     { path: './statistics', label: 'Statistics' },
     { path: './report', label: 'View Report and OEE'}
   ]

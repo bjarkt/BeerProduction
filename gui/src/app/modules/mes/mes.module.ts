@@ -7,6 +7,7 @@ import { StatisticsComponent } from './pages/statistics/statistics.component';
 import { MesDataService } from 'src/app/shared/services/mesData.service';
 import { CreateBatchesComponent } from './pages/create-batches/create-batches.component';
 import { ReportComponent } from './pages/report/report.component';
+import { SubOverviewComponent } from './pages/sub-overview/sub-overview.component';
 @NgModule({
     declarations: [
         
@@ -18,7 +19,9 @@ import { ReportComponent } from './pages/report/report.component';
         
     CreateBatchesComponent,
         
-    ReportComponent],
+    ReportComponent,
+        
+    SubOverviewComponent],
     imports: [ 
         CommonModule,
         MesRoutingModule,
