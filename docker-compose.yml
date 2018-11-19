@@ -8,6 +8,7 @@
 version: '3'
 services:
   web:
+    image: sdubeerproduction/beerproduction_web
     build:
       context: ./gui/
       dockerfile: Dockerfile
@@ -25,6 +26,7 @@ services:
       - scada
 
   scada:
+    image: sdubeerproduction/beerproduction_scada
     build:
       context: .
       dockerfile: DockerfileJava
@@ -39,6 +41,7 @@ services:
       - useSimulation=false
 
   mes:
+    image: sdubeerproduction/beerproduction_mes
     build:
       context: .
       dockerfile: DockerfileJava
@@ -54,6 +57,7 @@ services:
       - scada
 
   erp:
+    image: sdubeerproduction/beerproduction_erp
     build:
       context: .
       dockerfile: DockerfileJava
