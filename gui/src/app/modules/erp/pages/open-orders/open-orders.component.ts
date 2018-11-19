@@ -13,7 +13,6 @@ export class OpenOrdersComponent implements OnInit {
   orders: Order[] = [];
   dataSource: MatTableDataSource<Order>;
   columnsToDisplay = ['orderNumber', 'date', 'status', 'button'];
-  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   constructor(private data: DataService, private snackBar: MatSnackBar) {   
     this.dataSource = new MatTableDataSource(this.orders);
@@ -21,7 +20,6 @@ export class OpenOrdersComponent implements OnInit {
 
   ngOnInit() {
     this.loadOrders();
-    this.dataSource.paginator = this.paginator;
   }
 
   async loadOrders(){
@@ -29,7 +27,6 @@ export class OpenOrdersComponent implements OnInit {
     this.dataSource.data = [];
     this.orders = res as Order[];
     this.dataSource.data = this.orders;
-    this.dataSource.paginator = this.paginator;
   }
 
   async deleteOrder(order:Order){
