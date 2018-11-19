@@ -176,19 +176,18 @@ public class MesDAO extends DatabaseConnection {
     }
 
     private MeasurementsStatistics getMeasurementStatistics(List<Batch> batches){
-        MeasurementsStatistics measurementStatistics;
-        double highestTemp = Double.MIN_VALUE;
-        double lowestTemp = Double.MAX_VALUE;
-        double avgTemp = 0;
-        double tempSum = 0;
         List<MeasurementLog> measurements = new ArrayList<>();
-
-
         for(Batch batch : batches) {
             measurements.addAll(getMeasurementLogs(batch.getBatchId()));
         }
 
+        Double highestTemp = null;
+        Double lowestTemp = null;
         for(MeasurementLog measurement : measurements) {
+            if (highestTemp == null && lowestTemp == null) {
+                highestTemp = measurement.getMeasurements().getTemperature();
+                lowestTemp = measurement.getMeasurements().getTemperature();
+            }
             if(measurement.getMeasurements().getTemperature() > highestTemp) {
                 highestTemp = measurement.getMeasurements().getTemperature();
             }
@@ -197,13 +196,14 @@ public class MesDAO extends DatabaseConnection {
             }
         }
 
+        Double tempSum = 0.0;
         for(MeasurementLog measurement : measurements) {
             tempSum += measurement.getMeasurements().getTemperature();
         }
 
-        avgTemp = tempSum / measurements.size();
+        Double avgTemp = tempSum / measurements.size();
 
-        measurementStatistics = new MeasurementsStatistics(highestTemp, lowestTemp, avgTemp);
+        MeasurementsStatistics measurementStatistics = new MeasurementsStatistics(highestTemp, lowestTemp, avgTemp);
 
         return measurementStatistics;
     }
