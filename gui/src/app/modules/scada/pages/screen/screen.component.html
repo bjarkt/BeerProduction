@@ -35,15 +35,15 @@
   </div>
   <div class="griditem">
     Temperature
-    <span class="redorange"><i class="fas fa-temperature-low"></i> {{model.temperature}}</span>
+    <span class="redorange"><i class="fas fa-temperature-low"></i> {{model.temperature | number: '3.2-2'}}</span>
   </div>
   <div class="griditem">
     Humidity
-    <span class="blue"><i class="fas fa-tint"></i> {{model.humidity}}</span>
+    <span class="blue"><i class="fas fa-tint"></i> {{model.humidity | number: '3.2-2' }}</span>
   </div>
-  <div class="griditem">
+  <div class="griditem"> 
     Vibration
-    <span><i class="fas fa-water"></i> {{model.vibration}}</span>
+    <span><i class="fas fa-water"></i> {{model.vibration | number: '3.2-2' }}</span>
   </div>
   <div class="griditem">
     Product Amount
