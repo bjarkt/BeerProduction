@@ -1,9 +1,13 @@
 import { Injectable } from "@angular/core";
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpHeaders,
+  HttpErrorResponse
+} from "@angular/common/http";
 import { Observable, of } from "rxjs";
-import { map, catchError, tap } from 'rxjs/operators';
+import { map, catchError, tap } from "rxjs/operators";
 import { Order } from "../models/order";
-import { environment } from '../../../environments/environment'
+import { environment } from "../../../environments/environment";
 import { ProductionInfo } from "../models/ProductionInfo";
 
 const ErpEndpoint = environment.erpUrl;
@@ -11,9 +15,9 @@ const MesEndpoint = environment.mesUrl;
 const ScadaEndpoint = environment.scadaUrl;
 
 const httpOptions = {
-    headers: new HttpHeaders({
-        'Content-Type': 'application/json'
-    })
+  headers: new HttpHeaders({
+    "Content-Type": "application/json"
+  })
 };
 
 @Injectable()
