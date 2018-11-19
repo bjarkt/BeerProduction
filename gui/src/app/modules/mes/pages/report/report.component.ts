@@ -43,7 +43,6 @@ export class ReportComponent implements OnInit {
   public getOEE() {
     this.data.getOEE(this.selectedBatch.batchId).subscribe(result => {
       this.oee = result
-      console.log(this.oee)
     })
   }
 
