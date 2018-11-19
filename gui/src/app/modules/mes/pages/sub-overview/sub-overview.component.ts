@@ -16,7 +16,7 @@ export class SubOverviewComponent implements OnInit {
   ]
   
 
-  constructor(private data: DataService) {}
+  constructor() {}
 
   ngOnInit() {
     

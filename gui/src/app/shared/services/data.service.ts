@@ -1,23 +1,18 @@
 import { Injectable } from "@angular/core";
-import {
-  HttpClient,
-  HttpHeaders,
-  HttpErrorResponse
-} from "@angular/common/http";
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, of } from "rxjs";
-import { map, catchError, tap } from "rxjs/operators";
+import { map, catchError, tap } from 'rxjs/operators';
 import { Order } from "../models/order";
-import { environment } from "../../../environments/environment";
-import { ProductionInfo } from "../models/ProductionInfo";
+import { environment } from '../../../environments/environment'
 
 const ErpEndpoint = environment.erpUrl;
 const MesEndpoint = environment.mesUrl;
 const ScadaEndpoint = environment.scadaUrl;
 
 const httpOptions = {
-  headers: new HttpHeaders({
-    "Content-Type": "application/json"
-  })
+    headers: new HttpHeaders({
+        'Content-Type': 'application/json'
+    })
 };
 
 @Injectable()
@@ -76,16 +71,6 @@ export class DataService {
         return this.http.get(ErpEndpoint + 'view-orders/' + status);
     }
 
-    /**
-     * /create-batches
-     */
-    public createBatches(batches: ProductionInfo[]){
-        const batchesMap = {orderItems: batches}
-        console.log(batches)
-        return this.http.post(MesEndpoint + 'create-batches', batchesMap, httpOptions );
-    
-    }
-
     public getOrderItems(orderNumber: number | string){
         return this.http.get(ErpEndpoint + 'view-order-items/' + (+orderNumber));
     }
@@ -93,7 +78,6 @@ export class DataService {
     public deleteOrderItem(orderNumber: number, beerName: string): Observable<any> {
         return this.http.post(ErpEndpoint + 'delete-order-item/' + orderNumber + '/' + beerName,null,httpOptions);
     }
-
 
     public updateOrderItem(orderNumber: number, beerName: string, quantity: number): Observable<any>{
         return this.http.post(ErpEndpoint + 'edit-order-item/' + orderNumber + '/' + beerName + '?quantity=' + quantity,null,httpOptions);
@@ -109,17 +93,5 @@ export class DataService {
 
     public manageProduction(action: string): Observable<any> {
         return this.http.post(ScadaEndpoint + 'manage-production/' + action, null, httpOptions);
-    }
-
-    public getMesOrders(orderNumber: number): Observable<any> {
-        return this.http.get(MesEndpoint + 'view-order-items/' + orderNumber, httpOptions);
-    }
-
-    public viewStatistics(days?: number): Observable<any> {
-        if (days) {
-            return this.http.get(MesEndpoint + 'get-plant-statistics/?days=' + days, httpOptions);
-        } else {
-            return this.http.get(MesEndpoint + 'get-plant-statistics/', httpOptions)
-        }
     }
 }

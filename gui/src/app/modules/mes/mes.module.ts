@@ -6,7 +6,7 @@ import { SharedModule } from 'src/app/shared/components/shared.module';
 import { ProductionPlanningComponent } from './pages/production-planning/production-planning.component';
 import { StatisticsComponent } from './pages/statistics/statistics.component';
 import { SubOverviewComponent } from './pages/sub-overview/sub-overview.component';
-import { DataService } from 'src/app/shared/services/data.service';
+import { MesDataService } from 'src/app/shared/services/mesData.service';
 import { CreateBatchesComponent } from './pages/create-batches/create-batches.component';
 @NgModule({
     declarations: [
@@ -25,6 +25,6 @@ import { CreateBatchesComponent } from './pages/create-batches/create-batches.co
         MesRoutingModule,
         SharedModule
     ],
-    providers: [DataService]
+    providers: [MesDataService]
   })
   export class MesModule { }
