@@ -40,6 +40,18 @@ export class ScreenComponent implements OnInit, OnDestroy {
       this.model.vibration = res["Measurements"]["vibration"];
       this.model.productAmount = res["BatchOrder"]["amountToProduce"];
       this.model.machineSpeed = res["BatchOrder"]["productsPerMinute"];
+    } else {
+      this.model.batchID = null;
+      this.model.orderNumber = null;
+      this.model.beerType = null;
+      this.model.produced = null;
+      this.model.accepted = null;
+      this.model.defective = null;
+      this.model.temperature = null;
+      this.model.humidity = null;
+      this.model.vibration = null;
+      this.model.productAmount = null;
+      this.model.machineSpeed = null;
     }
   }
   
