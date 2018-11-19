@@ -1,0 +1,56 @@
+<div class="report-details">
+  <mat-card class="select-batch-card">
+    <mat-card-header>
+      <mat-card-title>Select a batchId to view report</mat-card-title>        
+      </mat-card-header>
+    <form #startForm="ngForm">
+      <mat-card-content>
+        <div class="form-group">
+          <mat-form-field>
+            <mat-select
+              required
+              class="form-control"
+              id="batchId"
+              [(ngModel)]="selectedBatch.batchId"
+              name="batchId"
+              placeholder="Select Batch Id"
+            >
+              <mat-option
+                *ngFor="let batch of batches"
+                [value]="batch.batchId"
+              >
+                {{ batch.batchId }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+    </form>
+    <mat-card-actions class="viewReport">
+      <button mat-stroked-button type="submit" color="primary" (click)="getReport()">View Report</button>
+      <button mat-stroked-button type="submit" color="primary" (click)="getOEE()">View OEE</button>
+    </mat-card-actions>
+  </mat-card>
+
+
+  <div class="OEE-info">
+    <div class="info" *ngIf="selectedBatch.batchId">
+      <h3 mat-subheader>Calculated OEE for batch {{selectedBatch.batchId}} </h3>
+      <mat-list *ngIf="oee">
+        <h3 mat-subheader>Overall Equipment Effectiveness</h3>
+        <mat-list-item>
+          <p>Availability: <br> {{oee.availability}} %</p>
+        </mat-list-item>
+        <mat-list-item>
+          <p>Performance: <br> {{oee.performance}} %</p>
+        </mat-list-item>
+        <mat-list-item>
+          <p>Quality: <br> {{oee.quality}} %</p>
+        </mat-list-item>
+        <mat-list-item>
+          <p>OEE: <br> {{oee.oee}} %</p>
+        </mat-list-item>
+          <mat-divider></mat-divider>
+      </mat-list>
+    </div>
+  </div>

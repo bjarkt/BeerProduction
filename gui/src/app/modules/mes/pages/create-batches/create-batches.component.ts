@@ -5,6 +5,7 @@ import { ProductionInfo } from "src/app/shared/models/ProductionInfo";
 import { OrderItem } from "src/app/shared/models/orderItem";
 import { Observable } from "rxjs";
 import { Recipe } from "src/app/shared/models/recipe";
+import { MesDataService } from "src/app/shared/services/mesData.service";
 @Component({
   selector: "app-create-batches",
   templateUrl: "./create-batches.component.html",
@@ -26,7 +27,7 @@ export class CreateBatchesComponent implements OnInit {
   batches: ProductionInfo[] = [];
   recipes: Recipe[] = [];
 
-  constructor(private data: DataService) {}
+  constructor(private data: MesDataService) {}
 
   ngOnInit() {
     this.addOrders();
@@ -45,11 +46,7 @@ export class CreateBatchesComponent implements OnInit {
   }
 
   public getOrderItems(event: any): void {
-<<<<<<< HEAD
     this.data.getMesOrderItems(this.order.orderNumber).subscribe(result => {
-=======
-    this.data.getOrderItems(this.order.orderNumber).subscribe(result => {
->>>>>>> dc116a0f05eb825beecb168dbe3953ec497f0aaa
       this.batches = [];
       this.recipes = [];
       for (let i = 0; i < result.OrderItems.length; i++) {

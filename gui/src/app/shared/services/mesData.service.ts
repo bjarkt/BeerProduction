@@ -2,7 +2,8 @@ import { Injectable } from "@angular/core";
 import {
   HttpClient,
   HttpHeaders,
-  HttpErrorResponse
+  HttpErrorResponse,
+  HttpResponse
 } from "@angular/common/http";
 import { Observable, of } from "rxjs";
 import { map, catchError, tap } from "rxjs/operators";
@@ -33,7 +34,7 @@ export class MesDataService {
 
   
     public getMesOrders(): Observable<any> {
-        return this.http.get(MesEndpoint + 'view-order-items', httpOptions);
+        return this.http.get(MesEndpoint + 'view-orders', httpOptions);
     }
 
     public getMesOrderItems(orderNumber: number): Observable<any> {
@@ -50,5 +51,24 @@ export class MesDataService {
 
     public getBatches(): Observable<any> {
         return this.http.get(MesEndpoint + 'view-all-batches', httpOptions)
+    }
+
+    public createBatches(batches: ProductionInfo[]){
+        const batchesMap = {orderItems: batches} 
+        return this.http.post(MesEndpoint + 'create-batches', batchesMap, httpOptions)
+    }
+
+    public getReport(batchId: number): Observable<any> {
+        return this.http.get(MesEndpoint + 'get-report/' + batchId, {...httpOptions, responseType: 'blob'})
+    }
+
+    public downloadFile(data: any, type: string) {
+        const blob = new Blob([data], {type: type.toString()})
+        const url = window.URL.createObjectURL(blob)
+        window.open(url)
+    }
+
+    public getOEE(batchId: number): Observable<any> {
+        return this.http.get(MesEndpoint + 'get-oee/' + batchId, httpOptions)
     }
 }

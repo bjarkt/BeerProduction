@@ -1,11 +1,11 @@
 
-.statistics-details {
+.report-details {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     
 
-    .select-days-card{
+    .select-batch-card{
         flex-grow: 1;
         max-width: calc(50% - 10px);
         mat-form-field {
@@ -13,7 +13,7 @@
         }
     }
 
-    .statistic-info{
+    .OEE-info{
         flex-grow: 1;
         max-width: calc(50% - 10px);
         mat-form-field {
@@ -21,7 +21,11 @@
         }
     }
 
-    .viewStatistics {
-        float:right;
+    .viewReport {
+        float: right;
     }
+
+
+
+    
 }
