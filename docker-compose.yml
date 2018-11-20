@@ -38,7 +38,7 @@ services:
     network_mode: host
     environment:
       - inDocker=true
-      - useSimulation=false
+      - useSimulation=true
 
   mes:
     image: sdubeerproduction/beerproduction_mes
