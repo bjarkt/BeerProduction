@@ -39,4 +39,6 @@ public class Plant {
     public MesDAO getMesDAO() {
         return mesDAO;
     }
+
+    public IOptimizer getOptimizer() { return optimizer; }
 }

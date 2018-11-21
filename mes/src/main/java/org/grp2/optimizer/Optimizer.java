@@ -6,7 +6,7 @@ public class Optimizer implements IOptimizer {
 
     public static void main(String[] args) {
         IOptimizer optimizer = new Optimizer();
-        Recipe recipe = new Recipe(0, "stout", 0, 200);
+        Recipe recipe = new Recipe(0, "pilsner", 0, 600);
         System.out.println("Most Profitable: " + optimizer.getOptimalMachSpeed(new Beer(recipe, 4, 6)));
         System.out.println("Fastest: " + optimizer.getFastestMachSpeed(new Beer(recipe, 4, 6), 50));
         System.out.println("Most Saving: " + optimizer.getMostSavingMachSpeed(new Beer(recipe, 4, 6)));
