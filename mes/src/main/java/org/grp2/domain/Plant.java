@@ -18,7 +18,7 @@ public class Plant {
         printManager = new SimplePdfPrinter1();
         mesDAO = new MesDAO();
         this.optimizer = new Optimizer();
-        this.printManager.setPath("report");
+        this.printManager.setPath("report.pdf");
     }
 
     /**
