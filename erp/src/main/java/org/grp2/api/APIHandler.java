@@ -12,8 +12,8 @@ public class APIHandler {
 
     private ErpDAO erpDAO;
 
-    public APIHandler() {
-        this.erpDAO = new ErpDAO();
+    public APIHandler(ErpDAO erpDAO) {
+        this.erpDAO = erpDAO;
     }
 
     public void createOrder(Context context) {
