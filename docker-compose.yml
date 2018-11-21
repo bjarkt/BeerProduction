@@ -2,21 +2,22 @@
 # THE LINES 'network_mode: host' SHOULD BE COMMENTED OUT
 # OTHERWISE YOU CANNOT ACCESS THE CONTAINERS (http://localhost:7000)
 
-# IF YOU ARE RUNNING THIS ON LINUX
+# IF YOU ARE RUNNING THIS ON LINUX (Azure Ubuntu VM)
 # THE LINES 'network_mode: host' SHOULD NOT BE COMMENTED OUT.
 
 version: '3'
 services:
   web:
+    image: sdubeerproduction/beerproduction_web
     build:
       context: ./gui/
       dockerfile: Dockerfile
       args:
         PORT: 80
-        PROD: "false"
+        PROD: "true"
     ports:
       - "80:80"
-    # network_mode: host
+    network_mode: host
     environment:
       - inDocker=true
     depends_on:
@@ -25,6 +26,7 @@ services:
       - scada
 
   scada:
+    image: sdubeerproduction/beerproduction_scada
     build:
       context: .
       dockerfile: DockerfileJava
@@ -33,12 +35,13 @@ services:
         SERVICE: scada
     ports:
       - "7000:7000"
-    # network_mode: host
+    network_mode: host
     environment:
       - inDocker=true
-      - useSimulation=false
+      - useSimulation=true
 
   mes:
+    image: sdubeerproduction/beerproduction_mes
     build:
       context: .
       dockerfile: DockerfileJava
@@ -47,13 +50,14 @@ services:
         SERVICE: mes
     ports:
       - "7001:7001"
-    # network_mode: host
+    network_mode: host
     environment:
       - inDocker=true
     depends_on:
       - scada
 
   erp:
+    image: sdubeerproduction/beerproduction_erp
     build:
       context: .
       dockerfile: DockerfileJava
@@ -62,6 +66,6 @@ services:
         SERVICE: erp
     ports:
       - "7002:7002"
-    # network_mode: host
+    network_mode: host
     environment:
       - inDocker=true
