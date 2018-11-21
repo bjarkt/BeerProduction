@@ -6,8 +6,10 @@ public class Optimizer implements IOptimizer {
 
     public static void main(String[] args) {
         IOptimizer optimizer = new Optimizer();
-        Recipe recipe = new Recipe(0, "alcohol free", 0, 100);
-        System.out.println(optimizer.getOptimalMachSpeed(new Beer(recipe, 4, 6)));
+        Recipe recipe = new Recipe(0, "stout", 0, 200);
+        System.out.println("Most Profitable: " + optimizer.getOptimalMachSpeed(new Beer(recipe, 4, 6)));
+        System.out.println("Fastest: " + optimizer.getFastestMachSpeed(new Beer(recipe, 4, 6), 50));
+        System.out.println("Most Saving: " + optimizer.getMostSavingMachSpeed(new Beer(recipe, 4, 6)));
     }
 
     public Optimizer(){
@@ -27,15 +29,10 @@ public class Optimizer implements IOptimizer {
             // Calculate defect and accepted beers.
             int defectBeers = this.calculateDefectPct(i, beer.getName());
             int acceptedBeers = 100 - defectBeers;
-
             // Ignore machine speed if 0 accepted (failure).
-            if(defectBeers >= 100) {
-                continue;
-            }
-
+            if(defectBeers >= 100) continue;
             // Calculate profit per minute.
             double temp = ((100*beer.getProfit()) - ((defectBeers * ((double) 100/acceptedBeers))*beer.getCost())) * ((double) i/100);
-
             // Set optimalMachSpeed if profit is higher.
             if(temp > maxProfitPerMinute){
                 maxProfitPerMinute = temp;
@@ -48,12 +45,48 @@ public class Optimizer implements IOptimizer {
 
     @Override
     public int getFastestMachSpeed(Beer beer, int quantity) {
-        return 0;
+        // Initialize variables
+        int optimalMachSpeed = -1;
+        double productionTime = Integer.MAX_VALUE;
+
+        // Iterate through every possible machine speed:
+        for(int i = beer.getMinSpeed(); i <= beer.getMaxSpeed(); i++){
+            // Ignore machine 0.
+            if(i == 0) continue;
+            // Ignore if defect rate equals or is above 100%.
+            if(this.calculateDefectPct(i, beer.getName()) >= 100) continue;
+            int defectBeers = (int)(((double) quantity/100) * this.calculateDefectPct(i, beer.getName()));
+            int acceptedBeers = quantity - defectBeers;
+            double temp = (quantity + (defectBeers * ((double) quantity/acceptedBeers))) / i;
+            if(temp < productionTime){
+                productionTime = temp;
+                optimalMachSpeed = i;
+            }
+        }
+
+        return optimalMachSpeed;
     }
 
     @Override
     public int getMostSavingMachSpeed(Beer beer) {
-        return 0;
+        // Initialize variables
+        int optimalMachSpeed = -1;
+        double minDefectPercentage = Integer.MAX_VALUE;
+
+        // Iterate through every possible machine speed:
+        for(int i = beer.getMinSpeed(); i <= beer.getMaxSpeed(); i++){
+            // Ignore machine speed 0.
+            if(i == 0) continue;
+            // Ignore if defect rate equals or is above 100%.
+            if(this.calculateDefectPct(i, beer.getName()) >= 100) continue;
+            int defectBeersPercentage = this.calculateDefectPct(i, beer.getName());
+            if(defectBeersPercentage <= minDefectPercentage){
+                minDefectPercentage = defectBeersPercentage;
+                optimalMachSpeed = i;
+            }
+        }
+
+        return optimalMachSpeed;
     }
 
     /**
