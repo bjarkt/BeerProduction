@@ -14,7 +14,7 @@ public class Plant {
     private Plant() {
         printManager = new SimplePdfPrinter1();
         mesDAO = new MesDAO();
-        this.printManager.setPath("report");
+        this.printManager.setPath("report.pdf");
     }
 
     /**
