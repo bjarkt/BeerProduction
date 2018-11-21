@@ -31,16 +31,20 @@ export class EditOrderComponent implements OnInit {
     this.order = await this.data.getOrderDetails(id).toPromise();
     const orderItemsRes = await this.data.getOrderItems(this.order.orderNumber).toPromise();
     this.orderItems = orderItemsRes as OrderItem[];
+    this.orderItems.sort(function(a, b){
+      if(a.beerName < b.beerName) return -1;
+      if(a.beerName > b.beerName) return 1;
+      return 0;
+    });
   }
 
   async updateOrderItem(orderItem: OrderItem) {
   
     this.inputs.forEach(element => {
-      if (element.nativeElement.id = orderItem.beerName) {
+      if (element.nativeElement.id == orderItem.beerName) {
         this.quantity = element.nativeElement.value;
       }
     })
-    console.log(this.quantity);
 
     const res = await this.data.updateOrderItem(orderItem.orderNumber, orderItem.beerName, this.quantity).toPromise();
     this.snackBar.open(res.message, 'Dismiss', {duration:4000});
