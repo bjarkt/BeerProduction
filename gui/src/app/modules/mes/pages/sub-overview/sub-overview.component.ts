@@ -37,8 +37,8 @@ export class SubOverviewComponent implements OnInit {
 
     this.orders = await this.data.getMesOrders().toPromise() as Order[]
     this.orders.sort((a, b) => {
-      if (a.orderNumber > b.orderNumber) return -1;
-      else if (a.orderNumber < b.orderNumber) return 1;
+      if (a.orderNumber > b.orderNumber) return 1;
+      else if (a.orderNumber < b.orderNumber) return -1;
       return 0;
     })
     this.ordersDataSource.data = this.orders
