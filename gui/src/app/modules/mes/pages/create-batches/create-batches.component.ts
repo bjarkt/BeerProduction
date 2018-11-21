@@ -31,9 +31,6 @@ export class CreateBatchesComponent implements OnInit {
 
   ngOnInit() {
     this.addOrders();
-    //this.orders.push({orderNumber: 123123, status: "processing", date: new Date()});
-    //this.orderItems.push({beerName: "Ale", orderNumber: 123123, quantity: 10, status: "locked" })
-    //this.orderItems.push({beerName: "Pilsner", orderNumber: 123123, quantity: 10, status: "locked" })
   }
 
   /**
