@@ -25,10 +25,11 @@ public class Machinery {
 
     private boolean restartingBatch = false;
 
-    public Machinery(IHardware hardware) {
-        scadaDAO = new ScadaDAO();
+    public Machinery(IHardware hardware, ScadaDAO scadaDAO) {
+        this.scadaDAO = scadaDAO;
         this.hardware = hardware;
         this.copenhagenZoneId = ZoneId.of("Europe/Copenhagen");
+        this.listenForStateChanges();
     }
 
     public void listenForStateChanges() {
