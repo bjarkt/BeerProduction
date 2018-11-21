@@ -1,11 +1,13 @@
 package org.grp2;
 
+import org.grp2.domain.BatchStatistics;
 import org.grp2.domain.MeasurementsStatistics;
 import org.grp2.shared.Batch;
 import org.grp2.shared.MeasurementLog;
 import org.grp2.shared.Measurements;
 import org.junit.Test;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,7 +29,14 @@ public class PlantStatisticsTest {
 
     @Test
     public void batchStatisticsTest() {
-        List<Batch> batches = setupBatchData();
+        Object[] data = setupBatchData();
+        BatchStatistics batchStatistics = new BatchStatistics((List<Batch>) data[0]);
+        BatchStatistics expected = (BatchStatistics) data[1];
+
+        assertEquals(expected.getAvgAccepted(), batchStatistics.getAvgAccepted(), 0);
+        assertEquals(expected.getAvgDefects(), batchStatistics.getAvgDefects(), 0);
+        assertEquals(expected.getAvgProductionSeconds(), batchStatistics.getAvgProductionSeconds(), 0);
+
     }
 
     private Object[] setupMeasurementsData() {
@@ -44,9 +53,17 @@ public class PlantStatisticsTest {
         return new Object[]{measurements, expected};
     }
 
-    private List<Batch> setupBatchData() {
+    private Object[] setupBatchData() {
         List<Batch> batches = new ArrayList<>();
 
-        return batches;
+        Collections.addAll(batches,
+                new Batch("testName", -1, -1, LocalDateTime.now(), LocalDateTime.now().plusSeconds(30), 142, 32, -1),
+                new Batch("testName", -1, -1, LocalDateTime.now(), LocalDateTime.now().plusSeconds(52), 500, 122, -1),
+                new Batch("testName", -1, -1, LocalDateTime.now(), LocalDateTime.now().plusSeconds(25), 250, 58, -1),
+                new Batch("testName", -1, -1, LocalDateTime.now(), LocalDateTime.now().plusSeconds(59), 600, 98, -1));
+
+        BatchStatistics expected = new BatchStatistics(373.0, 77.5, 41.5, null);
+
+        return new Object[]{batches, expected};
     }
 }
