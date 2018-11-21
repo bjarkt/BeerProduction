@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class OEETest {
@@ -24,7 +25,7 @@ public class OEETest {
             Double stopTime = stopTimes.get(i);
             OEE oee = new OEE(batch, stopTime);
 
-            assertTrue(oee.getOEE() == expectedOEE.get(i));
+            assertEquals((double)expectedOEE.get(i), (double)oee.getOEE(), 0);
         }
     }
 
