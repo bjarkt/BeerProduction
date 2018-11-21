@@ -135,14 +135,9 @@ public class MesDAO extends DatabaseConnection {
     }
 
 
-
     private BatchStatistics getBatchStatistics(LocalDateTime from, LocalDateTime to) {
-        BatchStatistics batchStatistics;
         String sql = "SELECT * FROM batches WHERE started  >= ? AND finished <= ? ";
         List<Batch> batches = new ArrayList<>();
-        double avgAccepted = 0;
-        double avgDefects = 0;
-        double avgProductionSeconds = 0;
 
         this.executeQuery(conn -> {
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -156,22 +151,9 @@ public class MesDAO extends DatabaseConnection {
                 Batch temp = batchFromResultSet(rs);
                 batches.add(temp);
             }
-
         });
 
-        double accepted = 0;
-        double defects = 0;
-        double seconds = 0;
-        for(Batch batch : batches) {
-            accepted += batch.getAccepted();
-            defects += batch.getDefect();
-            seconds += ChronoUnit.SECONDS.between(batch.getStarted(), batch.getFinished());
-        }
-        avgAccepted = accepted / batches.size();
-        avgDefects = defects / batches.size();
-        avgProductionSeconds = seconds / batches.size();
-
-        batchStatistics = new BatchStatistics(avgAccepted, avgDefects, avgProductionSeconds, batches);
+        BatchStatistics batchStatistics = new BatchStatistics(batches);
 
         return batchStatistics;
     }
@@ -182,29 +164,7 @@ public class MesDAO extends DatabaseConnection {
             measurements.addAll(getMeasurementLogs(batch.getBatchId()));
         }
 
-        Double highestTemp = null;
-        Double lowestTemp = null;
-        for(MeasurementLog measurement : measurements) {
-            if (highestTemp == null && lowestTemp == null) {
-                highestTemp = measurement.getMeasurements().getTemperature();
-                lowestTemp = measurement.getMeasurements().getTemperature();
-            }
-            if(measurement.getMeasurements().getTemperature() > highestTemp) {
-                highestTemp = measurement.getMeasurements().getTemperature();
-            }
-            if(measurement.getMeasurements().getTemperature() < lowestTemp) {
-                lowestTemp = measurement.getMeasurements().getTemperature();
-            }
-        }
-
-        Double tempSum = 0.0;
-        for(MeasurementLog measurement : measurements) {
-            tempSum += measurement.getMeasurements().getTemperature();
-        }
-
-        Double avgTemp = tempSum / measurements.size();
-
-        MeasurementsStatistics measurementStatistics = new MeasurementsStatistics(highestTemp, lowestTemp, avgTemp);
+        MeasurementsStatistics measurementStatistics = new MeasurementsStatistics(measurements);
 
         return measurementStatistics;
     }
