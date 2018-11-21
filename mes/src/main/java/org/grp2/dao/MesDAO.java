@@ -316,35 +316,12 @@ public class MesDAO extends DatabaseConnection {
     }
 
     public OEE getOEE(int batchID) {
-
-
         Batch batch = getBatch(batchID);
-
-        double availability = getOEEAvailability(batch);
-        double performance = getOEEPerformance(batch);
-        double quality = getOEEQuality(batch);
-
-        OEE oee = new OEE(availability, performance, quality);
+        OEE oee = new OEE(batch, getOEEStopTime(batch.getBatchId()));
 
         return oee;
-
     }
 
-    /**
-     * This method calculates the availability from the data that is in the database. The method is needed to
-     * calculate the OEE.
-     * @param batch
-     * @return
-     */
-    private double getOEEAvailability(Batch batch) {
-        double plannedProductionTime = (60.0/((double) batch.getMachineSpeed())) * (((double) batch.getAccepted()) + ((double)batch.getDefect()));
-        double stopTime = getOEEStopTime(batch.getBatchId());
-        double runtime = plannedProductionTime - stopTime;
-
-        double availability = runtime / plannedProductionTime;
-
-        return availability;
-    }
 
     /**
      * Method to get the stop time needed to calculate availability.
@@ -369,23 +346,6 @@ public class MesDAO extends DatabaseConnection {
         return stopTime.get();
     }
 
-    /**
-     * Performance cannot be calculated in our system so it will always be 1.
-     * @param batch
-     * @return
-     */
-    private double getOEEPerformance(Batch batch) {
-        return 1;
-    }
 
-    /**
-     * The method calculates the quality by getting the amount of accepted and defect beers and dividing the total
-     * @param batch
-     * @return
-     */
-    private double getOEEQuality(Batch batch) {
-        double quality = ((double) batch.getAccepted()) / (((double) batch.getAccepted()) + ((double) batch.getDefect()));
 
-        return quality;
-    }
 }
