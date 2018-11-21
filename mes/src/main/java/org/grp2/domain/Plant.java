@@ -1,6 +1,8 @@
 package org.grp2.domain;
 
 import org.grp2.dao.MesDAO;
+import org.grp2.optimizer.IOptimizer;
+import org.grp2.optimizer.Optimizer;
 import org.grp2.printmanager.IPrintManager;
 import org.grp2.printmanager.SimplePdfPrinter1;
 import org.grp2.printmanager.SimplePdfPrinter2;
@@ -10,10 +12,12 @@ public class Plant {
     private static Plant instance;
     private IPrintManager printManager;
     private MesDAO mesDAO;
+    private IOptimizer optimizer;
 
     private Plant() {
         printManager = new SimplePdfPrinter1();
         mesDAO = new MesDAO();
+        this.optimizer = new Optimizer();
         this.printManager.setPath("report");
     }
 
