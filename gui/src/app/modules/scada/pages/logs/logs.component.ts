@@ -37,8 +37,6 @@ export class LogsComponent implements OnInit {
     this.totalRefresh = 0;
   }
 
-  }
-
   ngOnInit() {
     this.dataMeasureSource.paginator = this.measurePaginator;
     this.dataStateSource.paginator = this.statePaginator;
@@ -48,7 +46,7 @@ export class LogsComponent implements OnInit {
     this.totalRefresh++;
 
     // CHANGE THIS: REMOVE BYID TO GET CURRENT BATCH!
-    this.data.getScadaLogsById(17).subscribe(res => {
+    this.data.getScadaLogs().subscribe(res => {
       this.dataMeasureSource.data = [];
       this.dataStateSource.data = [];
 
@@ -72,8 +70,6 @@ export class LogsComponent implements OnInit {
         humidity: measureLogs['measurements']['humidity'],
         vibration: measureLogs['measurements']['vibration'],
       };
-
-      console.log(measurement.datetime);
 
       measurements.push(measurement);
     }
