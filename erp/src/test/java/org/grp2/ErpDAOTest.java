@@ -10,22 +10,7 @@ import static org.mockito.Mockito.*;
 
 public class ErpDAOTest {
 
-    @Mock
-    private ErpDAO erpDao;
-
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-    }
-
     @Test
     public void testCreateOrderAndAddOrderItems() {
-        when(erpDao.getNewOrderNumber()).thenReturn(1);
-        when(erpDao.addOrderItem(any(Integer.class), any(String.class), any(Integer.class))).thenReturn(true);
-
-        int orderNumber = erpDao.getNewOrderNumber();
-        boolean success = erpDao.addOrderItem(orderNumber, "pilsner", 100);
-
-        System.out.println(success);
     }
 }

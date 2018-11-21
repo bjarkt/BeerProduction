@@ -7,25 +7,15 @@ import org.grp2.printmanager.SimplePdfPrinter2;
 
 public class Plant {
 
-    private static Plant instance;
     private IPrintManager printManager;
     private MesDAO mesDAO;
+    private UnirestWrapper unirestWrapper;
 
-    private Plant() {
+    public Plant(MesDAO mesDAO, UnirestWrapper unirestWrapper) {
         printManager = new SimplePdfPrinter1();
-        mesDAO = new MesDAO();
+        this.unirestWrapper = unirestWrapper;
+        this.mesDAO = mesDAO;
         this.printManager.setPath("report.pdf");
-    }
-
-    /**
-     * Get singleton instance of {@link Plant}
-     * @return instance of Plant.
-     */
-    public static Plant getInstance(){
-        if(instance == null){
-            instance = new Plant();
-        }
-        return instance;
     }
 
     public IPrintManager getPrintManager() {
@@ -34,5 +24,9 @@ public class Plant {
 
     public MesDAO getMesDAO() {
         return mesDAO;
+    }
+
+    public UnirestWrapper getUnirestWrapper() {
+        return unirestWrapper;
     }
 }

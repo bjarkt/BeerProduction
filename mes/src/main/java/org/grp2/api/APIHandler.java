@@ -9,6 +9,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import io.javalin.Context;
 import org.grp2.domain.PlantStatistics;
 import org.grp2.domain.OEE;
+import org.grp2.domain.UnirestWrapper;
 import org.grp2.javalin.Message;
 import org.grp2.dao.MesDAO;
 import org.grp2.domain.Plant;
@@ -31,8 +32,8 @@ public class APIHandler {
     private Plant plant;
     private com.fasterxml.jackson.databind.ObjectMapper mapper;
 
-    public APIHandler() {
-        this.plant = Plant.getInstance();
+    public APIHandler(MesDAO mesDAO, UnirestWrapper unirestWrapper) {
+        this.plant = new Plant(mesDAO, unirestWrapper);
         mapper = new com.fasterxml.jackson.databind.ObjectMapper();
     }
 
@@ -84,7 +85,12 @@ public class APIHandler {
 
             try {
                 String url = DockerUtility.dockerValueOrDefault("http://scada:7000/api/start-new-production", "http://localhost:7000/api/start-new-production");
-                HttpResponse<Message> postMessage = Unirest.post(url).asObject(Message.class);
+                Message postMessage = plant.getUnirestWrapper().post(url, Message.class);
+                if (postMessage != null) {
+                    message.set(postMessage.getStatus(), postMessage.getMessage());
+                } else {
+                    message.set(422, "Error from SCADA : scada service probably not running");
+                }
             } catch (UnirestException e) {
                 message.set(422, "Error from SCADA : " + e.getMessage());
             }
