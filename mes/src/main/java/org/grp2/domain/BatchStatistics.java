@@ -26,6 +26,8 @@ public class BatchStatistics {
         this.batchList = batches;
     }
 
+    public BatchStatistics() { }
+
     public double getAvgAccepted() {
         return avgAccepted;
     }

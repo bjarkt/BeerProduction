@@ -15,6 +15,8 @@ public class MeasurementsStatistics {
         this.avgTemp = avgTemp;
     }
 
+    public MeasurementsStatistics() { }
+
     public MeasurementsStatistics(List<MeasurementLog> measurements) {
         calculateStatistics(measurements);
     }

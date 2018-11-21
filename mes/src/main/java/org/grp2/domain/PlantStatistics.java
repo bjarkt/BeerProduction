@@ -9,6 +9,9 @@ public class PlantStatistics {
         this.batchStatistics = batchStatistics;
     }
 
+    public PlantStatistics() {
+    }
+
     public MeasurementsStatistics getMeasurementsStatistics() {
         return measurementsStatistics;
     }

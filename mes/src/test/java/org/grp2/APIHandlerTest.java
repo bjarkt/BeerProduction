@@ -6,19 +6,21 @@ import io.javalin.Context;
 import org.grp2.api.APIHandler;
 import org.grp2.api.APIRoutes;
 import org.grp2.dao.MesDAO;
-import org.grp2.domain.OEE;
-import org.grp2.domain.UnirestWrapper;
+import org.grp2.domain.*;
 import org.grp2.javalin.Message;
 import org.grp2.shared.Batch;
+import org.grp2.shared.Order;
 import org.grp2.utility.JavalinTestUtility;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.cglib.core.Local;
 
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -42,6 +44,96 @@ public class APIHandlerTest {
         MockitoAnnotations.initMocks(this);
 
         apiHandler = new APIHandler(mockMesDAO, unirestWrapper);
+    }
+
+    @Test
+    public void testViewOrders() {
+        Context context = JavalinTestUtility.getContext(basePath + APIRoutes.VIEW_ORDERS);
+
+        when(mockMesDAO.getLockedOrders()).thenReturn(Collections.singletonList(
+                new Order(1, Timestamp.valueOf(LocalDateTime.now()), "locked")));
+
+        apiHandler.viewOrders(context);
+        List<Map<String, Object>> result = JavalinTestUtility.getResponse(context, List.class);
+
+        assertEquals(1, result.get(0).get("orderNumber"));
+    }
+
+    @Test
+    public void testViewOrdersEmpty() {
+        Context context = JavalinTestUtility.getContext(basePath + APIRoutes.VIEW_ORDERS);
+
+        apiHandler.viewOrders(context);
+        List result = JavalinTestUtility.getResponse(context, List.class);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    public void testViewOrderItems() {
+        Context context = JavalinTestUtility.getContext(basePath + APIRoutes.VIEW_ORDER_ITEMS,
+                "order-number", "1");
+
+        apiHandler.viewOrderItems(context);
+
+        Map<String, Object> result = JavalinTestUtility.getResponse(context);
+
+        assertNotNull(result.get("Recipe"));
+        assertNotNull(result.get("OrderItems"));
+    }
+
+    @Test
+    public void testViewAllBatches() {
+        Context context = JavalinTestUtility.getContext(basePath + APIRoutes.VIEW_ALL_BATCHES);
+
+        when(mockMesDAO.viewAllBatches()).thenReturn(Collections.singletonList(new Batch("pilsner", 1, 1, LocalDateTime.now(), LocalDateTime.now(), 0, 0, 0)));
+
+        apiHandler.viewAllBatches(context);
+
+        List<Batch> result = (List<Batch>) JavalinTestUtility.getResponse(context, List.class);
+
+        assertTrue(result.size() >= 1);
+    }
+
+    @Test
+    public void testViewAllBatchesEmpty() {
+        Context context = JavalinTestUtility.getContext(basePath + APIRoutes.VIEW_ALL_BATCHES);
+
+        apiHandler.viewAllBatches(context);
+
+        List result = JavalinTestUtility.getResponse(context, List.class);
+
+        assertNotNull(result);
+    }
+
+    @Test
+    public void testViewPlantStatisticsSuccess() {
+        Context context = JavalinTestUtility.getContext(basePath + APIRoutes.VIEW_PLANT_STATISTICS,
+                Collections.singletonMap("days", "10"));
+
+        when(mockMesDAO.viewPlantStatistics(any(), any())).thenReturn(new PlantStatistics(new MeasurementsStatistics(-1.0, -1.0, -1.0), new BatchStatistics(-1, -1, -1, null)));
+
+        apiHandler.viewPlantStatistics(context);
+
+        PlantStatistics plantStatistics = JavalinTestUtility.getResponse(context, PlantStatistics.class);
+
+        assertEquals(-1, plantStatistics.getMeasurementsStatistics().getAvgTemp(), 0);
+    }
+
+    @Test
+    public void testViewPlantStatisticsFailure() {
+        String badDaysValue = "asdf";
+        Context context = JavalinTestUtility.getContext(basePath + APIRoutes.VIEW_PLANT_STATISTICS,
+                Collections.singletonMap("days", badDaysValue));
+
+        when(mockMesDAO.viewPlantStatistics(any(), any())).thenReturn(new PlantStatistics(new MeasurementsStatistics(-1.0, -1.0, -1.0), new BatchStatistics(-1, -1, -1, null)));
+
+        apiHandler.viewPlantStatistics(context);
+
+        Message response = JavalinTestUtility.getResponse(context, Message.class);
+
+        assertEquals("Bad value for query-param: " + badDaysValue, response.getMessage());
+        assertEquals(422, response.getStatus());
     }
 
     @Test
