@@ -1,6 +1,7 @@
 package org.grp2.api;
 
 import io.javalin.Context;
+import org.grp2.dao.ScadaDAO;
 import org.grp2.domain.*;
 import org.grp2.javalin.Message;
 import org.grp2.enums.State;
@@ -13,9 +14,8 @@ import java.util.*;
 public class APIHandler {
     private Machinery machinery;
 
-    public APIHandler(IHardware hardware) {
-        this.machinery = new Machinery(hardware);
-        this.machinery.listenForStateChanges();
+    public APIHandler(Machinery machinery) {
+        this.machinery = machinery;
     }
 
     public void startNewProduction(Context context) {
@@ -96,6 +96,7 @@ public class APIHandler {
                 batchId = Integer.parseInt(batchParam);
         } catch (NumberFormatException e) {
             context.json(new Message(422, "Bad value for query-param: " + batchParam));
+            return;
         }
 
         Batch currentBatch = machinery.getScadaDAO().getCurrentBatch();
