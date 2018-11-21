@@ -6,14 +6,16 @@ public class OEE {
     private double availability;
     private double performance;
     private double quality;
-    private double OEE;
+    private double oee;
 
     public OEE(Batch batch, double stopTime) {
         this.availability = getOEEAvailability(batch, stopTime);
         this.performance = getOEEPerformance(batch);
         this.quality = getOEEQuality(batch);
-        this.OEE = calculateOEE();
+        this.oee = calculateOEE();
     }
+
+    public OEE() { }
 
     public double getAvailability() {
         return availability;
@@ -28,7 +30,7 @@ public class OEE {
     }
 
     public double getOEE() {
-        return OEE;
+        return oee;
     }
 
     public double calculateOEE(){

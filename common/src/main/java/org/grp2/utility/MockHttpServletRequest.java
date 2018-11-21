@@ -2,9 +2,8 @@ package org.grp2.utility;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -14,10 +13,19 @@ import java.util.Map;
 public class MockHttpServletRequest implements HttpServletRequest {
 
     private String queryString;
+    private BufferedReader reader;
+    private String readerString;
 
     public MockHttpServletRequest() { }
 
 
+    public void setQueryString(String queryString) {
+        this.queryString = queryString;
+    }
+    public void setReader(String reader) {
+        this.reader = new BufferedReader(new StringReader(reader));
+        this.readerString = reader;
+    }
 
     @Override
     public String getAuthType() {
@@ -216,7 +224,34 @@ public class MockHttpServletRequest implements HttpServletRequest {
 
     @Override
     public ServletInputStream getInputStream() throws IOException {
-        return null;
+        InputStream is = new ByteArrayInputStream(this.readerString.getBytes(StandardCharsets.UTF_8));
+        ServletInputStream servletInputStream = new ServletInputStream() {
+            @Override
+            public boolean isFinished() {
+                try {
+                    return is.available() > 0;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return false;
+            }
+
+            @Override
+            public boolean isReady() {
+                return true;
+            }
+
+            @Override
+            public void setReadListener(ReadListener readListener) {
+
+            }
+
+            @Override
+            public int read() throws IOException {
+                return is.read();
+            }
+        };
+        return servletInputStream;
     }
 
     @Override
@@ -260,8 +295,8 @@ public class MockHttpServletRequest implements HttpServletRequest {
     }
 
     @Override
-    public BufferedReader getReader() throws IOException {
-        return null;
+    public BufferedReader getReader() {
+        return reader;
     }
 
     @Override
@@ -364,8 +399,5 @@ public class MockHttpServletRequest implements HttpServletRequest {
         return null;
     }
 
-    public void setQueryString(String queryString) {
-        this.queryString = queryString;
-    }
 
 }

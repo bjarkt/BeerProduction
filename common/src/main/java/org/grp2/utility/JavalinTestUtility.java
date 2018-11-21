@@ -14,10 +14,14 @@ import java.util.Map;
 public class JavalinTestUtility {
     private static ObjectMapper objectMapper = new ObjectMapper();
 
-    public static Context getContext(String path, Map<String, String> queryParams, Map<String, String> pathParams) {
+    public static Context getContext(String path, Map<String, String> queryParams, String body, Map<String, String> pathParams) {
         MockHttpServletRequest request = new MockHttpServletRequest();
         HttpServletResponse response = new MockHttpServletResponse();
         request.setQueryString(makeQueryString(queryParams));
+        if (body != null) {
+            request.setReader(body);
+        }
+
         if (pathParams != null) {
             return ContextUtil.init(request, response, path, pathParams);
         } else {
@@ -27,12 +31,12 @@ public class JavalinTestUtility {
 
     public static Context getContext(String path, String... pathParamKeyValuePairs) {
         Map<String, String> pathParams = makePathParamMap(pathParamKeyValuePairs);
-        return getContext(path, null, pathParams);
+        return getContext(path, null, null, pathParams);
     }
 
     public static Context getContext(String path, Map<String, String> queryParams, String... pathParamKeyValuePairs) {
         Map<String, String> pathParams = makePathParamMap(pathParamKeyValuePairs);
-        return getContext(path, queryParams, pathParams);
+        return getContext(path, queryParams, null, pathParams);
     }
 
     public static Map<String, Object> getResponse(Context context) {

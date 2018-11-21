@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mashape.unirest.http.ObjectMapper;
 import com.mashape.unirest.http.Unirest;
 import io.javalin.Javalin;
+import org.grp2.dao.MesDAO;
+import org.grp2.domain.UnirestWrapper;
 import org.grp2.javalin.AbstractAPI;
 import org.grp2.javalin.JavalinSetup;
 
@@ -19,7 +21,7 @@ public class API extends AbstractAPI {
 
     public void start() {
         Javalin app = JavalinSetup.setup(PORT);
-        APIHandler handler = new APIHandler();
+        APIHandler handler = new APIHandler(new MesDAO(), new UnirestWrapper());
         setRoutes(app, handler);
         setUniRestMapper();
         app.start();
@@ -28,17 +30,16 @@ public class API extends AbstractAPI {
     public void setRoutes(Javalin app, APIHandler handler) {
         app.routes(() -> {
             path("/api", () -> {
-                get("/view-orders", handler::viewOrders);
-                get("/view-order-items/:order-number", handler::viewOrderItems);
-                get("/view-all-batches", handler::viewAllBatches);
-                get("/get-plant-statistics", handler::viewPlantStatistics);
-                get("/get-report/:batch-id", handler::getReport);
-                post("/create-batches/", handler::createBatches);
-                get("/get-oee/:batch-id", handler::getOEE);
+                get(APIRoutes.VIEW_ORDERS, handler::viewOrders);
+                get(APIRoutes.VIEW_ORDER_ITEMS, handler::viewOrderItems);
+                get(APIRoutes.VIEW_ALL_BATCHES, handler::viewAllBatches);
+                get(APIRoutes.VIEW_PLANT_STATISTICS, handler::viewPlantStatistics);
+                get(APIRoutes.GET_REPORT, handler::getReport);
+                post(APIRoutes.CREATE_BATCHES, handler::createBatches);
+                get(APIRoutes.GET_OEE, handler::getOEE);
                 get("/get-profitable-machspeed/:beer-type", handler::getProfitableMachSpeed);
                 get("/get-fastest-machspeed/:beer-type/:quantity", handler::getFastestMachSpeed);
                 get("/get-saving-machspeed/:beer-type", handler::getSavingMachSpeed);
-
             });
         });
     }
