@@ -1,52 +1,123 @@
-<div class="start-order-header">
-  <mat-toolbar>
-    <mat-toolbar-row class="start-order-row">
-      <button [routerLink]="['/mes/pages/sub-overview']" color="warn" mat-stroked-button><i class="material-icons">keyboard_backspace</i>
-        Cancel</button>
-      <span>Start Production</span>
-      <button color="primary" mat-raised-button><i class="material-icons md-18">done</i> Start Order</button>
-    </mat-toolbar-row>
-  </mat-toolbar>
-  <mat-divider></mat-divider>
+<div class="overview">
+  <mat-card class="info-card">
+    <mat-card-header>
+      <mat-card-title>Locked Orders</mat-card-title>
+    </mat-card-header>
+    <div class="content">
+      <table mat-table [dataSource]="orders">
+          <!-- OrderNumber Column -->
+          <ng-container matColumnDef="orderNumber">
+              <th mat-header-cell *matHeaderCellDef> Order No. </th>
+              <td mat-cell *matCellDef="let order"> {{order.orderNumber}} </td>
+          </ng-container>
+    
+          <!-- Date Column -->
+          <ng-container matColumnDef="date">
+              <th mat-header-cell *matHeaderCellDef> Created </th>
+              <td mat-cell *matCellDef="let order">
+                {{order.date.hour | number:'2.0'}}:{{order.date.minute | number:'2.0'}}:{{order.date.second | number:'2.0'}} |
+                  {{order.date.dayOfWeek | lowercase | titlecase}}
+                  {{order.date.dayOfMonth | number:'2.0'}}/{{order.date.monthValue | number:'2.0'}}/{{order.date.year}}
+                </td>
+          </ng-container>
+    
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef> Status </th>
+              <td mat-cell *matCellDef="let order"> {{order.status | titlecase}} </td>
+          </ng-container>
+    
+          <ng-container matColumnDef="loading">
+              <mat-footer-cell *matFooterCellDef>Loading data...</mat-footer-cell>
+          </ng-container>
+          
+          <ng-container matColumnDef="noData">
+                  <mat-footer-cell *matFooterCellDef>You have no locked orders.</mat-footer-cell>
+              </ng-container>
+    
+          <tr mat-header-row *matHeaderRowDef="ordersColumnsToDisplay"></tr>
+          <tr mat-row *matRowDef="let row; columns: ordersColumnsToDisplay;"></tr>
+    
+          <mat-footer-row *matFooterRowDef="['loading']" [ngClass]="{'hide':ordersDataSource!=null}"></mat-footer-row>
+          <mat-footer-row *matFooterRowDef="['noData']" [ngClass]="{'hide':!(ordersDataSource!=null && ordersDataSource.data.length==0)}"></mat-footer-row>
+    
+      </table>
+    </div>
+  </mat-card>
+
+
+    <mat-card class="info-card overview-batches">
+      <mat-card-header>
+        <mat-card-title>Batches</mat-card-title>
+      </mat-card-header>
+      <table mat-table [dataSource]="batches">
+        <!-- BatchId Column -->
+        <ng-container matColumnDef="batchId">
+            <th mat-header-cell *matHeaderCellDef> Batch Id </th>
+            <td mat-cell *matCellDef="let batch"> {{ batch.batchId }} </td>
+        </ng-container>
+
+        <!-- OrderNumber Column -->
+        <ng-container matColumnDef="orderNumber">
+            <th mat-header-cell *matHeaderCellDef> Order no. </th>
+            <td mat-cell *matCellDef="let batch"> {{ batch.orderNumber }} </td>
+        </ng-container>
+  
+        <!-- Beer Name Column -->
+        <ng-container matColumnDef="beerName">
+            <th mat-header-cell *matHeaderCellDef> Beer Name </th>
+            <td mat-cell *matCellDef="let batch">{{ batch.beerName | titlecase }}</td>
+        </ng-container>
+  
+        <!-- Accepted Column -->
+        <ng-container matColumnDef="accepted">
+            <th mat-header-cell *matHeaderCellDef> Accepted </th>
+            <td mat-cell *matCellDef="let batch"> {{ batch.accepted }} </td>
+        </ng-container>
+  
+        <!-- Defect Column -->
+        <ng-container matColumnDef="defect">
+            <th mat-header-cell *matHeaderCellDef> Defects </th>
+            <td mat-cell *matCellDef="let batch"> {{ batch.defect }} </td>
+        </ng-container>
+  
+        <!-- Started Column -->
+        <ng-container matColumnDef="started">
+            <th mat-header-cell *matHeaderCellDef> Started </th>
+            <td mat-cell *matCellDef="let batch"> 
+                {{batch.started.hour | number:'2.0'}}:{{batch.started.minute | number:'2.0'}}:{{batch.started.second | number:'2.0'}} <br>
+                {{batch.started.dayOfMonth | number:'2.0'}}/{{batch.started.monthValue | number:'2.0'}}/{{batch.started.year}}
+            </td>
+        </ng-container>
+  
+        <!-- Finished Column -->
+        <ng-container matColumnDef="finished">
+            <th mat-header-cell *matHeaderCellDef> Finished </th>
+            <td mat-cell *matCellDef="let batch"> 
+              <span *ngIf="batch.finished">
+                {{batch.finished.hour | number:'2.0'}}:{{batch.finished.minute | number:'2.0'}}:{{batch.finished.second | number:'2.0'}} <br>
+                {{batch.finished.dayOfMonth | number:'2.0'}}/{{batch.finished.monthValue | number:'2.0'}}/{{batch.finished.year}}
+              </span>
+              <span *ngIf="!batch.finished">
+                  Not finished
+              </span>
+            </td>
+        </ng-container>
+  
+        <ng-container matColumnDef="loading">
+            <mat-footer-cell *matFooterCellDef>Loading data...</mat-footer-cell>
+        </ng-container>
+        
+        <ng-container matColumnDef="noData">
+                <mat-footer-cell *matFooterCellDef>You have no batches.</mat-footer-cell>
+            </ng-container>
+  
+        <tr mat-header-row *matHeaderRowDef="batchesColumnsToDisplay"></tr>
+        <tr mat-row *matRowDef="let row; columns: batchesColumnsToDisplay;"></tr>
+  
+        <mat-footer-row *matFooterRowDef="['loading']" [ngClass]="{'hide':batchesDataSource!=null}"></mat-footer-row>
+        <mat-footer-row *matFooterRowDef="['noData']" [ngClass]="{'hide':!(batchesDataSource!=null && batchesDataSource.data.length==0)}"></mat-footer-row>
+  
+    </table>
+    </mat-card>
 </div>
-
-<mat-card class="select-order-card">
-  <mat-card-header>
-    <mat-card-title>Select Order</mat-card-title>
-    <mat-card-subtitle>Select an order to start a production</mat-card-subtitle>
-  </mat-card-header>
-
-  <form #startForm="ngForm">
-    <mat-card-content>
-
-      <div class="form-group">
-        <mat-form-field>
-          <mat-select required class="form-control" id="orderNumber" [(ngModel)]="model.orderNumber" name="orderNumber"
-            placeholder="Select Order Number">
-
-            <mat-option *ngFor="let order of Orders"value="order.orderNumber">
-
-              {{order.orderNumber}} 
-              
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-
-    </mat-card-content>
-  </form>
-</mat-card>
-
-<div class="orderitems">
-  <mat-list>
-    <h3 mat-subheader>Choose production speed for each beer</h3>
-    <mat-list-item *ngFor="let order of Orders">
-      <h4 mat-line> Order: {{order.orderNumber}}</h4>
-      <p mat-line>Status: {{order.status}}</p>
-      <p mat-line>Date Created: {{order.date}}</p>
-      <mat-divider></mat-divider>
-    </mat-list-item>
-  </mat-list>
-</div>
-
-

@@ -1,3 +1,55 @@
-<p>
-  statistics works!
-</p>
+  <div class="statistics-details">
+    <mat-card class="select-days-card">
+      <mat-card-header>
+        <mat-card-title>Select how many days</mat-card-title>
+        <mat-card-subtitle
+          >Select how many days to look in the past for statistics</mat-card-subtitle
+        >
+      </mat-card-header>
+
+
+
+      <div class="form-group">
+        <mat-form-field>
+          <input #quantityInput minlength="" class="form-control" id="days" [(ngModel)]="days" name="days"
+            required type="number" matInput placeholder="Days" (keyup.enter)="getStatistics()">
+        </mat-form-field>
+      </div>
+    
+      <mat-card-actions class="viewStatistics">
+        <button mat-stroked-button type="submit" color="primary" (click)="getStatistics()">View statistics</button>
+      </mat-card-actions>
+        
+    </mat-card>
+
+
+    <div class="statistic-info">
+      <div class="info">
+        <h3 mat-subheader>Statistics for the past {{days}} days.</h3>
+        <mat-list *ngIf="plantStatistics">
+          <h3 mat-subheader>Measurements</h3>
+          <mat-list-item>
+            <p>Highest Temperature: <br> {{plantStatistics.measurementsStatistics.highestTemp}} °C</p>
+          </mat-list-item>
+          <mat-list-item>
+            <p>Lowest Temperature: <br> {{plantStatistics.measurementsStatistics.lowestTemp}} °C</p>
+          </mat-list-item>
+          <mat-list-item>
+            <p>Average Temperature: <br> {{plantStatistics.measurementsStatistics.avgTemp | number}} °C</p>
+          </mat-list-item>
+            <mat-divider></mat-divider>
+        </mat-list><mat-list *ngIf="plantStatistics">
+          <h3 mat-subheader>Batch</h3>
+          <mat-list-item>
+            <p>Avereage Accepted: <br> {{plantStatistics.batchStatistics.avgAccepted}} products</p>
+          </mat-list-item>
+          <mat-list-item>
+            <p>Average Defect: <br> {{plantStatistics.batchStatistics.avgDefects}} products</p>
+          </mat-list-item>
+          <mat-list-item>
+            <p>Average Production Time: <br> {{plantStatistics.batchStatistics.avgProductionSeconds | number}}s</p>
+          </mat-list-item>
+            <mat-divider></mat-divider>
+        </mat-list>
+      </div>
+    </div>

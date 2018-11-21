@@ -1,5 +1,5 @@
 
-.overview {
+.report-details {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -7,20 +7,27 @@
     margin-right: 5px;
     
 
-    .info-card{
+    .select-batch-card{
         flex-grow: 1;
         max-width: calc(50% - 10px);
-    }
-
-    .overview-batches{
-        flex-grow: 1;
-        max-width: calc(50% - 10px);
-    }
-    
-    table{
-        width: 100%;
-        .hide{
-            display: none;
+        mat-form-field {
+            width: 100%;
         }
     }
+
+    .OEE-info{
+        flex-grow: 1;
+        max-width: calc(50% - 10px);
+        mat-form-field {
+            width: 100%;
+        }
+    }
+
+    .viewReport {
+        float: right;
+    }
+
+
+
+    
 }

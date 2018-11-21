@@ -24,8 +24,9 @@ export class OpenOrdersComponent implements OnInit {
 
   async loadOrders(){
     const res = await this.data.getOrders("open").toPromise();
+    this.dataSource.data = [];
     this.orders = res as Order[];
-    this.dataSource.data = res as Order[];
+    this.dataSource.data = this.orders;
   }
 
   async deleteOrder(order:Order){
