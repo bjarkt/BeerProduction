@@ -1,16 +1,9 @@
 package org.grp2.optimizer;
 
+import org.grp2.shared.Beer;
 import org.grp2.shared.Recipe;
 
 public class Optimizer implements IOptimizer {
-
-    public static void main(String[] args) {
-        IOptimizer optimizer = new Optimizer();
-        Recipe recipe = new Recipe(0, "pilsner", 0, 600);
-        System.out.println("Most Profitable: " + optimizer.getOptimalMachSpeed(new Beer(recipe, 4, 6)));
-        System.out.println("Fastest: " + optimizer.getFastestMachSpeed(new Beer(recipe, 4, 6), 50));
-        System.out.println("Most Saving: " + optimizer.getMostSavingMachSpeed(new Beer(recipe, 4, 6)));
-    }
 
     public Optimizer(){
 

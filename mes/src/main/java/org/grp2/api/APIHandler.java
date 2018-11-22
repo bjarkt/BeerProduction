@@ -126,4 +126,26 @@ public class APIHandler {
         context.json(oee);
     }
 
+    public void getProfitableMachSpeed(Context context){
+        String beerType = context.pathParam("beer-type");
+        Beer beer = plant.getMesDAO().getBeerData(beerType);
+        int machSpeed = plant.getOptimizer().getOptimalMachSpeed(beer);
+        context.json(machSpeed);
+    }
+
+    public void getFastestMachSpeed(Context context){
+        String beerType = context.pathParam("beer-type");
+        int quantity = Integer.parseInt(context.pathParam("quantity"));
+        Beer beer = plant.getMesDAO().getBeerData(beerType);
+        int machSpeed = plant.getOptimizer().getFastestMachSpeed(beer, quantity);
+        context.json(machSpeed);
+    }
+
+    public void getSavingMachSpeed(Context context){
+        String beerType = context.pathParam("beer-type");
+        Beer beer = plant.getMesDAO().getBeerData(beerType);
+        int machSpeed = plant.getOptimizer().getMostSavingMachSpeed(beer);
+        context.json(machSpeed);
+    }
+
 }

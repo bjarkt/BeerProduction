@@ -13,9 +13,7 @@ public class APIHandler {
     private ErpDAO erpDAO;
 
     public APIHandler() {
-        // this.facade = facade
         this.erpDAO = new ErpDAO();
-
     }
 
     public void createOrder(Context context) {
@@ -79,7 +77,7 @@ public class APIHandler {
     public void lockOrder(Context context){
         int orderNumber = Integer.parseInt(context.pathParam("order-id"));
         erpDAO.lockOrder(orderNumber);
-        context.json(new Message(200, "Order with order number:" + orderNumber + " has been locked."));
+        context.json(new Message(200, "Order with order number: " + orderNumber + " has been locked."));
     }
 
     public void viewOrderItems(Context context){

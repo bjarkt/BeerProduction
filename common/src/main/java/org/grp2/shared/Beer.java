@@ -1,4 +1,4 @@
-package org.grp2.optimizer;
+package org.grp2.shared;
 
 import org.grp2.shared.Recipe;
 
@@ -20,4 +20,8 @@ public class Beer extends Recipe {
     public int getProfit() {
         return profit;
     }
+
+    public void setCost(int cost) { this.cost = cost; }
+
+    public void setProfit(int profit) { this.profit = profit; }
 }

@@ -1,5 +1,7 @@
 package org.grp2.optimizer;
 
+import org.grp2.shared.Beer;
+
 public interface IOptimizer {
 
     /**

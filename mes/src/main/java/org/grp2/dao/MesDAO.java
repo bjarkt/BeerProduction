@@ -6,6 +6,7 @@ import org.grp2.domain.MeasurementsStatistics;
 import org.grp2.domain.OEE;
 import org.grp2.domain.Plant;
 import org.grp2.domain.PlantStatistics;
+import org.grp2.enums.Finance;
 import org.grp2.enums.OrderItemStatus;
 import org.grp2.enums.OrderStatus;
 import org.grp2.shared.*;
@@ -291,6 +292,27 @@ public class MesDAO extends DatabaseConnection {
         });
 
         return batch.get();
+    }
+
+    public Beer getBeerData(String beerName){
+        Recipe recipe = new Recipe(-1, beerName, -1, -1);
+        int profit = Finance.valueOf(beerName.toUpperCase()).getProfit();
+        int cost = Finance.valueOf(beerName.toUpperCase()).getCost();
+
+        this.executeQuery(conn -> {
+            String getRecipeQuery = "SELECT max_speed, min_speed, ID FROM Recipes WHERE Recipes.name = ?";
+            PreparedStatement ps = conn.prepareStatement(getRecipeQuery);
+            ps.setString(1, Finance.valueOf(beerName.toUpperCase()).getName());
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()) {
+                recipe.setId(rs.getBigDecimal("ID").intValue());
+                recipe.setMaxSpeed(rs.getInt("max_speed"));
+                recipe.setMinSpeed(rs.getInt("min_speed"));
+            }
+        });
+
+        return new Beer(recipe, profit,cost);
+
     }
 
     /**

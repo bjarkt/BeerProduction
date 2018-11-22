@@ -35,6 +35,10 @@ public class API extends AbstractAPI {
                 get("/get-report/:batch-id", handler::getReport);
                 post("/create-batches/", handler::createBatches);
                 get("/get-oee/:batch-id", handler::getOEE);
+                get("/get-profitable-machspeed/:beer-type", handler::getProfitableMachSpeed);
+                get("/get-fastest-machspeed/:beer-type/:quantity", handler::getFastestMachSpeed);
+                get("/get-saving-machspeed/:beer-type", handler::getSavingMachSpeed);
+
             });
         });
     }
