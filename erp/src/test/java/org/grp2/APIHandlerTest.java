@@ -8,9 +8,7 @@ import org.grp2.dao.ErpDAO;
 import org.grp2.enums.OrderStatus;
 import org.grp2.javalin.Message;
 import org.grp2.shared.Order;
-import org.grp2.shared.OrderItem;
 import org.grp2.utility.JavalinTestUtility;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -18,10 +16,13 @@ import org.mockito.MockitoAnnotations;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 public class APIHandlerTest {
 
@@ -57,8 +58,8 @@ public class APIHandlerTest {
     public void testAddOrderItem() {
         Context context = JavalinTestUtility.getContext(basePath + APIRoutes.ADD_ORDER_ITEM,
                 "order-id", "1",
-                                         "beer-name", "pilsner",
-                                         "quantity", "100");
+                "beer-name", "pilsner",
+                "quantity", "100");
 
         when(erpDAO.addOrderItem(any(Integer.class), any(String.class), any(Integer.class))).thenReturn(true).thenReturn(false);
 
@@ -93,8 +94,8 @@ public class APIHandlerTest {
         queryParams.put("quantity", "100");
         queryParams.put("new-beer-name", "ale");
         Context context = JavalinTestUtility.getContext(basePath + APIRoutes.EDIT_ORDER_ITEM, queryParams,
-                                            "order-id", "1",
-                                            "beer-name", "pilsner");
+                "order-id", "1",
+                "beer-name", "pilsner");
         when(erpDAO.editOrderItem(anyInt(), anyString(), anyInt(), anyString())).thenReturn(true).thenReturn(false);
         when(erpDAO.editOrderItem(anyInt(), anyString(), anyString())).thenReturn(true).thenReturn(false);
         when(erpDAO.editOrderItem(anyInt(), anyString(), anyInt())).thenReturn(true).thenReturn(false);
@@ -112,7 +113,7 @@ public class APIHandlerTest {
     public void testDeleteOrderItem() {
         Context context = JavalinTestUtility.getContext(basePath + APIRoutes.DELETE_ORDER_ITEM,
                 "order-id", "1",
-                                        "beer-name", "pilsner");
+                "beer-name", "pilsner");
         when(erpDAO.deleteOrderItem(anyInt(), anyString())).thenReturn(true).thenReturn(false);
 
         apiHandler.deleteOrderItem(context);
@@ -163,14 +164,15 @@ public class APIHandlerTest {
     public void testViewOrdersOpen() {
         String openStatus = OrderStatus.OPEN.getStatus();
         Context context = JavalinTestUtility.getContext(basePath + APIRoutes.VIEW_ORDERS,
-                    "status", openStatus);
+                "status", openStatus);
         when(erpDAO.getOrders(eq(openStatus))).thenReturn(Arrays.asList(
                 new Order(1, Timestamp.valueOf(LocalDateTime.now()), openStatus),
                 new Order(2, Timestamp.valueOf(LocalDateTime.now()), openStatus)
         ));
 
         apiHandler.viewOrders(context);
-        List<Map<String, Object>> response = JavalinTestUtility.getResponse(context, new TypeReference<List<Map<String, Object>>>(){});
+        List<Map<String, Object>> response = JavalinTestUtility.getResponse(context, new TypeReference<List<Map<String, Object>>>() {
+        });
 
         for (Map<String, Object> order : response) {
             assertEquals(openStatus, order.get("status"));
@@ -188,7 +190,8 @@ public class APIHandlerTest {
         ));
 
         apiHandler.viewOrders(context);
-        List<Map<String, Object>> response = JavalinTestUtility.getResponse(context, new TypeReference<List<Map<String, Object>>>(){});
+        List<Map<String, Object>> response = JavalinTestUtility.getResponse(context, new TypeReference<List<Map<String, Object>>>() {
+        });
 
         for (Map<String, Object> order : response) {
             assertEquals(lockedStatus, order.get("status"));
@@ -206,7 +209,8 @@ public class APIHandlerTest {
         ));
 
         apiHandler.viewOrders(context);
-        List<Map<String, Object>> response = JavalinTestUtility.getResponse(context, new TypeReference<List<Map<String, Object>>>(){});
+        List<Map<String, Object>> response = JavalinTestUtility.getResponse(context, new TypeReference<List<Map<String, Object>>>() {
+        });
 
         for (Map<String, Object> order : response) {
             assertEquals(doneStatus, order.get("status"));
