@@ -1,6 +1,5 @@
 package org.grp2;
 
-import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import io.javalin.Context;
 import org.grp2.api.APIHandler;
@@ -16,16 +15,18 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.cglib.core.Local;
 
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
-import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 public class APIHandlerTest {
 
@@ -141,7 +142,7 @@ public class APIHandlerTest {
         String bodyJson = "{\"orderItems\":[{\"recipeName\":\"pilsner\",\"orderNumber\":1,\"machineSpeed\":600,\"quantity\":100,\"batchId\":1}]}";
 
         Map<String, String> pathParams = Collections.singletonMap("batch-id", "1");
-        Context context = JavalinTestUtility.getContext(basePath + APIRoutes.CREATE_BATCHES,null,
+        Context context = JavalinTestUtility.getContext(basePath + APIRoutes.CREATE_BATCHES, null,
                 bodyJson, pathParams);
 
 
@@ -159,11 +160,11 @@ public class APIHandlerTest {
         String bodyJson = "{\"orderItems\":[{\"recipeName\":\"pilsner\",\"orderNumber\":1,\"machineSpeed\":600,\"quantity\":100,\"batchId\":1}]}";
 
         Map<String, String> pathParams = Collections.singletonMap("batch-id", "1");
-        Context context = JavalinTestUtility.getContext(basePath + APIRoutes.CREATE_BATCHES,null,
+        Context context = JavalinTestUtility.getContext(basePath + APIRoutes.CREATE_BATCHES, null,
                 bodyJson, pathParams);
 
         when(unirestWrapper.post(anyString(), any())).thenReturn(
-               new Message(422, "Error from SCADA : <error message>"));
+                new Message(422, "Error from SCADA : <error message>"));
 
         apiHandler.createBatches(context);
         Message response = JavalinTestUtility.getResponse(context, Message.class);
@@ -177,7 +178,7 @@ public class APIHandlerTest {
         String bodyJson = "bla bla bla, bad json";
 
         Map<String, String> pathParams = Collections.singletonMap("batch-id", "1");
-        Context context = JavalinTestUtility.getContext(basePath + APIRoutes.CREATE_BATCHES,null,
+        Context context = JavalinTestUtility.getContext(basePath + APIRoutes.CREATE_BATCHES, null,
                 bodyJson, pathParams);
 
         apiHandler.createBatches(context);
@@ -229,7 +230,7 @@ public class APIHandlerTest {
 
         when(mockMesDAO.getOEE(anyInt())).thenReturn(
                 new OEE(new Batch("testBeerName", -1, -1, null,
-                                null, 100, 0, 300), 117.0));
+                        null, 100, 0, 300), 117.0));
 
         apiHandler.getOEE(context);
         OEE oeeResponse = JavalinTestUtility.getResponse(context, OEE.class);
