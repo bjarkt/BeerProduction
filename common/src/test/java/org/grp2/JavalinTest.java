@@ -3,6 +3,8 @@ package org.grp2;
 import io.javalin.Javalin;
 import org.grp2.javalin.AbstractAPI;
 import org.grp2.javalin.JavalinSetup;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -15,20 +17,8 @@ public class JavalinTest {
     private Javalin app;
     private int port = 6999;
 
-    @Test
-    public void WebServerOpeningOnPort() {
-        startApi();
-
-        int statusCode = hostAvailabilityCheck("http://localhost:" + port + "/routes");
-
-        assertTrue(statusCode != -1);
-
-        assertEquals(statusCode, 200);
-
-        stopApi();
-    }
-
-    private void startApi() {
+    @Before
+    public void setUp() {
         app = JavalinSetup.setup(port);
         AbstractAPI api = new AbstractAPI(port) {
             @Override
@@ -40,11 +30,21 @@ public class JavalinTest {
         api.start();
     }
 
-    private void stopApi() {
+    @After
+    public void tearDown() {
         app.stop();
     }
 
-    private int hostAvailabilityCheck(String url) {
+    @Test
+    public void WebServerOpeningOnPort() {
+        int statusCode = getStatusCode("http://localhost:" + port + "/routes");
+
+        assertTrue(statusCode != -1);
+
+        assertEquals(statusCode, 200);
+    }
+
+    private int getStatusCode(String url) {
         int statusCode = -1;
         try{
             URL _url = new URL(url);
