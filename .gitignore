@@ -133,6 +133,9 @@ yarn-error.log
 # Remove pdfs
 *.pdf
 
+# remove files that get created during testing
+.attach_pid*
+
 # Excludes
 !.idea/runConfigurations/*
 

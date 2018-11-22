@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.Context;
 import io.javalin.core.util.ContextUtil;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,26 +39,6 @@ public class JavalinTestUtility {
         return getContext(path, queryParams, null, pathParams);
     }
 
-    public static Map<String, Object> getResponse(Context context) {
-        Map<String, Object> response = null;
-        try {
-            response = objectMapper.readValue(context.resultString(), new TypeReference<Map<String,Object>>(){});
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return response;
-    }
-
-    public static <T> T getResponse(Context context, Class<T> type) {
-        T response = null;
-        try {
-            response = objectMapper.readValue(context.resultString(), type);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return response;
-    }
-
     public static <T> T getResponse(Context context, TypeReference typeReference) {
         T response = null;
         try {
@@ -68,6 +48,20 @@ public class JavalinTestUtility {
         }
         return response;
     }
+
+    public static Map<String, Object> getResponse(Context context) {
+        return getResponse(context, new TypeReference<Map<String, Object>>(){});
+    }
+
+    public static <T> T getResponse(Context context, Class<T> type) {
+        return getResponse(context, new TypeReference<T>(){
+            @Override
+            public Type getType() {
+                return type;
+            }
+        });
+    }
+
 
     public static Map<String, String> makePathParamMap(String... keyValuePairs) {
         if (keyValuePairs.length > 0 && keyValuePairs.length % 2 != 0) {
