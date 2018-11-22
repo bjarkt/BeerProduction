@@ -71,4 +71,16 @@ export class MesDataService {
     public getOEE(batchId: number): Observable<any> {
         return this.http.get(MesEndpoint + 'get-oee/' + batchId, httpOptions)
     }
+
+    public getSavingMachSpeed(beerType: string): Observable<any>{
+        return this.http.get(MesEndpoint + 'get-saving-machspeed/' + beerType, httpOptions);
+    }
+
+    public getProfitableMachSpeed(beerType: string): Observable<any>{
+        return this.http.get(MesEndpoint + 'get-profitable-machspeed/' + beerType, httpOptions);
+    }
+
+    public getFastestMachSpeed(beerType: string, quantity: number): Observable<any>{
+        return this.http.get(MesEndpoint + 'get-fastest-machspeed/' + beerType + '/' + quantity, httpOptions);
+    }
 }

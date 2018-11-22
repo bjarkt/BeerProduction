@@ -71,4 +71,23 @@ export class CreateBatchesComponent implements OnInit {
   public createBatch() {
     this.data.createBatches(this.batches).toPromise();
   }
+
+  async setMachSpeed(i, priority : string, quantity?: number){
+    var machSpeed = -1;
+    var beerName = this.batches[i].recipeName.replace(/ /g, ''); 
+    console.log(beerName);
+  
+    if(priority == 'saving'){
+      const res = await this.data.getSavingMachSpeed(beerName).toPromise();
+      machSpeed = res;
+    } else if(priority == 'profitable'){
+      const res = await this.data.getProfitableMachSpeed(beerName).toPromise();
+      machSpeed = res;
+    } else if(priority == 'fastest'){
+      const res = await this.data.getFastestMachSpeed(beerName, this.batches[i].quantity).toPromise();
+      machSpeed = res;
+    }
+
+    this.batches[i].machineSpeed = machSpeed;
+  }
 }
