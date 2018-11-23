@@ -1,99 +1,123 @@
-  <div class="start-order-header">
-    <mat-toolbar>
-      <mat-toolbar-row class="start-order-row">
-        <button
-          [routerLink]="['/mes/']"
-          color="warn"
-          mat-stroked-button
-        >
-          <i class="material-icons">keyboard_backspace</i> Cancel
-        </button>
-        <span>Start Production</span>
-        <button (click)="createBatch()" color="primary" mat-raised-button>
-          <i class="material-icons md-18">done</i> Start Batches
-        </button>
-      </mat-toolbar-row>
-    </mat-toolbar>
-    <mat-divider></mat-divider>
-  </div>
+<div class="start-order-header">
+  <mat-toolbar>
+    <mat-toolbar-row class="start-order-row">
+      <button [routerLink]="['/mes/']" color="warn" mat-stroked-button>
+        <i class="material-icons">keyboard_backspace</i> Cancel
+      </button>
+      <span>Start Production</span>
+      <button (click)="createBatch()" color="primary" mat-raised-button>
+        <i class="material-icons md-18">done</i> Start Batches
+      </button>
+    </mat-toolbar-row>
+  </mat-toolbar>
+  <mat-divider></mat-divider>
+</div>
 
-  <div class="order-details">
+<div class="order-details">
+  <div class="left">
     <mat-card class="select-order-card">
       <mat-card-header>
         <mat-card-title>Select Order</mat-card-title>
-        <mat-card-subtitle
-          >Select an order to start a production</mat-card-subtitle
-        >
+        <mat-card-subtitle>Select an order to start a production</mat-card-subtitle>
       </mat-card-header>
 
       <form #startForm="ngForm">
         <mat-card-content>
           <div class="form-group">
             <mat-form-field>
-              <mat-select
-                required
-                class="form-control"
-                id="orderNumber"
-                [(ngModel)]="order.orderNumber"
-                (selectionChange)="getOrderItems($event)"
-                name="orderNumber"
-                placeholder="Select Order Number"
-              >
-                <mat-option
-                  *ngFor="let order of orders"
-                  [value]="order.orderNumber"
-                >
+              <mat-select required class="form-control" id="orderNumber" [(ngModel)]="order.orderNumber"
+                (selectionChange)="getOrderItems($event)" name="orderNumber" placeholder="Select Order Number">
+                <mat-option *ngFor="let order of orders" [value]="order.orderNumber">
                   {{ order.orderNumber }}
                 </mat-option>
               </mat-select>
             </mat-form-field>
           </div>
+          <mat-divider [class.hide]="order.orderNumber == null"></mat-divider>
+          <div class="info" [hidden]="order.orderNumber == null">
+            <mat-list>
+              <mat-list-item *ngIf="order.orderNumber">
+                <h4 mat-line>Order: {{ order.orderNumber }}</h4>
+                <p mat-line>Status: {{ order.status }}</p>
+                <p mat-line>
+                  Date Created: {{ order.date.hour }}:{{ order.date.minute }}:{{
+                  order.date.second
+                  }}
+                  | {{ order.date.dayOfWeek | lowercase | titlecase }}
+                  {{ order.date.dayOfMonth }}/{{ order.date.monthValue }}/{{
+                  order.date.year
+                  }}
+                </p>
+              </mat-list-item>
+            </mat-list>
+          </div>
         </mat-card-content>
       </form>
     </mat-card>
+  </div>
 
-    <div class="order-info">
-      <div class="info" [hidden]="order.orderNumber == null">
-        <mat-list>
-          <h3 mat-subheader>Choose production speed for each batch</h3>
-          <mat-list-item *ngIf="order.orderNumber">
-            <h4 mat-line>Order: {{ order.orderNumber }}</h4>
-            <p mat-line>Status: {{ order.status }}</p>
-            <p mat-line>
-              Date Created: {{ order.date.hour }}:{{ order.date.minute }}:{{
-                order.date.second
-              }}
-              | {{ order.date.dayOfWeek | lowercase | titlecase }}
-              {{ order.date.dayOfMonth }}/{{ order.date.monthValue }}/{{
-                order.date.year
-              }}
-            </p>
-            <mat-divider></mat-divider>
-          </mat-list-item>
-        </mat-list>
-      </div>
+  <div class="right"></div>
 
-      <div class="items" [hidden]="order.orderNumber == null">
-        <div *ngFor="let produductInfo of batches; let i = index">
-          <div>{{ produductInfo.quantity }} {{ produductInfo.recipeName | titlecase }}</div>
-          <mat-form-field>
-            <div>
-              <input
-                #SpeedInput
-                class="form-control"
-                id="machSpeed"
-                name="machSpeed"
-                [(ngModel)]="batches[i].machineSpeed"
-                required
-                type="number"
-                matInput
-                min="{{ recipes[i].minSpeed }}"
-                max="{{ recipes[i].maxSpeed }}"
-                placeholder="Machine speed: [{{recipes[i].minSpeed}};{{recipes[i].maxSpeed}}]"
-              />
+  <div class="order-info">
+
+    <div class="items" [hidden]="order.orderNumber == null">
+      <mat-list>
+        <h3 mat-subheader>Choose production speed for each batch</h3>
+        <div class="batches-container" *ngFor="let produductInfo of batches; let i = index">
+          <mat-list-item>
+            <div class="flex-column">
+              <h4 mat-line>{{ produductInfo.quantity }} {{ produductInfo.recipeName | titlecase }}</h4>
+              <div class="button-group">
+                <button (click)="setMachSpeed(i, 'saving')" color="primary" mat-button>
+                  <i class="material-icons md-18">favorite_border</i> Most Saving
+                </button>
+                <button (click)="setMachSpeed(i, 'profitable')" color="primary" mat-button>
+                  <i class="material-icons md-18">attach_money</i> Most Profitable
+                </button>
+                <button (click)="setMachSpeed(i, 'fastest', produductInfo.quantity)" color="primary" mat-button>
+                  <i class="material-icons md-18">flash_on</i> Fastest
+                </button>
+              </div>
+              <mat-form-field>
+                <div>
+                  <input #SpeedInput class="form-control" id="{{produductInfo.recipeName}}" name="machSpeed"
+                    [(ngModel)]="batches[i].machineSpeed" required type="number" matInput min="{{ recipes[i].minSpeed }}"
+                    max="{{ recipes[i].maxSpeed }}" placeholder="Machine speed: [{{recipes[i].minSpeed}};{{recipes[i].maxSpeed}}]" />
+                </div>
+              </mat-form-field>
             </div>
-          </mat-form-field>
+          </mat-list-item>
         </div>
+      </mat-list>
+
+    </div>
+
+
+
+
+
+    <div class="items" [hidden]="true">
+      <div *ngFor="let produductInfo of batches; let i = index">
+        <div>{{ produductInfo.quantity }} {{ produductInfo.recipeName | titlecase }}</div>
+        <div class="button-group">
+          <button (click)="setMachSpeed(i, 'saving')" color="primary" mat-button>
+            <i class="material-icons md-18">favorite_border</i> Most Saving
+          </button>
+          <button (click)="setMachSpeed(i, 'profitable')" color="primary" mat-button>
+            <i class="material-icons md-18">attach_money</i> Most Profitable
+          </button>
+          <button (click)="setMachSpeed(i, 'fastest', produductInfo.quantity)" color="primary" mat-button>
+            <i class="material-icons md-18">flash_on</i> Fastest
+          </button>
+        </div>
+        <mat-form-field>
+          <div>
+            <input #SpeedInput class="form-control" id="{{produductInfo.recipeName}}" name="machSpeed" [(ngModel)]="batches[i].machineSpeed"
+              required type="number" matInput min="{{ recipes[i].minSpeed }}" max="{{ recipes[i].maxSpeed }}"
+              placeholder="Machine speed: [{{recipes[i].minSpeed}};{{recipes[i].maxSpeed}}]" />
+          </div>
+        </mat-form-field>
       </div>
     </div>
   </div>
+</div>
