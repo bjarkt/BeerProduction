@@ -3,7 +3,7 @@ package org.grp2;
 import io.javalin.Context;
 import org.grp2.api.APIHandler;
 import org.grp2.api.APIRoutes;
-import org.grp2.dao.ScadaDAO;
+import org.grp2.data.ScadaDAO;
 import org.grp2.domain.Machinery;
 import org.grp2.hardware.Hardware;
 import org.grp2.hardware.HardwareProvider;

@@ -1,8 +1,8 @@
 package org.grp2;
 
-import org.grp2.printmanager.IPrintManager;
-import org.grp2.printmanager.SimplePdfPrinter1;
-import org.grp2.printmanager.SimplePdfPrinter2;
+import org.grp2.domain.printmanager.IPrintManager;
+import org.grp2.domain.printmanager.SimplePdfPrinter1;
+import org.grp2.domain.printmanager.SimplePdfPrinter2;
 import org.grp2.shared.Batch;
 import org.grp2.shared.MeasurementLog;
 import org.grp2.shared.Measurements;

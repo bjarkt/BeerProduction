@@ -1,11 +1,9 @@
 package org.grp2.api;
 
 import io.javalin.Context;
-import org.grp2.dao.ScadaDAO;
 import org.grp2.domain.*;
 import org.grp2.javalin.Message;
 import org.grp2.enums.State;
-import org.grp2.hardware.*;
 import org.grp2.shared.Batch;
 import org.grp2.shared.Measurements;
 

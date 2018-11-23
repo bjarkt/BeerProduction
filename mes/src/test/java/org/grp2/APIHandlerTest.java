@@ -4,7 +4,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import io.javalin.Context;
 import org.grp2.api.APIHandler;
 import org.grp2.api.APIRoutes;
-import org.grp2.dao.MesDAO;
+import org.grp2.data.MesDAO;
 import org.grp2.domain.*;
 import org.grp2.javalin.Message;
 import org.grp2.shared.Batch;

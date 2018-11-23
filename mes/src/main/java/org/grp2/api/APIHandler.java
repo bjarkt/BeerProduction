@@ -7,7 +7,7 @@ import org.grp2.domain.PlantStatistics;
 import org.grp2.domain.OEE;
 import org.grp2.utility.UnirestWrapper;
 import org.grp2.javalin.Message;
-import org.grp2.dao.MesDAO;
+import org.grp2.data.MesDAO;
 import org.grp2.domain.Plant;
 import org.grp2.enums.OrderItemStatus;
 import org.grp2.shared.*;

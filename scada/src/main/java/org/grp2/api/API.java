@@ -1,15 +1,13 @@
 package org.grp2.api;
 
 import io.javalin.Javalin;
-import org.grp2.dao.ScadaDAO;
+import org.grp2.data.ScadaDAO;
 import org.grp2.domain.Machinery;
 import org.grp2.javalin.AbstractAPI;
 import org.grp2.javalin.JavalinSetup;
 import org.grp2.hardware.Hardware;
 import org.grp2.hardware.IHardware;
 import org.grp2.utility.DockerUtility;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 import static io.javalin.apibuilder.ApiBuilder.*;
 

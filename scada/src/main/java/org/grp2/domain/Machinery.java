@@ -1,6 +1,6 @@
 package org.grp2.domain;
 
-import org.grp2.dao.ScadaDAO;
+import org.grp2.data.ScadaDAO;
 import org.grp2.enums.State;
 import org.grp2.hardware.CubeNodeId;
 import org.grp2.hardware.IHardware;

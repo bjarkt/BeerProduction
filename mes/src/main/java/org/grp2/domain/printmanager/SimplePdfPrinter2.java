@@ -1,4 +1,4 @@
-package org.grp2.printmanager;
+package org.grp2.domain.printmanager;
 
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;

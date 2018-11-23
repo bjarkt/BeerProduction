@@ -1,29 +1,24 @@
-package org.grp2.dao;
+package org.grp2.data;
 
 import org.grp2.database.DatabaseConnection;
 import org.grp2.domain.BatchStatistics;
 import org.grp2.domain.MeasurementsStatistics;
 import org.grp2.domain.OEE;
-import org.grp2.domain.Plant;
 import org.grp2.domain.PlantStatistics;
 import org.grp2.enums.Finance;
 import org.grp2.enums.OrderItemStatus;
 import org.grp2.enums.OrderStatus;
 import org.grp2.shared.*;
 
-import java.sql.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class MesDAO extends DatabaseConnection {

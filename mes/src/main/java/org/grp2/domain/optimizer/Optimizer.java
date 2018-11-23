@@ -1,7 +1,6 @@
-package org.grp2.optimizer;
+package org.grp2.domain.optimizer;
 
 import org.grp2.shared.Beer;
-import org.grp2.shared.Recipe;
 
 public class Optimizer implements IOptimizer {
 

@@ -1,7 +1,6 @@
-package org.grp2.dao;
+package org.grp2.data;
 
 import org.grp2.database.DatabaseConnection;
-import org.grp2.enums.OrderStatus;
 import org.grp2.shared.Order;
 import org.grp2.shared.OrderItem;
 

@@ -1,10 +1,10 @@
 package org.grp2.domain;
 
-import org.grp2.dao.MesDAO;
-import org.grp2.optimizer.IOptimizer;
-import org.grp2.optimizer.Optimizer;
-import org.grp2.printmanager.IPrintManager;
-import org.grp2.printmanager.SimplePdfPrinter1;
+import org.grp2.data.MesDAO;
+import org.grp2.domain.optimizer.IOptimizer;
+import org.grp2.domain.optimizer.Optimizer;
+import org.grp2.domain.printmanager.IPrintManager;
+import org.grp2.domain.printmanager.SimplePdfPrinter1;
 import org.grp2.utility.UnirestWrapper;
 
 public class Plant {

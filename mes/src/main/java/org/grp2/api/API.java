@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mashape.unirest.http.ObjectMapper;
 import com.mashape.unirest.http.Unirest;
 import io.javalin.Javalin;
-import org.grp2.dao.MesDAO;
+import org.grp2.data.MesDAO;
 import org.grp2.utility.UnirestWrapper;
 import org.grp2.javalin.AbstractAPI;
 import org.grp2.javalin.JavalinSetup;

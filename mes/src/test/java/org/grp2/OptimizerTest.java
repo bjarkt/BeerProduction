@@ -1,8 +1,8 @@
 package org.grp2;
 
 import org.grp2.enums.Finance;
-import org.grp2.optimizer.IOptimizer;
-import org.grp2.optimizer.Optimizer;
+import org.grp2.domain.optimizer.IOptimizer;
+import org.grp2.domain.optimizer.Optimizer;
 import org.grp2.shared.Beer;
 import org.grp2.shared.Recipe;
 import org.junit.Before;
