@@ -1,4 +1,4 @@
-package org.grp2.domain;
+package org.grp2.utility;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
