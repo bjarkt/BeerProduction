@@ -6,7 +6,6 @@ import org.grp2.api.APIHandler;
 import org.grp2.api.APIRoutes;
 import org.grp2.dao.MesDAO;
 import org.grp2.domain.*;
-import org.grp2.enums.Finance;
 import org.grp2.javalin.Message;
 import org.grp2.shared.Batch;
 import org.grp2.shared.Beer;
