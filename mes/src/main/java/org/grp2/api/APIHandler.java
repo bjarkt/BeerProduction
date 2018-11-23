@@ -1,15 +1,11 @@
 package org.grp2.api;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.ObjectMapper;
-import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import io.javalin.Context;
 import org.grp2.domain.PlantStatistics;
 import org.grp2.domain.OEE;
-import org.grp2.domain.UnirestWrapper;
+import org.grp2.utility.UnirestWrapper;
 import org.grp2.javalin.Message;
 import org.grp2.dao.MesDAO;
 import org.grp2.domain.Plant;
@@ -20,9 +16,7 @@ import org.grp2.utility.DockerUtility;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

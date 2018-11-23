@@ -10,6 +10,7 @@ import org.grp2.javalin.Message;
 import org.grp2.shared.Batch;
 import org.grp2.shared.Order;
 import org.grp2.utility.JavalinTestUtility;
+import org.grp2.utility.UnirestWrapper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
