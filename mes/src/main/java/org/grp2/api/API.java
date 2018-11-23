@@ -37,9 +37,9 @@ public class API extends AbstractAPI {
                 get(APIRoutes.GET_REPORT, handler::getReport);
                 post(APIRoutes.CREATE_BATCHES, handler::createBatches);
                 get(APIRoutes.GET_OEE, handler::getOEE);
-                get("/get-profitable-machspeed/:beer-type", handler::getProfitableMachSpeed);
-                get("/get-fastest-machspeed/:beer-type/:quantity", handler::getFastestMachSpeed);
-                get("/get-saving-machspeed/:beer-type", handler::getSavingMachSpeed);
+                get(APIRoutes.GET_PROFITABLE_MACH_SPEED, handler::getProfitableMachSpeed);
+                get(APIRoutes.GET_FASTEST_MACH_SPEED, handler::getFastestMachSpeed);
+                get(APIRoutes.GET_SAVING_MACH_SPEED, handler::getSavingMachSpeed);
             });
         });
     }
