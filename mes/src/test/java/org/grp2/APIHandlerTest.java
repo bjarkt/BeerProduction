@@ -6,9 +6,12 @@ import org.grp2.api.APIHandler;
 import org.grp2.api.APIRoutes;
 import org.grp2.dao.MesDAO;
 import org.grp2.domain.*;
+import org.grp2.enums.Finance;
 import org.grp2.javalin.Message;
 import org.grp2.shared.Batch;
+import org.grp2.shared.Beer;
 import org.grp2.shared.Order;
+import org.grp2.shared.Recipe;
 import org.grp2.utility.JavalinTestUtility;
 import org.grp2.utility.UnirestWrapper;
 import org.junit.Assert;
@@ -237,5 +240,46 @@ public class APIHandlerTest {
         OEE oeeResponse = JavalinTestUtility.getResponse(context, OEE.class);
 
         assertEquals(-4.85, oeeResponse.getOEE(), 0);
+    }
+
+    @Test
+    public void testGetProfitableMachSpeed() {
+        Context context = JavalinTestUtility.getContext(basePath + APIRoutes.GET_PROFITABLE_MACH_SPEED,
+                "beer-type", "a beer");
+        setUpMachineSpeedMock();
+
+        apiHandler.getProfitableMachSpeed(context);
+
+        Integer machineSpeedResponse = JavalinTestUtility.getResponse(context, Integer.class);
+        assertNotNull(machineSpeedResponse);
+    }
+
+    @Test
+    public void testGetFastestMachSpeed() {
+        Context context = JavalinTestUtility.getContext(basePath + APIRoutes.GET_FASTEST_MACH_SPEED,
+                "beer-type", "a beer", "quantity", "1");
+        setUpMachineSpeedMock();
+
+        apiHandler.getFastestMachSpeed(context);
+
+        Integer machineSpeedResponse = JavalinTestUtility.getResponse(context, Integer.class);
+        assertNotNull(machineSpeedResponse);
+    }
+
+    @Test
+    public void testGetSavingMachSpeed() {
+        Context context = JavalinTestUtility.getContext(basePath + APIRoutes.GET_SAVING_MACH_SPEED,
+                "beer-type", "a beer");
+        setUpMachineSpeedMock();
+
+        apiHandler.getSavingMachSpeed(context);
+        
+        Integer machineSpeedResponse = JavalinTestUtility.getResponse(context, Integer.class);
+        assertNotNull(machineSpeedResponse);
+    }
+
+    private void setUpMachineSpeedMock() {
+        when(mockMesDAO.getBeerData(anyString())).thenReturn(new Beer(new Recipe(1, "a beer",
+                0, 1), 1, 1)); // values doesnt matter for test
     }
 }
