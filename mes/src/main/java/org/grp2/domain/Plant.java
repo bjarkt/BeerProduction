@@ -5,31 +5,21 @@ import org.grp2.optimizer.IOptimizer;
 import org.grp2.optimizer.Optimizer;
 import org.grp2.printmanager.IPrintManager;
 import org.grp2.printmanager.SimplePdfPrinter1;
-import org.grp2.printmanager.SimplePdfPrinter2;
+import org.grp2.utility.UnirestWrapper;
 
 public class Plant {
 
-    private static Plant instance;
     private IPrintManager printManager;
     private MesDAO mesDAO;
     private IOptimizer optimizer;
+    private UnirestWrapper unirestWrapper;
 
-    private Plant() {
+    public Plant(MesDAO mesDAO, UnirestWrapper unirestWrapper) {
         printManager = new SimplePdfPrinter1();
-        mesDAO = new MesDAO();
         this.optimizer = new Optimizer();
-        this.printManager.setPath("report");
-    }
-
-    /**
-     * Get singleton instance of {@link Plant}
-     * @return instance of Plant.
-     */
-    public static Plant getInstance(){
-        if(instance == null){
-            instance = new Plant();
-        }
-        return instance;
+        this.unirestWrapper = unirestWrapper;
+        this.mesDAO = mesDAO;
+        this.printManager.setPath("report.pdf");
     }
 
     public IPrintManager getPrintManager() {
@@ -41,4 +31,8 @@ public class Plant {
     }
 
     public IOptimizer getOptimizer() { return optimizer; }
+
+    public UnirestWrapper getUnirestWrapper() {
+        return unirestWrapper;
+    }
 }

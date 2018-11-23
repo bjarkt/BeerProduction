@@ -1,6 +1,7 @@
 package org.grp2.api;
 
 import io.javalin.Javalin;
+import org.grp2.dao.ErpDAO;
 import org.grp2.javalin.AbstractAPI;
 import org.grp2.javalin.JavalinSetup;
 
@@ -14,7 +15,7 @@ public class API extends AbstractAPI {
 
     public void start() {
         Javalin app = JavalinSetup.setup(PORT);
-        APIHandler handler = new APIHandler();
+        APIHandler handler = new APIHandler(new ErpDAO());
         setRoutes(app, handler);
         app.start();
     }
@@ -22,15 +23,15 @@ public class API extends AbstractAPI {
     public void setRoutes(Javalin app, APIHandler handler) {
         app.routes(() -> {
             path("/api", () -> {
-                post("/create-order", handler::createOrder);
-                post("/add-order-item/:order-id/:beer-name/:quantity", handler::addOrderItem);
-                post("/delete-order/:order-id", handler::deleteOrder);
-                post("/edit-order-item/:order-id/:beer-name", handler::editOrderItem);
-                post("/delete-order-item/:order-id/:beer-name", handler::deleteOrderItem);
-                post("/lock-order/:order-id", handler::lockOrder);
-                get("/view-order-items/:order-id", handler::viewOrderItems);
-                get("/view-order-details/:order-id", handler::viewOrderDetails);
-                get("/view-orders/:status", handler::viewOrders);
+                post(APIRoutes.CREATE_ORDER, handler::createOrder);
+                post(APIRoutes.ADD_ORDER_ITEM, handler::addOrderItem);
+                post(APIRoutes.DELETE_ORDER, handler::deleteOrder);
+                post(APIRoutes.EDIT_ORDER_ITEM, handler::editOrderItem);
+                post(APIRoutes.DELETE_ORDER_ITEM, handler::deleteOrderItem);
+                post(APIRoutes.LOCK_ORDER, handler::lockOrder);
+                get(APIRoutes.VIEW_ORDER_ITEMS, handler::viewOrderItems);
+                get(APIRoutes.VIEW_ORDER_DETAILS, handler::viewOrderDetails);
+                get(APIRoutes.VIEW_ORDERS, handler::viewOrders);
             });
         });
     }

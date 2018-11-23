@@ -3,6 +3,7 @@ package org.grp2.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.grp2.shared.Batch;
 
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class BatchStatistics {
@@ -19,6 +20,13 @@ public class BatchStatistics {
         this.avgProductionSeconds = avgProductionSeconds;
         this.batchList = batchList;
     }
+
+    public BatchStatistics(List<Batch> batches) {
+        calculateStatistics(batches);
+        this.batchList = batches;
+    }
+
+    public BatchStatistics() { }
 
     public double getAvgAccepted() {
         return avgAccepted;
@@ -50,6 +58,20 @@ public class BatchStatistics {
 
     public void setBatchList(List<Batch> batchList) {
         this.batchList = batchList;
+    }
+
+    private void calculateStatistics(List<Batch> batches) {
+        double accepted = 0;
+        double defects = 0;
+        double seconds = 0;
+        for(Batch batch : batches) {
+            accepted += batch.getAccepted();
+            defects += batch.getDefect();
+            seconds += ChronoUnit.SECONDS.between(batch.getStarted(), batch.getFinished());
+        }
+        this.avgAccepted = accepted / batches.size();
+        this.avgDefects = defects / batches.size();
+        this.avgProductionSeconds = seconds / batches.size();
     }
 }
 
