@@ -30,7 +30,7 @@ export class EditOrderComponent implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     this.order = await this.data.getOrderDetails(id).toPromise();
     const orderItemsRes = await this.data.getOrderItems(this.order.orderNumber).toPromise();
-    this.orderItems = orderItemsRes as OrderItem[];
+    this.orderItems = orderItemsRes.OrderItems as OrderItem[];
     this.orderItems.sort(function(a, b){
       if(a.beerName < b.beerName) return -1;
       if(a.beerName > b.beerName) return 1;
