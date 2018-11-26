@@ -1,6 +1,7 @@
 package org.grp2.domain;
 
 import org.grp2.data.ScadaDAO;
+import org.grp2.enums.OrderItemStatus;
 import org.grp2.enums.State;
 import org.grp2.hardware.CubeNodeId;
 import org.grp2.hardware.IHardware;
@@ -144,7 +145,7 @@ public class Machinery {
 
         Batch finishedBatch = scadaDAO.updateCurrentBatchFinished();
         if (finishedBatch != null) {
-            scadaDAO.updateOrderItemStatus(finishedBatch, "processed");
+            scadaDAO.updateOrderItemStatus(finishedBatch, OrderItemStatus.PROCESSED);
             scadaDAO.deleteQueueItem(finishedBatch);
         }
 

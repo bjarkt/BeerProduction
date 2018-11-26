@@ -116,7 +116,7 @@ public class MesDAOTest extends AbstractDAOTest {
     public void testGetOEE() {
         int orderNumber = getOrderNumber();
         addBatch("pilsner", orderNumber, 1, 300);
-        
+
         OEE oee = mesDAO.getOEE(1);
         assertNotNull(oee);
     }

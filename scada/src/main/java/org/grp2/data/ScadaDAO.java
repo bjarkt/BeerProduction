@@ -1,6 +1,8 @@
 package org.grp2.data;
 
 import org.grp2.database.DatabaseConnection;
+import org.grp2.database.DatabaseLogin;
+import org.grp2.enums.OrderItemStatus;
 import org.grp2.enums.State;
 import org.grp2.shared.*;
 
@@ -16,6 +18,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ScadaDAO extends DatabaseConnection {
+    public ScadaDAO(DatabaseLogin loginInformation) {
+        super(loginInformation);
+    }
+
+    public ScadaDAO() { }
 
     /**
      * Get measurements logs for a batch.
@@ -137,8 +144,10 @@ public class ScadaDAO extends DatabaseConnection {
     /**
      * Add a {@link ProductionInformation} from the queue to the batches table, and remove it from the queue.
      * @param productionInformation the item to add and remove
+     * @return how many rows was changed in the database
      */
-    private void addBatch(ProductionInformation productionInformation) {
+    private int addBatch(ProductionInformation productionInformation) {
+        AtomicInteger insertResult = new AtomicInteger();
         this.executeQuery(conn -> {
             PreparedStatement ps = conn.prepareStatement("INSERT INTO batches VALUES (?, ?, ?, now(), null, 0, 0, ?)");
             ps.setString(1, productionInformation.getRecipeName());
@@ -146,30 +155,36 @@ public class ScadaDAO extends DatabaseConnection {
             ps.setInt(3, productionInformation.getBatchId());
             ps.setInt(4, productionInformation.getMachineSpeed());
 
-            ps.executeUpdate();
+            insertResult.set(ps.executeUpdate());
         });
+
+        return insertResult.get();
     }
 
     /**
      * Delete an item from the queue.
      * @param productionInformation item to remove
+     * @return how many rows deleted in db
      */
-    private void deleteQueueItem(ProductionInformation productionInformation) {
-        this.deleteQueueItem(productionInformation.getRecipeName(), productionInformation.getOrderNumber());
+    private int deleteQueueItem(ProductionInformation productionInformation) {
+        return this.deleteQueueItem(productionInformation.getRecipeName(), productionInformation.getOrderNumber());
     }
 
-    public void deleteQueueItem(Batch batch) {
-        this.deleteQueueItem(batch.getBeerName(), batch.getOrderNumber());
+    public int deleteQueueItem(Batch batch) {
+        return this.deleteQueueItem(batch.getBeerName(), batch.getOrderNumber());
     }
 
-    private void deleteQueueItem(String recipeName, int orderNumber) {
+    private int deleteQueueItem(String recipeName, int orderNumber) {
+        AtomicInteger deleteResult = new AtomicInteger();
         this.executeQuery(conn -> {
             PreparedStatement ps = conn.prepareStatement("DELETE FROM queue_items WHERE recipe_name = ? AND order_number = ?");
             ps.setString(1, recipeName);
             ps.setInt(2, orderNumber);
 
-            ps.executeUpdate();
+            deleteResult.set(ps.executeUpdate());
         });
+
+        return deleteResult.get();
     }
 
     /**
@@ -262,8 +277,9 @@ public class ScadaDAO extends DatabaseConnection {
      * @param temperature temperature
      * @param humidity humidity
      */
-    public void updateMeasurementLogs(double temperature, double humidity, double vibration) {
+    public int updateMeasurementLogs(double temperature, double humidity, double vibration) {
         Batch currentBatch = this.getCurrentBatch();
+        AtomicInteger insertResult = new AtomicInteger();
 
         if (currentBatch != null) {
             this.executeQuery(conn -> {
@@ -273,18 +289,22 @@ public class ScadaDAO extends DatabaseConnection {
                 ps.setDouble(3, humidity);
                 ps.setDouble(4, vibration);
 
-                ps.executeUpdate();
+                insertResult.set(ps.executeUpdate());
             });
         }
+
+        return insertResult.get();
     }
 
     /**
      * Update the state time logs, for the current batch.
      * @param state the state
      * @param timeElapsed how much time spent in that state
+     * @return how many rows changed in db
      */
-    public void updateStateTimeLogs(State state, int timeElapsed) {
+    public int updateStateTimeLogs(State state, int timeElapsed) {
         Batch currentBatch = this.getCurrentBatch();
+        AtomicInteger result = new AtomicInteger();
 
         if (currentBatch != null && state != null) {
             AtomicInteger currentSeconds = new AtomicInteger(-1);
@@ -313,17 +333,21 @@ public class ScadaDAO extends DatabaseConnection {
                     ps.setInt(3, state.getValue());
                 }
 
-                ps.executeUpdate();
+                result.set(ps.executeUpdate());
             });
         }
+
+        return result.get();
     }
 
     /**
      * Update the produced column for the current batch.
      * @param accepted how many accepted
+     * @return how many rows changed in db
      */
-    public void updateCurrentBatchProduced(int accepted) {
+    public int updateCurrentBatchProduced(int accepted) {
         Batch currentBatch = getCurrentBatch();
+        AtomicInteger result = new AtomicInteger();
 
         if (currentBatch != null) {
             this.executeQuery(conn -> {
@@ -331,17 +355,21 @@ public class ScadaDAO extends DatabaseConnection {
                 ps.setInt(1, accepted);
                 ps.setInt(2, currentBatch.getBatchId());
 
-                ps.executeUpdate();
+                result.set(ps.executeUpdate());
             });
         }
+
+        return result.get();
     }
 
     /**
      * Update the defects column for the current batch.
      * @param defects how many defects
+     * @return how many rows changed in db
      */
-    public void updateCurrentBatchDefects(int defects) {
+    public int updateCurrentBatchDefects(int defects) {
         Batch currentBatch = getCurrentBatch();
+        AtomicInteger result = new AtomicInteger();
 
         if (currentBatch != null) {
             this.executeQuery(conn -> {
@@ -349,23 +377,32 @@ public class ScadaDAO extends DatabaseConnection {
                 ps.setInt(1, defects);
                 ps.setInt(2, currentBatch.getBatchId());
 
-                ps.executeUpdate();
+                result.set(ps.executeUpdate());
             });
         }
+
+        return result.get();
     }
 
-    public void updateOrderItemStatus(Batch finishedBatch, String status) {
+    /**
+     * Updates the status of an order item
+     * @param finishedBatch which batch
+     * @param status new status
+     * @return how many rows changed in db
+     */
+    public int updateOrderItemStatus(Batch finishedBatch, OrderItemStatus status) {
+        AtomicInteger result = new AtomicInteger();
         if (finishedBatch != null) {
             this.executeQuery(conn -> {
                 PreparedStatement ps = conn.prepareStatement("UPDATE order_items SET status = ? WHERE order_number = ?");
-                ps.setString(1, status);
+                ps.setString(1, status.getStatus());
                 ps.setInt(2, finishedBatch.getOrderNumber());
 
-                ps.executeUpdate();
+                result.set(ps.executeUpdate());
             });
         }
+
+        return result.get();
     }
 
-    public void removeFromQueueItems(Batch finishedBatch) {
-    }
 }
