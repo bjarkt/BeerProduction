@@ -1,6 +1,7 @@
 package org.grp2.data;
 
 import org.grp2.database.DatabaseConnection;
+import org.grp2.database.DatabaseLogin;
 import org.grp2.domain.BatchStatistics;
 import org.grp2.domain.MeasurementsStatistics;
 import org.grp2.domain.OEE;
@@ -23,6 +24,11 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class MesDAO extends DatabaseConnection {
 
+    public MesDAO(DatabaseLogin loginInformation) {
+        super(loginInformation);
+    }
+
+    public MesDAO() { }
 
     /**
      * Get a list of {@link Order} ready for production.
