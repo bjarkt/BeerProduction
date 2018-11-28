@@ -69,13 +69,16 @@
               <h4 mat-line>{{ produductInfo.quantity }} {{ produductInfo.recipeName | titlecase }}</h4>
               <div class="button-group">
                 <button (click)="setMachSpeed(i, 'saving')" color="primary" mat-button>
-                  <i class="material-icons md-18">favorite_border</i> Most Saving
+                  <i class="material-icons md-18">favorite_border</i> Most Saving:
+                  <span *ngIf="machspeeds.get(produductInfo.recipeName)">{{machspeeds.get(produductInfo.recipeName)[0]}}</span> 
                 </button>
                 <button (click)="setMachSpeed(i, 'profitable')" color="primary" mat-button>
                   <i class="material-icons md-18">attach_money</i> Most Profitable
+                  <span *ngIf="machspeeds.get(produductInfo.recipeName)">{{machspeeds.get(produductInfo.recipeName)[1]}}</span> 
                 </button>
                 <button (click)="setMachSpeed(i, 'fastest', produductInfo.quantity)" color="primary" mat-button>
                   <i class="material-icons md-18">flash_on</i> Fastest
+                  <span *ngIf="machspeeds.get(produductInfo.recipeName)">{{machspeeds.get(produductInfo.recipeName)[2]}}</span> 
                 </button>
               </div>
               <mat-form-field>
