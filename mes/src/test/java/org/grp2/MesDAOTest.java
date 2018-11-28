@@ -5,9 +5,10 @@ import org.grp2.database.DatabaseLogin;
 import org.grp2.domain.OEE;
 import org.grp2.enums.OrderItemStatus;
 import org.grp2.shared.*;
-import org.grp2.utility.AbstractDAOTest;
+import org.grp2.tests.AbstractDAOTest;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -23,6 +24,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.junit.Assert.*;
 public class MesDAOTest extends AbstractDAOTest {
     private MesDAO mesDAO = new MesDAO(DatabaseLogin.TEST);
+
+    @BeforeClass
+    public static void checkDatabaseConnection() {
+        org.junit.Assume.assumeTrue(isDatabaseUp(DatabaseLogin.TEST));
+    }
 
     @Before
     public void setUp() {

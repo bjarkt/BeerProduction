@@ -9,7 +9,7 @@ import org.grp2.hardware.Hardware;
 import org.grp2.hardware.HardwareProvider;
 import org.grp2.javalin.Message;
 import org.grp2.shared.Batch;
-import org.grp2.utility.JavalinTestUtility;
+import org.grp2.tests.JavalinTestUtility;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

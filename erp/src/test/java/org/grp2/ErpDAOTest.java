@@ -4,9 +4,10 @@ import org.grp2.data.ErpDAO;
 import org.grp2.database.DatabaseLogin;
 import org.grp2.shared.Order;
 import org.grp2.shared.OrderItem;
-import org.grp2.utility.AbstractDAOTest;
+import org.grp2.tests.AbstractDAOTest;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 
@@ -17,6 +18,11 @@ import static org.junit.Assert.*;
 public class ErpDAOTest extends AbstractDAOTest {
 
     private ErpDAO erpDAO = new ErpDAO(DatabaseLogin.TEST);
+
+    @BeforeClass
+    public static void checkDatabaseConnection() {
+        org.junit.Assume.assumeTrue(isDatabaseUp(DatabaseLogin.TEST));
+    }
 
     @Before
     public void setUp() {

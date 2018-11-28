@@ -11,7 +11,7 @@ import org.grp2.shared.Batch;
 import org.grp2.shared.Beer;
 import org.grp2.shared.Order;
 import org.grp2.shared.Recipe;
-import org.grp2.utility.JavalinTestUtility;
+import org.grp2.tests.JavalinTestUtility;
 import org.grp2.utility.UnirestWrapper;
 import org.junit.Assert;
 import org.junit.Before;

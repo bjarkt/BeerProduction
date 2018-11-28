@@ -1,4 +1,4 @@
-package org.grp2.utility;
+package org.grp2.tests;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;

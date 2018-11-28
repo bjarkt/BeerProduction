@@ -1,4 +1,4 @@
-package org.grp2.utility;
+package org.grp2.tests;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

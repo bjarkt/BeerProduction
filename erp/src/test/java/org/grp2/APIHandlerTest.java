@@ -8,7 +8,7 @@ import org.grp2.data.ErpDAO;
 import org.grp2.enums.OrderStatus;
 import org.grp2.javalin.Message;
 import org.grp2.shared.Order;
-import org.grp2.utility.JavalinTestUtility;
+import org.grp2.tests.JavalinTestUtility;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

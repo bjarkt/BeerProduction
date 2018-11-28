@@ -1,13 +1,26 @@
-package org.grp2.utility;
+package org.grp2.tests;
 
 import org.grp2.database.DatabaseConnection;
 import org.grp2.database.DatabaseLogin;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
 public abstract class AbstractDAOTest {
+
+    protected static boolean isDatabaseUp(DatabaseLogin login) {
+        try {
+            Connection connection = DriverManager.getConnection(login.getUrl(), login.getUsername(), login.getPassword());
+            return true;
+        } catch (SQLException e) {
+            return false;
+        }
+
+    }
 
     protected void cleanUpTables(DatabaseConnection connection) {
         List<String> tableNames = Arrays.asList("batches", "measurement_logs", "order_items", "orders",
