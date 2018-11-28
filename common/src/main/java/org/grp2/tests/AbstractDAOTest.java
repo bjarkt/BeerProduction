@@ -15,6 +15,7 @@ public abstract class AbstractDAOTest {
     protected static boolean isDatabaseUp(DatabaseLogin login) {
         try {
             Connection connection = DriverManager.getConnection(login.getUrl(), login.getUsername(), login.getPassword());
+            connection.close();
             return true;
         } catch (SQLException e) {
             return false;
