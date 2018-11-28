@@ -1,4 +1,4 @@
-package org.grp2;
+package org.grp2.unitTest;
 
 import io.javalin.Context;
 import org.grp2.api.APIHandler;

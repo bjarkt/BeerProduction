@@ -1,4 +1,4 @@
-package org.grp2;
+package org.grp2.unitTest;
 
 import org.grp2.enums.Finance;
 import org.grp2.domain.optimizer.IOptimizer;

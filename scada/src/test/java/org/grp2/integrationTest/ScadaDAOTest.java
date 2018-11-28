@@ -1,4 +1,4 @@
-package org.grp2;
+package org.grp2.integrationTest;
 
 import org.grp2.data.ScadaDAO;
 import org.grp2.database.DatabaseLogin;

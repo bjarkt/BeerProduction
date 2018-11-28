@@ -1,4 +1,4 @@
-package org.grp2;
+package org.grp2.unitTest;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
 import io.javalin.Context;

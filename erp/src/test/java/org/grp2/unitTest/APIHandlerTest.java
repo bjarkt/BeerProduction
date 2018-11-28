@@ -1,4 +1,4 @@
-package org.grp2;
+package org.grp2.unitTest;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.javalin.Context;
