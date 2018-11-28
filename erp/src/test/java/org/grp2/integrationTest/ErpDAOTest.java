@@ -35,7 +35,7 @@ public class ErpDAOTest extends AbstractDAOTest {
     }
 
     @Test
-    public void TestOrderNumber() {
+    public void testOrderNumber() {
         int orderNumber = erpDAO.getNewOrderNumber();
 
         assertEquals(1, orderNumber);
