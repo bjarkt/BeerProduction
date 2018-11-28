@@ -26,6 +26,7 @@ export class CreateBatchesComponent implements OnInit {
   };
   batches: ProductionInfo[] = [];
   recipes: Recipe[] = [];
+  machspeeds: Map<string, string[]> = new Map();
 
   constructor(private data: MesDataService) {}
 
@@ -57,6 +58,20 @@ export class CreateBatchesComponent implements OnInit {
         });
         this.recipes.push(((result.Recipe) as Recipe[]).find(r => r.name === orderItem.beerName));
       }
+
+      this.batches.forEach(batch => {
+        var speeds = new Array();
+        this.data.getSavingMachSpeed(batch.recipeName).subscribe(res => {
+          speeds.push(res);
+          this.data.getProfitableMachSpeed(batch.recipeName).subscribe(res2 => {
+            speeds.push(res2);
+            this.data.getFastestMachSpeed(batch.recipeName, batch.quantity).subscribe(res3 => {
+              speeds.push(res3);
+              this.machspeeds.set(batch.recipeName, speeds);
+            })
+          })
+        })
+      });
     });
 
     for (let order of this.orders) {
@@ -66,6 +81,7 @@ export class CreateBatchesComponent implements OnInit {
         break;
       }
     }
+
   }
 
   public createBatch() {
@@ -75,8 +91,7 @@ export class CreateBatchesComponent implements OnInit {
   async setMachSpeed(i, priority : string, quantity?: number){
     var machSpeed = -1;
     var beerName = this.batches[i].recipeName.replace(/ /g, ''); 
-    console.log(beerName);
-  
+
     if(priority == 'saving'){
       const res = await this.data.getSavingMachSpeed(beerName).toPromise();
       machSpeed = res;

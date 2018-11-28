@@ -266,13 +266,14 @@ public class MesDAO extends DatabaseConnection {
 
     public Beer getBeerData(String beerName){
         Recipe recipe = new Recipe(-1, beerName, -1, -1);
-        int profit = Finance.valueOf(beerName.toUpperCase()).getProfit();
-        int cost = Finance.valueOf(beerName.toUpperCase()).getCost();
+        String beerNameFormatted = beerName.replaceAll("\\s","");
+        int profit = Finance.valueOf(beerNameFormatted.toUpperCase()).getProfit();
+        int cost = Finance.valueOf(beerNameFormatted.toUpperCase()).getCost();
 
         this.executeQuery(conn -> {
             String getRecipeQuery = "SELECT max_speed, min_speed, ID FROM Recipes WHERE Recipes.name = ?";
             PreparedStatement ps = conn.prepareStatement(getRecipeQuery);
-            ps.setString(1, Finance.valueOf(beerName.toUpperCase()).getName());
+            ps.setString(1, Finance.valueOf(beerNameFormatted.toUpperCase()).getName());
             ResultSet rs = ps.executeQuery();
             while(rs.next()) {
                 recipe.setId(rs.getBigDecimal("ID").intValue());
