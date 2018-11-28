@@ -1,9 +1,9 @@
 -- noinspection SqlNoDataSourceInspectionForFile
 
 /* BEWARE: Resets auto-increment */
-TRUNCATE TABLE Orders, order_items, batches RESTART IDENTITY;
+/*TRUNCATE TABLE Orders, order_items, batches RESTART IDENTITY;*/
 
-DROP TABLE IF EXISTS Order_items, Orders, /*Recipes,*/ Queue_items, Batches, Measurement_logs, State_time_logs;
+DROP TABLE IF EXISTS Order_items, Orders, Recipes, Queue_items, Batches, Measurement_logs, State_time_logs;
 
 CREATE TABLE Orders (
 	date_created TIMESTAMP default CURRENT_TIMESTAMP,
@@ -20,7 +20,7 @@ CREATE TABLE Order_items (
 	FOREIGN KEY (order_number) REFERENCES Orders(order_number)
 );
 
-/*CREATE TABLE Recipes (
+CREATE TABLE Recipes (
 	id INT PRIMARY KEY,
 	name VARCHAR(255) UNIQUE,
 	min_speed INT,
@@ -31,7 +31,7 @@ INSERT INTO Recipes VALUES (1, 'wheat', 0, 300);
 INSERT INTO Recipes VALUES (2, 'ipa', 0, 150);
 INSERT INTO Recipes VALUES (3, 'stout', 0, 200);
 INSERT INTO Recipes VALUES (4, 'ale', 0, 100);
-INSERT INTO Recipes VALUES (5, 'alcohol free', 0, 125);*/
+INSERT INTO Recipes VALUES (5, 'alcohol free', 0, 125);
 
 CREATE TABLE Queue_items (
 	batches_id BIGSERIAL PRIMARY KEY,

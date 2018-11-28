@@ -1,6 +1,7 @@
 package org.grp2.data;
 
 import org.grp2.database.DatabaseConnection;
+import org.grp2.database.DatabaseLogin;
 import org.grp2.shared.Order;
 import org.grp2.shared.OrderItem;
 
@@ -12,6 +13,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ErpDAO extends DatabaseConnection {
+
+    /**
+     * Specify which database to use
+     * @param loginInformation
+     */
+    public ErpDAO(DatabaseLogin loginInformation) {
+        super(loginInformation);
+    }
+
+    /**
+     * Uses live database by default
+     */
+    public ErpDAO() { }
 
     /**
      * Creates a new order and returns the newly created order_number.

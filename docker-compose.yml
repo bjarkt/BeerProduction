@@ -69,3 +69,14 @@ services:
     network_mode: host
     environment:
       - inDocker=true
+
+  testdb:
+    image: postgres
+    volumes:
+      - ./common/src/main/resources/SQL/:/docker-entrypoint-initdb.d
+    ports:
+      - "5431:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=testdb

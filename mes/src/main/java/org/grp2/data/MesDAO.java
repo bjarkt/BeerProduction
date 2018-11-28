@@ -1,6 +1,7 @@
 package org.grp2.data;
 
 import org.grp2.database.DatabaseConnection;
+import org.grp2.database.DatabaseLogin;
 import org.grp2.domain.BatchStatistics;
 import org.grp2.domain.MeasurementsStatistics;
 import org.grp2.domain.OEE;
@@ -19,10 +20,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class MesDAO extends DatabaseConnection {
 
+    public MesDAO(DatabaseLogin loginInformation) {
+        super(loginInformation);
+    }
+
+    public MesDAO() { }
 
     /**
      * Get a list of {@link Order} ready for production.
@@ -168,9 +176,12 @@ public class MesDAO extends DatabaseConnection {
     /**
      * Add {@link ProductionInformation} list to queue_items.
      * @param productionInformations list of production information
+     * @return output of ps.executeBatch, an array of same size as argument with 1's for each successful insert
      */
-    public void addToQueueItems(List<ProductionInformation> productionInformations) {
+    public int[] addToQueueItems(List<ProductionInformation> productionInformations) {
         String sql = "INSERT INTO queue_items VALUES (DEFAULT, ?, ?, ?, ?)";
+
+        AtomicReference<int[]> databaseUpdateResults = new AtomicReference<>();
 
         this.executeQuery(conn -> {
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -181,24 +192,28 @@ public class MesDAO extends DatabaseConnection {
                 ps.setInt(4, productInfo.getOrderNumber());
                 ps.addBatch();
             }
-            ps.executeBatch();
+            databaseUpdateResults.set(ps.executeBatch());
         });
+
+        return databaseUpdateResults.get();
     }
 
     /**
      * Update status on {@link OrderItem} for every OrderItem connected to the orderNumber.
      * @param status    which status to set
      * @param orderNumber   orderNumber
+     * @return returns amount of rows changed
      */
-    public void setOrderItemStatus(OrderItemStatus status, int orderNumber){
+    public int setOrderItemStatus(OrderItemStatus status, int orderNumber){
         String sql = "UPDATE Order_items SET status = ? WHERE order_number = ?";
-
+        AtomicInteger success = new AtomicInteger();
         this.executeQuery(conn -> {
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, status.getStatus());
             ps.setInt(2, orderNumber);
-            ps.execute();
+            success.set(ps.executeUpdate());
         });
+        return success.get();
     }
 
     /**

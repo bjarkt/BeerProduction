@@ -6,26 +6,33 @@ import java.sql.SQLException;
 
 public class DatabaseConnection {
 
-    private static String url;
-    private static String username;
-    private static String password;
+    private DatabaseLogin loginInformation;
 
-    static {
-        url = "jdbc:postgresql://tek-mmmi-db0a.tek.c.sdu.dk:5432/si3_2018_group_22_db";
-        username =  "si3_2018_group_22";
-        password =  "snipe0[seism";
+    /**
+     * Specify which database to use
+     * @param loginInformation
+     */
+    public DatabaseConnection(DatabaseLogin loginInformation) {
+        this.loginInformation = loginInformation;
+    }
+
+    /**
+     * Uses live database by default
+     */
+    public DatabaseConnection() {
+        loginInformation = DatabaseLogin.LIVE;
     }
 
     public void executeQuery(IDatabaseCallback callback) {
-        try (Connection connection = getConnection()) {
+        try (Connection connection = getConnection(this.loginInformation)) {
             callback.execute(connection);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(url, username, password);
+    static Connection getConnection(DatabaseLogin login) throws SQLException {
+        return DriverManager.getConnection(login.getUrl(), login.getUsername(), login.getPassword());
     }
 
 }

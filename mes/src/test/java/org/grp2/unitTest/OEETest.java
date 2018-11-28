@@ -1,4 +1,4 @@
-package org.grp2;
+package org.grp2.unitTest;
 
 import org.grp2.domain.OEE;
 import org.grp2.shared.Batch;
