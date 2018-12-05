@@ -5,6 +5,8 @@
 
 DROP TABLE IF EXISTS Order_items, Orders, Recipes, Queue_items, Batches, Measurement_logs, State_time_logs;
 
+SET TIME ZONE 'Europe/Copenhagen';
+
 CREATE TABLE Orders (
 	date_created TIMESTAMP default CURRENT_TIMESTAMP,
 	status VARCHAR(255) default ('open'),
