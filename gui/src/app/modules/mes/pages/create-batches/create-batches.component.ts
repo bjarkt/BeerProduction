@@ -103,7 +103,7 @@ export class CreateBatchesComponent implements OnInit {
 
   async setMachSpeed(i, priority : string, quantity?: number){
     var machSpeed = -1;
-    var beerName = this.batches[i].recipeName.replace(/ /g, ''); 
+    var beerName = this.batches[i].recipeName
 
     if(priority == 'saving'){
       const res = await this.data.getSavingMachSpeed(beerName).toPromise();
