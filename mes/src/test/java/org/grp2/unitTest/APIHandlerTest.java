@@ -115,7 +115,7 @@ public class APIHandlerTest {
         Context context = JavalinTestUtility.getContext(basePath + APIRoutes.VIEW_PLANT_STATISTICS,
                 Collections.singletonMap("days", "10"));
 
-        when(mockMesDAO.viewPlantStatistics(any(), any())).thenReturn(new PlantStatistics(new MeasurementsStatistics(-1.0, -1.0, -1.0), new BatchStatistics(-1, -1, -1, null)));
+        when(mockMesDAO.viewPlantStatistics(any(), any())).thenReturn(new PlantStatistics(new MeasurementsStatistics(-1.0, -1.0, -1.0), new BatchStatistics(-1, -1, -1, -1, -1, -1, null)));
 
         apiHandler.viewPlantStatistics(context);
 
@@ -130,7 +130,7 @@ public class APIHandlerTest {
         Context context = JavalinTestUtility.getContext(basePath + APIRoutes.VIEW_PLANT_STATISTICS,
                 Collections.singletonMap("days", badDaysValue));
 
-        when(mockMesDAO.viewPlantStatistics(any(), any())).thenReturn(new PlantStatistics(new MeasurementsStatistics(-1.0, -1.0, -1.0), new BatchStatistics(-1, -1, -1, null)));
+        when(mockMesDAO.viewPlantStatistics(any(), any())).thenReturn(new PlantStatistics(new MeasurementsStatistics(-1.0, -1.0, -1.0), new BatchStatistics(-1, -1, -1, -1, -1, -1, null)));
 
         apiHandler.viewPlantStatistics(context);
 
