@@ -35,7 +35,8 @@ public class BatchStatistics {
         this.batchList = batches;
     }
 
-    public BatchStatistics() { }
+    public BatchStatistics() {
+    }
 
     public double getAvgAccepted() {
         return avgAccepted;
@@ -85,7 +86,7 @@ public class BatchStatistics {
         double accepted = 0;
         double defects = 0;
         double seconds = 0;
-        for(Batch batch : batches) {
+        for (Batch batch : batches) {
             accepted += batch.getAccepted();
             defects += batch.getDefect();
             seconds += ChronoUnit.SECONDS.between(batch.getStarted(), batch.getFinished());

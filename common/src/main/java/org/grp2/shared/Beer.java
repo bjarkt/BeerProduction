@@ -1,7 +1,5 @@
 package org.grp2.shared;
 
-import org.grp2.shared.Recipe;
-
 public class Beer extends Recipe {
 
     private int profit;
@@ -21,7 +19,11 @@ public class Beer extends Recipe {
         return profit;
     }
 
-    public void setCost(int cost) { this.cost = cost; }
+    public void setCost(int cost) {
+        this.cost = cost;
+    }
 
-    public void setProfit(int profit) { this.profit = profit; }
+    public void setProfit(int profit) {
+        this.profit = profit;
+    }
 }

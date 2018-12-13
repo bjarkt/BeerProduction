@@ -15,7 +15,8 @@ public class MeasurementsStatistics {
         this.avgTemp = avgTemp;
     }
 
-    public MeasurementsStatistics() { }
+    public MeasurementsStatistics() {
+    }
 
     public MeasurementsStatistics(List<MeasurementLog> measurements) {
         calculateStatistics(measurements);
@@ -48,21 +49,21 @@ public class MeasurementsStatistics {
     private void calculateStatistics(List<MeasurementLog> measurements) {
         Double highestTemp = null;
         Double lowestTemp = null;
-        for(MeasurementLog measurement : measurements) {
+        for (MeasurementLog measurement : measurements) {
             if (highestTemp == null && lowestTemp == null) {
                 highestTemp = measurement.getMeasurements().getTemperature();
                 lowestTemp = measurement.getMeasurements().getTemperature();
             }
-            if(measurement.getMeasurements().getTemperature() > highestTemp) {
+            if (measurement.getMeasurements().getTemperature() > highestTemp) {
                 highestTemp = measurement.getMeasurements().getTemperature();
             }
-            if(measurement.getMeasurements().getTemperature() < lowestTemp) {
+            if (measurement.getMeasurements().getTemperature() < lowestTemp) {
                 lowestTemp = measurement.getMeasurements().getTemperature();
             }
         }
 
         Double tempSum = 0.0;
-        for(MeasurementLog measurement : measurements) {
+        for (MeasurementLog measurement : measurements) {
             tempSum += measurement.getMeasurements().getTemperature();
         }
 

@@ -28,8 +28,7 @@ public enum ERPCommands implements ICommand {
         return Integer.parseInt(name.split(":")[2]);
     }
 
-    public String getUnirestCommand ()
-    {
+    public String getUnirestCommand() {
         return name.split(":")[3];
     }
 }

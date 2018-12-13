@@ -5,7 +5,10 @@ import io.javalin.Context;
 import org.grp2.api.APIHandler;
 import org.grp2.api.APIRoutes;
 import org.grp2.data.MesDAO;
-import org.grp2.domain.*;
+import org.grp2.domain.BatchStatistics;
+import org.grp2.domain.MeasurementsStatistics;
+import org.grp2.domain.OEE;
+import org.grp2.domain.PlantStatistics;
 import org.grp2.javalin.Message;
 import org.grp2.shared.Batch;
 import org.grp2.shared.Beer;
@@ -272,7 +275,7 @@ public class APIHandlerTest {
         setUpMachineSpeedMock();
 
         apiHandler.getSavingMachSpeed(context);
-        
+
         Integer machineSpeedResponse = JavalinTestUtility.getResponse(context, Integer.class);
         assertNotNull(machineSpeedResponse);
     }

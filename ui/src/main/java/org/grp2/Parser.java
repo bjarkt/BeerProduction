@@ -12,15 +12,13 @@ public class Parser {
         reader = new Scanner(System.in);
     }
 
-    public Command getCommand ()
-    {
+    public Command getCommand() {
         String inputLine = reader.nextLine();
         String[] inputs = inputLine.split(" ");
 
         SubSystem subSystem = SubSystem.fromCommand(inputs[0]);
 
-        if (subSystem == null)
-        {
+        if (subSystem == null) {
             System.err.println("Wrong subsystem!");
             return null;
         }
@@ -29,15 +27,13 @@ public class Parser {
 
         ICommand commandInfo = validator.validateCommandAndGetInfo(subSystem, commandInput);
 
-        if (commandInfo == null)
-        {
+        if (commandInfo == null) {
             System.err.println("Invalid command!");
             return null;
         }
 
         String[] arguments = new String[0];
-        if (inputs.length > 2)
-        {
+        if (inputs.length > 2) {
             arguments = new String[inputs.length - 2];
             for (int i = 0; i < arguments.length; i++)
                 arguments[i] = inputs[i + 2];

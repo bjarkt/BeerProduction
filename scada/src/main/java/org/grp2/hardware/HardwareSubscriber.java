@@ -19,46 +19,46 @@ import java.util.function.BiConsumer;
 import static org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.Unsigned.uint;
 
 public class HardwareSubscriber implements IHardwareSubscriber {
-	private OpcUaClient client;
+    private OpcUaClient client;
 
-	public HardwareSubscriber(OpcUaClient client) {
-		this.client = client;
-		client.getSubscriptionManager().clearSubscriptions();
-	}
+    public HardwareSubscriber(OpcUaClient client) {
+        this.client = client;
+        client.getSubscriptionManager().clearSubscriptions();
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void subscribe(CubeNodeId node, SubscribeCallback callback, int interval) {
-		ReadValueId readValueId =
-				new ReadValueId(HardwareUtil.getNodeId(node), AttributeId.Value.uid(),
-						null, null);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void subscribe(CubeNodeId node, SubscribeCallback callback, int interval) {
+        ReadValueId readValueId =
+                new ReadValueId(HardwareUtil.getNodeId(node), AttributeId.Value.uid(),
+                        null, null);
 
-		int clientHandler = 123456789;
+        int clientHandler = 123456789;
 
-		MonitoringParameters parameters =
-				new MonitoringParameters(uint(clientHandler), (double) interval, null, uint(clientHandler), true);
+        MonitoringParameters parameters =
+                new MonitoringParameters(uint(clientHandler), (double) interval, null, uint(clientHandler), true);
 
-		MonitoredItemCreateRequest request = new MonitoredItemCreateRequest(readValueId, MonitoringMode.Reporting, parameters);
+        MonitoredItemCreateRequest request = new MonitoredItemCreateRequest(readValueId, MonitoringMode.Reporting, parameters);
 
-		BiConsumer<UaMonitoredItem, DataValue> consumer = (item, value) -> {
-			callback.action(value.getValue().getValue());
-		};
+        BiConsumer<UaMonitoredItem, DataValue> consumer = (item, value) -> {
+            callback.action(value.getValue().getValue());
+        };
 
-		BiConsumer<UaMonitoredItem, Integer> onItemCreated = (monitoredItem, integer) -> {
-			monitoredItem.setValueConsumer(consumer);
-		};
+        BiConsumer<UaMonitoredItem, Integer> onItemCreated = (monitoredItem, integer) -> {
+            monitoredItem.setValueConsumer(consumer);
+        };
 
-		try {
-			UaSubscription sub = client.getSubscriptionManager().createSubscription(1000).get();
+        try {
+            UaSubscription sub = client.getSubscriptionManager().createSubscription(1000).get();
 
-			List<UaMonitoredItem> items = sub.createMonitoredItems(TimestampsToReturn.Both,
-					Arrays.asList(request),
-					onItemCreated).get();
+            List<UaMonitoredItem> items = sub.createMonitoredItems(TimestampsToReturn.Both,
+                    Arrays.asList(request),
+                    onItemCreated).get();
 
-		} catch(InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-		}
-	}
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
 }

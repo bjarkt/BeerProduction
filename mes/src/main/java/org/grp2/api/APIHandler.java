@@ -3,15 +3,14 @@ package org.grp2.api;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import io.javalin.Context;
-import org.grp2.domain.PlantStatistics;
-import org.grp2.domain.OEE;
-import org.grp2.utility.UnirestWrapper;
-import org.grp2.javalin.Message;
 import org.grp2.data.MesDAO;
+import org.grp2.domain.OEE;
 import org.grp2.domain.Plant;
+import org.grp2.domain.PlantStatistics;
 import org.grp2.enums.OrderItemStatus;
+import org.grp2.javalin.Message;
 import org.grp2.shared.*;
-import org.grp2.utility.DockerUtility;
+import org.grp2.utility.UnirestWrapper;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -105,7 +104,7 @@ public class APIHandler {
         List<MeasurementLog> measurementLogs = plant.getMesDAO().getMeasurementLogs(batchID);
         Batch batch = plant.getMesDAO().getBatch(batchID);
 
-        if(batch != null && measurementLogs!=null){
+        if (batch != null && measurementLogs != null) {
             MeasurementLog[] mesLogs = new MeasurementLog[measurementLogs.size()];
             mesLogs = measurementLogs.toArray(mesLogs);
 
@@ -115,7 +114,7 @@ public class APIHandler {
             context.header("Content-Length", String.valueOf(report.length));
             context.header("Content-Disposition", "attachment;filename=batch-report.pdf");
             context.result(new ByteArrayInputStream(report));
-        } else{
+        } else {
             context.json(new Message(404, "No measurement logs exists."));
         }
 
@@ -127,14 +126,14 @@ public class APIHandler {
         context.json(oee);
     }
 
-    public void getProfitableMachSpeed(Context context){
+    public void getProfitableMachSpeed(Context context) {
         String beerType = context.pathParam("beer-type");
         Beer beer = plant.getMesDAO().getBeerData(beerType);
         int machSpeed = plant.getOptimizer().getOptimalMachSpeed(beer);
         context.json(machSpeed);
     }
 
-    public void getFastestMachSpeed(Context context){
+    public void getFastestMachSpeed(Context context) {
         String beerType = context.pathParam("beer-type");
         int quantity = Integer.parseInt(context.pathParam("quantity"));
         Beer beer = plant.getMesDAO().getBeerData(beerType);
@@ -142,7 +141,7 @@ public class APIHandler {
         context.json(machSpeed);
     }
 
-    public void getSavingMachSpeed(Context context){
+    public void getSavingMachSpeed(Context context) {
         String beerType = context.pathParam("beer-type");
         Beer beer = plant.getMesDAO().getBeerData(beerType);
         int machSpeed = plant.getOptimizer().getMostSavingMachSpeed(beer);

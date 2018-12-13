@@ -7,7 +7,8 @@ public class ProductionInformation {
     private int quantity;
     private Integer batchId;
 
-    public ProductionInformation() { }
+    public ProductionInformation() {
+    }
 
     public ProductionInformation(String recipeName, int orderNumber, int machineSpeed, int quantity) {
         this.recipeName = recipeName;
@@ -56,7 +57,7 @@ public class ProductionInformation {
         this.batchId = batchId;
     }
 
-    public boolean validateMachSpeed(int min, int max){
+    public boolean validateMachSpeed(int min, int max) {
         return this.machineSpeed >= min && this.machineSpeed <= max;
     }
 }

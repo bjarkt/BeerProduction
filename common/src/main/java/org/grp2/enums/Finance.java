@@ -14,7 +14,7 @@ public enum Finance {
     private final int profit;
     private final int cost;
 
-    Finance(String name, int profit, int cost){
+    Finance(String name, int profit, int cost) {
         this.name = name;
         this.profit = profit;
         this.cost = cost;

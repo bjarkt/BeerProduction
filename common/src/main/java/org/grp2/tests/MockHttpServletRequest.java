@@ -16,12 +16,14 @@ public class MockHttpServletRequest implements HttpServletRequest {
     private BufferedReader reader;
     private String readerString;
 
-    public MockHttpServletRequest() { }
+    public MockHttpServletRequest() {
+    }
 
 
     public void setQueryString(String queryString) {
         this.queryString = queryString;
     }
+
     public void setReader(String reader) {
         this.reader = new BufferedReader(new StringReader(reader));
         this.readerString = reader;

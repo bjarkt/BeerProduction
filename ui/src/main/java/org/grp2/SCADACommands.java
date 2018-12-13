@@ -1,6 +1,6 @@
 package org.grp2;
 
-public enum SCADACommands implements ICommand{
+public enum SCADACommands implements ICommand {
 
     START_NEW_BATCH("start:start-new-production:0:post"),
     MANAGE_PRODUCTION("manage:manage-production:1:post"),
@@ -25,8 +25,7 @@ public enum SCADACommands implements ICommand{
         return Integer.parseInt(name.split(":")[2]);
     }
 
-    public String getUnirestCommand ()
-    {
+    public String getUnirestCommand() {
         return name.split(":")[3];
     }
 }

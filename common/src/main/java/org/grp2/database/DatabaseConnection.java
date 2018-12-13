@@ -10,6 +10,7 @@ public class DatabaseConnection {
 
     /**
      * Specify which database to use
+     *
      * @param loginInformation
      */
     public DatabaseConnection(DatabaseLogin loginInformation) {

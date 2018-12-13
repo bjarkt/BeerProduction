@@ -2,18 +2,18 @@ package org.grp2;
 
 public class Validator {
 
-    public Validator() {}
+    public Validator() {
+    }
 
     /**
      * Checks if the command is valid and returns information about the command
+     *
      * @param subSystem any Subsystem
-     * @param command any string represented in a Commands Enum
+     * @param command   any string represented in a Commands Enum
      * @return the value of the command enum
      */
-    public ICommand validateCommandAndGetInfo(SubSystem subSystem, String command)
-    {
-        switch (subSystem)
-        {
+    public ICommand validateCommandAndGetInfo(SubSystem subSystem, String command) {
+        switch (subSystem) {
             case SCADA:
                 for (SCADACommands value : SCADACommands.values())
                     if (command.equals(value.getName()))
