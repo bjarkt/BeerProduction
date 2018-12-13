@@ -46,13 +46,13 @@ public class JavalinTest {
 
     private int getStatusCode(String url) {
         int statusCode = -1;
-        try{
+        try {
             URL _url = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection)_url.openConnection();
+            HttpURLConnection connection = (HttpURLConnection) _url.openConnection();
             connection.setRequestMethod("GET");
             connection.connect();
             statusCode = connection.getResponseCode();
-        }catch(UnknownHostException e){
+        } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (ProtocolException e) {
             e.printStackTrace();

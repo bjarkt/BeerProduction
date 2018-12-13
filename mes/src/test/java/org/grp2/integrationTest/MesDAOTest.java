@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.*;
+
 public class MesDAOTest extends AbstractDAOTest {
     private MesDAO mesDAO = new MesDAO(DatabaseLogin.TEST);
 
@@ -44,7 +45,7 @@ public class MesDAOTest extends AbstractDAOTest {
     public void testGetLockedOrders() {
         int orderNumber = getOrderNumber("locked");
 
-        List<Order> orderItems =  mesDAO.getLockedOrders();
+        List<Order> orderItems = mesDAO.getLockedOrders();
         assertEquals(1, orderItems.size());
     }
 
@@ -70,10 +71,10 @@ public class MesDAOTest extends AbstractDAOTest {
     public void testAddToQueueItems() {
         int orderNumber = getOrderNumber("locked");
         List<ProductionInformation> productionInformations = Arrays.asList(
-                        new ProductionInformation("pilsner", orderNumber, 300, 100),
-                        new ProductionInformation("ale", orderNumber, 300, 100),
-                        new ProductionInformation("wheat", orderNumber, 300, 100)
-                );
+                new ProductionInformation("pilsner", orderNumber, 300, 100),
+                new ProductionInformation("ale", orderNumber, 300, 100),
+                new ProductionInformation("wheat", orderNumber, 300, 100)
+        );
 
         int[] results = mesDAO.addToQueueItems(productionInformations);
 
@@ -162,7 +163,7 @@ public class MesDAOTest extends AbstractDAOTest {
     private void addBatch(String recipeName, int orderNumber, int batchId, int machineSpeed) {
         mesDAO.executeQuery(conn -> {
             PreparedStatement ps = conn.prepareStatement("INSERT INTO batches VALUES (?, ?, ?, now(), null, 0, 0, ?)");
-            ps.setString(1,recipeName);
+            ps.setString(1, recipeName);
             ps.setInt(2, orderNumber);
             ps.setInt(3, batchId);
             ps.setInt(4, machineSpeed);

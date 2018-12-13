@@ -23,10 +23,12 @@ public class ScadaDAO extends DatabaseConnection {
         super(loginInformation);
     }
 
-    public ScadaDAO() { }
+    public ScadaDAO() {
+    }
 
     /**
      * Get measurements logs for a batch.
+     *
      * @param batchId batch id
      * @return list of measurementlog
      */
@@ -52,6 +54,7 @@ public class ScadaDAO extends DatabaseConnection {
 
     /**
      * Get state time logs.
+     *
      * @param batchId batch id
      * @return list of state time logs
      */
@@ -76,6 +79,7 @@ public class ScadaDAO extends DatabaseConnection {
 
     /**
      * Get batch by id.
+     *
      * @param batchId batch id
      * @return a batch
      */
@@ -83,7 +87,7 @@ public class ScadaDAO extends DatabaseConnection {
         AtomicReference<Batch> batch = new AtomicReference<>();
         this.executeQuery(conn -> {
             PreparedStatement ps = conn.prepareStatement("SELECT beer_name, order_number, batch_id, started, " +
-                                                        "finished, accepted, defect, machine_speed FROM batches WHERE batch_id = ?");
+                    "finished, accepted, defect, machine_speed FROM batches WHERE batch_id = ?");
             ps.setInt(1, batchId);
 
             ResultSet rs = ps.executeQuery();
@@ -99,6 +103,7 @@ public class ScadaDAO extends DatabaseConnection {
 
     /**
      * Get items in queue_items.
+     *
      * @return list of {@link ProductionInformation} objects
      */
     public List<ProductionInformation> getQueueItems() {
@@ -122,9 +127,10 @@ public class ScadaDAO extends DatabaseConnection {
 
     /**
      * Get items from the queue, and add the first as a batch, if the machine is ready.
+     *
      * @return
      */
-    public ProductionInformation startNextBatch(){
+    public ProductionInformation startNextBatch() {
         List<ProductionInformation> queueItems = getQueueItems();
         Optional<ProductionInformation> productionInformation = queueItems.stream().findFirst();
         boolean batchRunning = true;
@@ -141,9 +147,10 @@ public class ScadaDAO extends DatabaseConnection {
             return null; // no item, cannot start
         }
     }
-  
+
     /**
      * Add a {@link ProductionInformation} from the queue to the batches table, and remove it from the queue.
+     *
      * @param productionInformation the item to add and remove
      * @return how many rows was changed in the database
      */
@@ -164,6 +171,7 @@ public class ScadaDAO extends DatabaseConnection {
 
     /**
      * Delete an item from the queue.
+     *
      * @param productionInformation item to remove
      * @return how many rows deleted in db
      */
@@ -190,20 +198,21 @@ public class ScadaDAO extends DatabaseConnection {
 
     /**
      * Get a recipe by beer name.
+     *
      * @param name name of beer
      * @return
      */
-    public Recipe getRecipe(String name){
+    public Recipe getRecipe(String name) {
         AtomicReference<Recipe> recipe = new AtomicReference<>();
 
         this.executeQuery(conn -> {
             PreparedStatement ps = conn.prepareStatement("SELECT id, name, min_speed, max_speed " +
-                                                            "FROM recipes WHERE name = ?");
+                    "FROM recipes WHERE name = ?");
             ps.setString(1, name.toLowerCase());
 
             ResultSet rs = ps.executeQuery();
 
-            while(rs.next()){
+            while (rs.next()) {
                 Recipe temp = new Recipe(rs.getInt("id"), rs.getString("name"),
                         rs.getInt("min_speed"), rs.getInt("max_speed"));
 
@@ -216,6 +225,7 @@ public class ScadaDAO extends DatabaseConnection {
 
     /**
      * Get the currently executing batch.
+     *
      * @return the executing batch
      */
     public Batch getCurrentBatch() {
@@ -253,6 +263,7 @@ public class ScadaDAO extends DatabaseConnection {
 
     /**
      * Create a batch from a result set.
+     *
      * @param rs
      * @return
      * @throws SQLException
@@ -275,8 +286,9 @@ public class ScadaDAO extends DatabaseConnection {
 
     /**
      * Adds a new row to the measurement logs, for the current batch.
+     *
      * @param temperature temperature
-     * @param humidity humidity
+     * @param humidity    humidity
      */
     public int updateMeasurementLogs(double temperature, double humidity, double vibration) {
         Batch currentBatch = this.getCurrentBatch();
@@ -299,7 +311,8 @@ public class ScadaDAO extends DatabaseConnection {
 
     /**
      * Update the state time logs, for the current batch.
-     * @param state the state
+     *
+     * @param state       the state
      * @param timeElapsed how much time spent in that state
      * @return how many rows changed in db
      */
@@ -343,6 +356,7 @@ public class ScadaDAO extends DatabaseConnection {
 
     /**
      * Update the produced column for the current batch.
+     *
      * @param accepted how many accepted
      * @return how many rows changed in db
      */
@@ -365,6 +379,7 @@ public class ScadaDAO extends DatabaseConnection {
 
     /**
      * Update the defects column for the current batch.
+     *
      * @param defects how many defects
      * @return how many rows changed in db
      */
@@ -387,8 +402,9 @@ public class ScadaDAO extends DatabaseConnection {
 
     /**
      * Updates the status of an order item
+     *
      * @param finishedBatch which batch
-     * @param status new status
+     * @param status        new status
      * @return how many rows changed in db
      */
     public int updateOrderItemStatus(Batch finishedBatch, OrderItemStatus status) {

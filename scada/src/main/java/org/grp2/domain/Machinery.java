@@ -74,7 +74,7 @@ public class Machinery {
             case COMPLETE:
                 restartingBatch = true;
                 try {
-                    if(calculateMissingBeers() == 0) this.completeBatch();
+                    if (calculateMissingBeers() == 0) this.completeBatch();
                     else handleRejectedBeers(calculateMissingBeers());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -87,8 +87,8 @@ public class Machinery {
     private void collectData() {
         // Collect measurements
         AtomicReference<Double> vibration = new AtomicReference<>(Double.MIN_VALUE);
-        AtomicReference<Double> humidity =  new AtomicReference<>(Double.MIN_VALUE);
-        AtomicReference<Double> temperature =  new AtomicReference<>(Double.MIN_VALUE);
+        AtomicReference<Double> humidity = new AtomicReference<>(Double.MIN_VALUE);
+        AtomicReference<Double> temperature = new AtomicReference<>(Double.MIN_VALUE);
 
         this.getHardware().getSubscriber().subscribe(CubeNodeId.READ_VIBRATION, vibrationFloat -> {
             vibration.set(((Float) vibrationFloat).doubleValue());
@@ -164,16 +164,16 @@ public class Machinery {
     }
 
 
-    private int calculateMissingBeers(){
+    private int calculateMissingBeers() {
         int quantity = (int) getHardware().getProvider().getAmountToProduce();
         int acceptedBeers = getHardware().getProvider().getAcceptedBeersProduced();
-        if(quantity != acceptedBeers){
+        if (quantity != acceptedBeers) {
             return quantity - acceptedBeers;
         }
         return 0;
     }
 
-    private void handleRejectedBeers(int rejects) throws InterruptedException{
+    private void handleRejectedBeers(int rejects) throws InterruptedException {
         updateAccepted(this.hardware.getProvider().getAcceptedBeersProduced());
         updateDefective(this.hardware.getProvider().getDefectiveBeersProduced());
 

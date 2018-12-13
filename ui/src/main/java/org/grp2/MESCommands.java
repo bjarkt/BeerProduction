@@ -1,6 +1,6 @@
 package org.grp2;
 
-public enum MESCommands implements ICommand{
+public enum MESCommands implements ICommand {
 
     VIEW_ORDERS("vorders:view-orders:0:get"),
     VIEW_ORDER_ITEMS("vitems:view-order-items:1:get"),
@@ -28,8 +28,7 @@ public enum MESCommands implements ICommand{
         return Integer.parseInt(name.split(":")[2]);
     }
 
-    public String getUnirestCommand ()
-    {
+    public String getUnirestCommand() {
         return name.split(":")[3];
     }
 }

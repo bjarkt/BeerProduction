@@ -79,5 +79,7 @@ public class Batch {
         this.defect = defect;
     }
 
-    public int getMachineSpeed() { return machineSpeed; }
+    public int getMachineSpeed() {
+        return machineSpeed;
+    }
 }

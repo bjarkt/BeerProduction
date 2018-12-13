@@ -5,9 +5,9 @@ import com.mashape.unirest.http.ObjectMapper;
 import com.mashape.unirest.http.Unirest;
 import io.javalin.Javalin;
 import org.grp2.data.MesDAO;
-import org.grp2.utility.UnirestWrapper;
 import org.grp2.javalin.AbstractAPI;
 import org.grp2.javalin.JavalinSetup;
+import org.grp2.utility.UnirestWrapper;
 
 import java.io.IOException;
 
@@ -44,7 +44,7 @@ public class API extends AbstractAPI {
         });
     }
 
-    private void setUniRestMapper () {
+    private void setUniRestMapper() {
         Unirest.setObjectMapper(new ObjectMapper() {
             private com.fasterxml.jackson.databind.ObjectMapper jacksonObjectMapper
                     = new com.fasterxml.jackson.databind.ObjectMapper();

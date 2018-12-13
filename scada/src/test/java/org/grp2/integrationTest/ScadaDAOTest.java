@@ -72,7 +72,7 @@ public class ScadaDAOTest extends AbstractDAOTest {
         }
 
 
-        for (StateTimeLog log :  scadaDAO.getStateTimeLogs(1)) {
+        for (StateTimeLog log : scadaDAO.getStateTimeLogs(1)) {
             assertEquals(20, log.getTimeElapsed());
             assertTrue(Arrays.asList(State.values()).contains(log.getPhase()));
         }
@@ -173,7 +173,7 @@ public class ScadaDAOTest extends AbstractDAOTest {
     private void addBatch(String recipeName, int orderNumber, int batchId, int machineSpeed) {
         scadaDAO.executeQuery(conn -> {
             PreparedStatement ps = conn.prepareStatement("INSERT INTO batches VALUES (?, ?, ?, now(), null, 0, 0, ?)");
-            ps.setString(1,recipeName);
+            ps.setString(1, recipeName);
             ps.setInt(2, orderNumber);
             ps.setInt(3, batchId);
             ps.setInt(4, machineSpeed);
@@ -193,7 +193,6 @@ public class ScadaDAOTest extends AbstractDAOTest {
             ps.executeUpdate();
         });
     }
-
 
 
     private int getOrderNumber(String status) {

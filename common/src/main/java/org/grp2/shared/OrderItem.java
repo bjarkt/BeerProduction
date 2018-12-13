@@ -7,7 +7,7 @@ public class OrderItem {
     private int quantity;
     private String status;
 
-    public OrderItem(int orderNumber, String beerName, int quantity, String status){
+    public OrderItem(int orderNumber, String beerName, int quantity, String status) {
         this.orderNumber = orderNumber;
         this.beerName = beerName;
         this.quantity = quantity;

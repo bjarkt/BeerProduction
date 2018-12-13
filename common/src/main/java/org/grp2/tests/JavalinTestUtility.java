@@ -50,11 +50,12 @@ public class JavalinTestUtility {
     }
 
     public static Map<String, Object> getResponse(Context context) {
-        return getResponse(context, new TypeReference<Map<String, Object>>(){});
+        return getResponse(context, new TypeReference<Map<String, Object>>() {
+        });
     }
 
     public static <T> T getResponse(Context context, Class<T> type) {
-        return getResponse(context, new TypeReference<T>(){
+        return getResponse(context, new TypeReference<T>() {
             @Override
             public Type getType() {
                 return type;
@@ -73,9 +74,9 @@ public class JavalinTestUtility {
 
         Map<String, String> map = new HashMap<>();
 
-        for (int i = 0; i < keyValuePairs.length-1; i = i+2) {
+        for (int i = 0; i < keyValuePairs.length - 1; i = i + 2) {
             String key = keyValuePairs[i];
-            String value = keyValuePairs[i+1];
+            String value = keyValuePairs[i + 1];
             map.put(key, value);
         }
 

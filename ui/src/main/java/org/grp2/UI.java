@@ -19,8 +19,7 @@ public class UI {
         setUniRestMapper();
     }
 
-    public void readInputs()
-    {
+    public void readInputs() {
 
         do {
             System.out.print("What do you want to do?: ");
@@ -30,15 +29,13 @@ public class UI {
         } while (true);
     }
 
-    private void performCommand(Command command)
-    {
+    private void performCommand(Command command) {
         Message message = new Message(200, "Success");
         boolean validCommand = true;
         boolean validArguments = true;
         StringBuilder sb = new StringBuilder();
 
-        switch (command.getSubSystem())
-        {
+        switch (command.getSubSystem()) {
             case SCADA:
                 sb.append("http://localhost:7000/api/");
                 break;
@@ -52,32 +49,27 @@ public class UI {
                 validCommand = false;
         }
 
-        if (validCommand)
-        {
+        if (validCommand) {
             sb.append(command.getCommandURL());
 
-            if (command.getNumArgs() == command.getArgs().length)
-            {
-                if (command.getNumArgs() > 0 && !command.getCommandURL().equals("create-batches"))
-                {
+            if (command.getNumArgs() == command.getArgs().length) {
+                if (command.getNumArgs() > 0 && !command.getCommandURL().equals("create-batches")) {
                     for (int i = 0; i < command.getNumArgs(); i++) {
                         sb.append("/");
                         sb.append(command.getArgs()[i]);
                     }
                 }
-            } else
-            {
+            } else {
                 System.err.println("Invalid amount of arguments! [" + command.getArgs().length + "]");
                 validArguments = false;
             }
 
-            if (validArguments)
-            {
+            if (validArguments) {
                 System.out.println(command.getKeyword() + ": " + Arrays.toString(command.getArgs()));
 
                 try {
                     if (command.getCommandURL().equals("create-batches")) {
-                        HttpResponse<Message> postMessage = Unirest.post(sb.toString()).header("accept","application/json").body(command.getArgs()[0]).asObject(Message.class);
+                        HttpResponse<Message> postMessage = Unirest.post(sb.toString()).header("accept", "application/json").body(command.getArgs()[0]).asObject(Message.class);
                     } else if (command.getUnirestCommand().equals("post")) {
                         HttpResponse<Message> postMessage = Unirest.post(sb.toString()).asObject(Message.class);
                     } else if (command.getUnirestCommand().equals("get")) {
@@ -95,7 +87,7 @@ public class UI {
         }
     }
 
-    private void setUniRestMapper () {
+    private void setUniRestMapper() {
         Unirest.setObjectMapper(new ObjectMapper() {
             private com.fasterxml.jackson.databind.ObjectMapper jacksonObjectMapper
                     = new com.fasterxml.jackson.databind.ObjectMapper();

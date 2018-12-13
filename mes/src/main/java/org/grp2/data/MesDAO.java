@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -30,10 +29,12 @@ public class MesDAO extends DatabaseConnection {
         super(loginInformation);
     }
 
-    public MesDAO() { }
+    public MesDAO() {
+    }
 
     /**
      * Get a list of {@link Order} ready for production.
+     *
      * @return list of orders.
      */
     public List<Order> getLockedOrders() {
@@ -62,8 +63,9 @@ public class MesDAO extends DatabaseConnection {
 
     /**
      * Get map of {@link OrderItem} and its {@link Recipe} for an order.
+     *
      * @param orderNumber
-     * @return  map of OrderItem and Recipe.
+     * @return map of OrderItem and Recipe.
      */
     public Map<OrderItem, Recipe> getOrderItems(int orderNumber) {
 
@@ -103,6 +105,7 @@ public class MesDAO extends DatabaseConnection {
 
     /**
      * Get list of all {@link Batch}.
+     *
      * @return list of batches.
      */
     public List<Batch> viewAllBatches() {
@@ -125,7 +128,6 @@ public class MesDAO extends DatabaseConnection {
 
 
     /**
-     *
      * @return
      */
     public PlantStatistics viewPlantStatistics(LocalDateTime from, LocalDateTime to) {
@@ -134,7 +136,7 @@ public class MesDAO extends DatabaseConnection {
 
         PlantStatistics plantStatistics = new PlantStatistics(ms, bs);
 
-        return  plantStatistics;
+        return plantStatistics;
     }
 
 
@@ -150,7 +152,7 @@ public class MesDAO extends DatabaseConnection {
 
             ResultSet rs = ps.executeQuery();
 
-            while(rs.next()) {
+            while (rs.next()) {
                 Batch temp = batchFromResultSet(rs);
                 batches.add(temp);
             }
@@ -161,9 +163,9 @@ public class MesDAO extends DatabaseConnection {
         return batchStatistics;
     }
 
-    private MeasurementsStatistics getMeasurementStatistics(List<Batch> batches){
+    private MeasurementsStatistics getMeasurementStatistics(List<Batch> batches) {
         List<MeasurementLog> measurements = new ArrayList<>();
-        for(Batch batch : batches) {
+        for (Batch batch : batches) {
             measurements.addAll(getMeasurementLogs(batch.getBatchId()));
         }
 
@@ -175,6 +177,7 @@ public class MesDAO extends DatabaseConnection {
 
     /**
      * Add {@link ProductionInformation} list to queue_items.
+     *
      * @param productionInformations list of production information
      * @return output of ps.executeBatch, an array of same size as argument with 1's for each successful insert
      */
@@ -200,11 +203,12 @@ public class MesDAO extends DatabaseConnection {
 
     /**
      * Update status on {@link OrderItem} for every OrderItem connected to the orderNumber.
-     * @param status    which status to set
-     * @param orderNumber   orderNumber
+     *
+     * @param status      which status to set
+     * @param orderNumber orderNumber
      * @return returns amount of rows changed
      */
-    public int setOrderItemStatus(OrderItemStatus status, int orderNumber){
+    public int setOrderItemStatus(OrderItemStatus status, int orderNumber) {
         String sql = "UPDATE Order_items SET status = ? WHERE order_number = ?";
         AtomicInteger success = new AtomicInteger();
         this.executeQuery(conn -> {
@@ -218,6 +222,7 @@ public class MesDAO extends DatabaseConnection {
 
     /**
      * Get measurements logs for a batch.
+     *
      * @param batchId batch id
      * @return list of measurementlog
      */
@@ -243,6 +248,7 @@ public class MesDAO extends DatabaseConnection {
 
     /**
      * Get batch by id.
+     *
      * @param batchId batch id
      * @return a batch
      */
@@ -264,9 +270,9 @@ public class MesDAO extends DatabaseConnection {
         return batch.get();
     }
 
-    public Beer getBeerData(String beerName){
+    public Beer getBeerData(String beerName) {
         Recipe recipe = new Recipe(-1, beerName, -1, -1);
-        String beerNameFormatted = beerName.replaceAll("\\s","");
+        String beerNameFormatted = beerName.replaceAll("\\s", "");
         int profit = Finance.valueOf(beerNameFormatted.toUpperCase()).getProfit();
         int cost = Finance.valueOf(beerNameFormatted.toUpperCase()).getCost();
 
@@ -275,19 +281,20 @@ public class MesDAO extends DatabaseConnection {
             PreparedStatement ps = conn.prepareStatement(getRecipeQuery);
             ps.setString(1, Finance.valueOf(beerNameFormatted.toUpperCase()).getName());
             ResultSet rs = ps.executeQuery();
-            while(rs.next()) {
+            while (rs.next()) {
                 recipe.setId(rs.getBigDecimal("ID").intValue());
                 recipe.setMaxSpeed(rs.getInt("max_speed"));
                 recipe.setMinSpeed(rs.getInt("min_speed"));
             }
         });
 
-        return new Beer(recipe, profit,cost);
+        return new Beer(recipe, profit, cost);
 
     }
 
     /**
      * Create a batch from a result set.
+     *
      * @param rs
      * @return
      * @throws SQLException
@@ -318,6 +325,7 @@ public class MesDAO extends DatabaseConnection {
 
     /**
      * Method to get the stop time needed to calculate availability.
+     *
      * @param batchID
      * @return
      */
@@ -338,7 +346,6 @@ public class MesDAO extends DatabaseConnection {
         });
         return stopTime.get();
     }
-
 
 
 }

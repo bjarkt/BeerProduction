@@ -9,7 +9,8 @@ import java.util.Collection;
 import java.util.Locale;
 
 public class MockHttpServletResponse implements HttpServletResponse {
-    public MockHttpServletResponse() { }
+    public MockHttpServletResponse() {
+    }
 
     @Override
     public void addCookie(Cookie cookie) {

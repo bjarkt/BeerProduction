@@ -1,13 +1,17 @@
 package org.grp2.api;
 
 import io.javalin.Context;
-import org.grp2.domain.*;
-import org.grp2.javalin.Message;
+import org.grp2.domain.BatchViewData;
+import org.grp2.domain.BatchViewOrder;
+import org.grp2.domain.Machinery;
 import org.grp2.enums.State;
+import org.grp2.javalin.Message;
 import org.grp2.shared.Batch;
 import org.grp2.shared.Measurements;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class APIHandler {
     private Machinery machinery;
@@ -102,8 +106,7 @@ public class APIHandler {
         if (batchId == null && currentBatch != null)
             batchId = currentBatch.getBatchId();
 
-        if (batchId != null)
-        {
+        if (batchId != null) {
             map.put("MeasurementLogs", machinery.getScadaDAO().getMeasurementLogs(batchId));
             map.put("StateTimeLogs", machinery.getScadaDAO().getStateTimeLogs(batchId));
             context.json(map);

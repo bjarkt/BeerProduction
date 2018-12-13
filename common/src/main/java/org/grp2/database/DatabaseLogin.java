@@ -7,7 +7,6 @@ public enum DatabaseLogin {
 
     /**
      * Remember to start a docker instance when using this! `docker-compose up testdb`
-     *
      */
     TEST("jdbc:postgresql://localhost:5431/testdb", "postgres", "password");
 

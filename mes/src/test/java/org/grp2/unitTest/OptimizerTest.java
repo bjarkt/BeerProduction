@@ -1,14 +1,14 @@
 package org.grp2.unitTest;
 
-import org.grp2.enums.Finance;
 import org.grp2.domain.optimizer.IOptimizer;
 import org.grp2.domain.optimizer.Optimizer;
+import org.grp2.enums.Finance;
 import org.grp2.shared.Beer;
 import org.grp2.shared.Recipe;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 public class OptimizerTest {
 

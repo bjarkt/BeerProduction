@@ -47,7 +47,7 @@ public class Command {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "Name: " + this.keyword + "\nArguments: " + Arrays.toString(this.args) + "\nSystem: " + this.subSystem
                 + "\nURL: " + this.commandURL + "\nNumber of arguments: " + this.numArgs;
     }

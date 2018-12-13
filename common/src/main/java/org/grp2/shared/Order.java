@@ -9,11 +9,11 @@ public class Order {
     private LocalDateTime date;
     private int orderNumber;
 
-    public Order(int orderNumber){
+    public Order(int orderNumber) {
         this.orderNumber = orderNumber;
     }
 
-    public Order(int orderNumber, Timestamp date, String status){
+    public Order(int orderNumber, Timestamp date, String status) {
         this.orderNumber = orderNumber;
         this.date = date.toLocalDateTime();
         this.status = status;

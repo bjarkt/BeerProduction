@@ -15,7 +15,8 @@ public class OEE {
         this.oee = calculateOEE();
     }
 
-    public OEE() { }
+    public OEE() {
+    }
 
     public double getAvailability() {
         return availability;
@@ -33,18 +34,19 @@ public class OEE {
         return oee;
     }
 
-    public double calculateOEE(){
+    public double calculateOEE() {
         return availability * performance * quality;
     }
 
     /**
      * This method calculates the availability from the data that is in the database. The method is needed to
      * calculate the OEE.
+     *
      * @param batch
      * @return
      */
     private double getOEEAvailability(Batch batch, double stopTime) {
-        double plannedProductionTime = (60.0/((double) batch.getMachineSpeed())) * (((double) batch.getAccepted()) + ((double)batch.getDefect()));
+        double plannedProductionTime = (60.0 / ((double) batch.getMachineSpeed())) * (((double) batch.getAccepted()) + ((double) batch.getDefect()));
         double runtime = plannedProductionTime - stopTime;
 
         double availability = runtime / plannedProductionTime;
@@ -54,6 +56,7 @@ public class OEE {
 
     /**
      * Performance cannot be calculated in our system so it will always be 1.
+     *
      * @param batch
      * @return
      */
@@ -63,6 +66,7 @@ public class OEE {
 
     /**
      * The method calculates the quality by getting the amount of accepted and defect beers and dividing the total
+     *
      * @param batch
      * @return
      */

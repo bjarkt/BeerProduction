@@ -30,7 +30,9 @@ public class Plant {
         return mesDAO;
     }
 
-    public IOptimizer getOptimizer() { return optimizer; }
+    public IOptimizer getOptimizer() {
+        return optimizer;
+    }
 
     public UnirestWrapper getUnirestWrapper() {
         return unirestWrapper;

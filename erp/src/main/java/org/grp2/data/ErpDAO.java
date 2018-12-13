@@ -16,6 +16,7 @@ public class ErpDAO extends DatabaseConnection {
 
     /**
      * Specify which database to use
+     *
      * @param loginInformation
      */
     public ErpDAO(DatabaseLogin loginInformation) {
@@ -25,7 +26,8 @@ public class ErpDAO extends DatabaseConnection {
     /**
      * Uses live database by default
      */
-    public ErpDAO() { }
+    public ErpDAO() {
+    }
 
     /**
      * Creates a new order and returns the newly created order_number.
@@ -49,7 +51,7 @@ public class ErpDAO extends DatabaseConnection {
         return orderID.get().intValue();
     }
 
-    public List<Order> getOrders(String status){
+    public List<Order> getOrders(String status) {
         List<Order> orders = new ArrayList<>();
 
         this.executeQuery(conn -> {
@@ -209,7 +211,6 @@ public class ErpDAO extends DatabaseConnection {
 
 
     /**
-     *
      * @param orderNumber
      * @return
      */
@@ -245,7 +246,6 @@ public class ErpDAO extends DatabaseConnection {
     }
 
     /**
-     *
      * @param orderNumber
      * @return
      */
@@ -279,7 +279,6 @@ public class ErpDAO extends DatabaseConnection {
 
 
     /**
-     *
      * @param orderNumber
      * @param beerName
      * @return
@@ -310,14 +309,13 @@ public class ErpDAO extends DatabaseConnection {
 
 
     /**
-     *
      * @param orderNumber
      * @param beerName
      * @param quantity
      * @param newBeerName
      * @return
      */
-    public boolean editOrderItem(int orderNumber, String beerName, Integer quantity, String newBeerName){
+    public boolean editOrderItem(int orderNumber, String beerName, Integer quantity, String newBeerName) {
         boolean isOrderProcessed = isOrderProcessed(orderNumber);
 
         if (!isOrderProcessed && !isDuplicateOrderItem(orderNumber, beerName)) {
@@ -327,7 +325,7 @@ public class ErpDAO extends DatabaseConnection {
                     PreparedStatement ps = conn.prepareStatement(updateOrderItemQuery);
                     ps.setInt(1, quantity.intValue());
                     ps.setString(2, newBeerName);
-                    ps.setInt(3,orderNumber);
+                    ps.setInt(3, orderNumber);
                     ps.setString(4, beerName);
                     ps.execute();
 
@@ -344,13 +342,12 @@ public class ErpDAO extends DatabaseConnection {
     }
 
     /**
-     *
      * @param orderNumber
      * @param beerName
      * @param newBeerName
      * @return
      */
-    public boolean editOrderItem(int orderNumber, String beerName, String newBeerName){
+    public boolean editOrderItem(int orderNumber, String beerName, String newBeerName) {
         boolean isOrderProcessed = isOrderProcessed(orderNumber);
 
         if (!isOrderProcessed && !isDuplicateOrderItem(orderNumber, beerName)) {
@@ -361,7 +358,7 @@ public class ErpDAO extends DatabaseConnection {
                     ps.setInt(1, orderNumber);
                     ps.setString(2, beerName);
                     ps.setString(3, newBeerName);
-                    ps.setInt(4,orderNumber);
+                    ps.setInt(4, orderNumber);
                     ps.setString(5, beerName);
                     ps.execute();
 
@@ -377,7 +374,7 @@ public class ErpDAO extends DatabaseConnection {
         return false;
     }
 
-    public void lockOrder(int orderNumber){
+    public void lockOrder(int orderNumber) {
         this.executeQuery(conn -> {
             try {
                 String lockOrderQuery = "UPDATE Orders SET status = 'locked' WHERE order_number = ?";
@@ -392,13 +389,12 @@ public class ErpDAO extends DatabaseConnection {
     }
 
     /**
-     *
      * @param orderNumber
      * @param beerName
      * @param quantity
      * @return
      */
-    public boolean editOrderItem(int orderNumber, String beerName, int quantity){
+    public boolean editOrderItem(int orderNumber, String beerName, int quantity) {
         boolean isOrderProcessed = isOrderProcessed(orderNumber);
 
         if (!isOrderProcessed && isDuplicateOrderItem(orderNumber, beerName)) {
@@ -409,7 +405,7 @@ public class ErpDAO extends DatabaseConnection {
                     ps.setInt(1, quantity);
                     ps.setInt(2, orderNumber);
                     ps.setString(3, beerName);
-                    ps.setInt(4,orderNumber);
+                    ps.setInt(4, orderNumber);
                     ps.setString(5, beerName);
                     ps.execute();
 
@@ -422,6 +418,7 @@ public class ErpDAO extends DatabaseConnection {
             return true;
         }
 
-        return false;    }
+        return false;
+    }
 
 }
