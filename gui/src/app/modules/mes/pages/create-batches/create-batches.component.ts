@@ -3,9 +3,13 @@ import { Order } from "src/app/shared/models/order";
 import { DataService } from "src/app/shared/services/data.service";
 import { ProductionInfo } from "src/app/shared/models/ProductionInfo";
 import { OrderItem } from "src/app/shared/models/orderItem";
+import { Message } from "src/app/shared/models/message";
 import { Observable } from "rxjs";
 import { Recipe } from "src/app/shared/models/recipe";
 import { MesDataService } from "src/app/shared/services/mesData.service";
+import { MatSnackBar } from "@angular/material";
+import { Router } from '@angular/router';
+
 @Component({
   selector: "app-create-batches",
   templateUrl: "./create-batches.component.html",
@@ -28,10 +32,13 @@ export class CreateBatchesComponent implements OnInit {
   recipes: Recipe[] = [];
   machspeeds: Map<string, string[]> = new Map();
 
-  constructor(private data: MesDataService) {}
+  disableCreateOrderBtn: boolean;
+
+  constructor(private data: MesDataService, private snackBar: MatSnackBar, private router: Router) {}
 
   ngOnInit() {
     this.addOrders();
+    this.disableCreateOrderBtn = false;
   }
 
   /**
@@ -85,12 +92,18 @@ export class CreateBatchesComponent implements OnInit {
   }
 
   public createBatch() {
-    this.data.createBatches(this.batches).toPromise();
+    this.disableCreateOrderBtn = true;
+    this.data.createBatches(this.batches).subscribe(res => {
+      const message = res as Message;
+      this.disableCreateOrderBtn = false;
+      this.snackBar.open(message.message, 'Dismiss', { duration: 4000 });
+      this.router.navigate(['/mes/overview']);
+    })
   }
 
   async setMachSpeed(i, priority : string, quantity?: number){
     var machSpeed = -1;
-    var beerName = this.batches[i].recipeName.replace(/ /g, ''); 
+    var beerName = this.batches[i].recipeName
 
     if(priority == 'saving'){
       const res = await this.data.getSavingMachSpeed(beerName).toPromise();

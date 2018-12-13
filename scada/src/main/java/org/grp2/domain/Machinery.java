@@ -2,19 +2,23 @@ package org.grp2.domain;
 
 import org.grp2.data.ScadaDAO;
 import org.grp2.enums.OrderItemStatus;
+import org.grp2.enums.OrderStatus;
 import org.grp2.enums.State;
 import org.grp2.hardware.CubeNodeId;
 import org.grp2.hardware.IHardware;
 import org.grp2.javalin.Message;
 import org.grp2.shared.Batch;
+import org.grp2.shared.OrderItem;
 import org.grp2.shared.ProductionInformation;
 import org.grp2.shared.Recipe;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 public class Machinery {
     private ScadaDAO scadaDAO;
@@ -147,6 +151,12 @@ public class Machinery {
         if (finishedBatch != null) {
             scadaDAO.updateOrderItemStatus(finishedBatch, OrderItemStatus.PROCESSED);
             scadaDAO.deleteQueueItem(finishedBatch);
+
+            List<OrderItem> orderItems = scadaDAO.getOrderItems(finishedBatch.getOrderNumber());
+            List<Boolean> doneStatusses = orderItems.stream().map(orderItem -> orderItem.getStatus().equals(OrderItemStatus.PROCESSED.getStatus())).collect(Collectors.toList());
+            if (!doneStatusses.contains(false)) {
+                scadaDAO.updateOrderStatus(finishedBatch.getOrderNumber(), OrderStatus.DONE);
+            }
         }
 
         TimeUnit.SECONDS.sleep(2);

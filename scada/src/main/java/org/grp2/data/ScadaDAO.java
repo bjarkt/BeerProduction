@@ -3,6 +3,7 @@ package org.grp2.data;
 import org.grp2.database.DatabaseConnection;
 import org.grp2.database.DatabaseLogin;
 import org.grp2.enums.OrderItemStatus;
+import org.grp2.enums.OrderStatus;
 import org.grp2.enums.State;
 import org.grp2.shared.*;
 
@@ -394,9 +395,10 @@ public class ScadaDAO extends DatabaseConnection {
         AtomicInteger result = new AtomicInteger();
         if (finishedBatch != null) {
             this.executeQuery(conn -> {
-                PreparedStatement ps = conn.prepareStatement("UPDATE order_items SET status = ? WHERE order_number = ?");
+                PreparedStatement ps = conn.prepareStatement("UPDATE order_items SET status = ? WHERE order_number = ? AND beer_name = ?");
                 ps.setString(1, status.getStatus());
                 ps.setInt(2, finishedBatch.getOrderNumber());
+                ps.setString(3, finishedBatch.getBeerName());
 
                 result.set(ps.executeUpdate());
             });
@@ -405,4 +407,36 @@ public class ScadaDAO extends DatabaseConnection {
         return result.get();
     }
 
+    public List<OrderItem> getOrderItems(int orderNumber) {
+        List<OrderItem> orderItems = new ArrayList<>();
+        this.executeQuery(conn -> {
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM order_items WHERE order_number = ?");
+            ps.setInt(1, orderNumber);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                orderItems.add(new OrderItem(
+                        rs.getInt("order_number"),
+                        rs.getString("beer_name"),
+                        rs.getInt("quantity"),
+                        rs.getString("status")
+                ));
+            }
+        });
+
+        return orderItems;
+    }
+
+    public int updateOrderStatus(int orderNumber, OrderStatus done) {
+        AtomicInteger result = new AtomicInteger();
+        this.executeQuery(conn -> {
+            PreparedStatement ps = conn.prepareStatement("UPDATE orders SET status = ? WHERE order_number = ?");
+            ps.setString(1, done.getStatus());
+            ps.setInt(2, orderNumber);
+
+            result.set(ps.executeUpdate());
+        });
+
+        return result.get();
+    }
 }

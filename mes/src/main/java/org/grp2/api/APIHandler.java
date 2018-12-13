@@ -78,9 +78,10 @@ public class APIHandler {
             plant.getMesDAO().addToQueueItems(orderList);
 
             try {
-                String url = DockerUtility.dockerValueOrDefault("http://scada:7000/api/start-new-production", "http://localhost:7000/api/start-new-production");
+                String url = "http://localhost:7000/api/start-new-production";
                 Message postMessage = plant.getUnirestWrapper().post(url, Message.class);
                 if (postMessage != null) {
+                    System.out.println("Message from SCADA: " + postMessage.getMessage());
                     message.set(postMessage.getStatus(), postMessage.getMessage());
                 } else {
                     message.set(422, "Error from SCADA : scada service probably not running");

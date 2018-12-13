@@ -11,13 +11,22 @@ public class BatchStatistics {
     private double avgDefects;
     private double avgProductionSeconds;
 
+    private double sumAccepted;
+    private double sumDefects;
+    private double sumProductionSeconds;
+
     @JsonIgnore
     private List<Batch> batchList;
 
-    public BatchStatistics(double avgAccepted, double avgDefects, double avgProductionSeconds, List<Batch> batchList) {
+    public BatchStatistics(double avgAccepted, double avgDefects, double avgProductionSeconds, double sumAccepted,
+                           double sumDefects, double sumProductionSeconds, List<Batch> batchList) {
         this.avgAccepted = avgAccepted;
         this.avgDefects = avgDefects;
         this.avgProductionSeconds = avgProductionSeconds;
+        this.sumAccepted = sumAccepted;
+        this.sumDefects = sumDefects;
+        this.sumProductionSeconds = sumProductionSeconds;
+
         this.batchList = batchList;
     }
 
@@ -60,6 +69,18 @@ public class BatchStatistics {
         this.batchList = batchList;
     }
 
+    public double getSumAccepted() {
+        return sumAccepted;
+    }
+
+    public double getSumDefects() {
+        return sumDefects;
+    }
+
+    public double getSumProductionSeconds() {
+        return sumProductionSeconds;
+    }
+
     private void calculateStatistics(List<Batch> batches) {
         double accepted = 0;
         double defects = 0;
@@ -69,6 +90,11 @@ public class BatchStatistics {
             defects += batch.getDefect();
             seconds += ChronoUnit.SECONDS.between(batch.getStarted(), batch.getFinished());
         }
+
+        this.sumAccepted = accepted;
+        this.sumDefects = defects;
+        this.sumProductionSeconds = seconds;
+
         this.avgAccepted = accepted / batches.size();
         this.avgDefects = defects / batches.size();
         this.avgProductionSeconds = seconds / batches.size();

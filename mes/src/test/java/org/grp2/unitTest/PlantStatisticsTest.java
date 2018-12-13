@@ -36,6 +36,10 @@ public class PlantStatisticsTest {
         assertEquals(expected.getAvgDefects(), batchStatistics.getAvgDefects(), 0);
         assertEquals(expected.getAvgProductionSeconds(), batchStatistics.getAvgProductionSeconds(), 0);
 
+        assertEquals(expected.getSumAccepted(), batchStatistics.getSumAccepted(), 0);
+        assertEquals(expected.getSumDefects(), batchStatistics.getSumDefects(), 0);
+        assertEquals(expected.getSumProductionSeconds(), batchStatistics.getSumProductionSeconds(), 0);
+
     }
 
     private Object[] setupMeasurementsData() {
@@ -61,7 +65,7 @@ public class PlantStatisticsTest {
                 new Batch("testName", -1, -1, LocalDateTime.now(), LocalDateTime.now().plusSeconds(25), 250, 58, -1),
                 new Batch("testName", -1, -1, LocalDateTime.now(), LocalDateTime.now().plusSeconds(59), 600, 98, -1));
 
-        BatchStatistics expected = new BatchStatistics(373.0, 77.5, 41.5, null);
+        BatchStatistics expected = new BatchStatistics(373.0, 77.5, 41.5, 1492, 310, 166, null);
 
         return new Object[]{batches, expected};
     }

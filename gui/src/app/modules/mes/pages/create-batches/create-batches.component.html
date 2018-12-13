@@ -5,7 +5,7 @@
         <i class="material-icons">keyboard_backspace</i> Cancel
       </button>
       <span>Start Production</span>
-      <button (click)="createBatch()" color="primary" mat-raised-button>
+      <button (click)="createBatch()" [disabled]="disableCreateOrderBtn" color="primary" mat-raised-button>
         <i class="material-icons md-18">done</i> Start Batches
       </button>
     </mat-toolbar-row>
