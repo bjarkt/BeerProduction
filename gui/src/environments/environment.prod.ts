@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  erpUrl: 'http://13.80.182.230:7002/api/',
-  mesUrl: 'http://13.80.182.230:7001/api/',
-  scadaUrl: 'http://13.80.182.230:7000/api/'
+  erpUrl: 'http://52.236.178.73:7002/api/',
+  mesUrl: 'http://52.236.178.73:7001/api/',
+  scadaUrl: 'http://52.236.178.73:7000/api/'
 };
